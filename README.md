@@ -27,7 +27,7 @@ recordatorios automáticos de vacunación.
 | [`sitio-web/`](sitio-web/) | 5 páginas estáticas, hoja de estilos e íconos SVG. Sin JavaScript ni frameworks. |
 | [`basedatos/`](basedatos/) | `01_esquema.sql`, `02_datos_prueba.sql`, `03_transaccion_compra.sql`, `04_consultas_ejemplo.sql` |
 | [`backend/`](backend/) | `CarritoCompra`, `ItemCarrito` y `DemoCarrito` en `pe.vetpetsurco.carrito` |
-| [`docs/`](docs/) | [Entrega 1](docs/entrega-1-modelo-de-negocio.md), [Entrega 2](docs/entrega-2-arquitectura-software.md), [modelo de datos](docs/modelo-de-datos.md), capturas y los `.docx` originales |
+| [`docs/`](docs/) | [Entrega 1](docs/entrega-1-modelo-de-negocio.md), [Entrega 2](docs/entrega-2-arquitectura-software.md), [modelo de datos](docs/modelo-de-datos.md), la [presentación](docs/presentacion/) de la Entrega 2, capturas y los `.docx` originales |
 
 ---
 
@@ -36,7 +36,7 @@ recordatorios automáticos de vacunación.
 | Entrega | Semana | Contenido | Documento |
 | --- | --- | --- | --- |
 | 1 | 3 | Modelo de negocio y plan estratégico (Capítulos I y II) | [Markdown](docs/entrega-1-modelo-de-negocio.md) · [Word](docs/originales/Entrega1_VetPetConnect.docx) |
-| 2 | 5 | Arquitectura de software y core transaccional (Capítulos III y IV) | [Markdown](docs/entrega-2-arquitectura-software.md) · [Word](docs/originales/Entrega2_VetPetConnect.docx) |
+| 2 | 5 | Arquitectura de software y core transaccional (Capítulos III y IV) | [Markdown](docs/entrega-2-arquitectura-software.md) · [Word](docs/originales/Entrega2_VetPetConnect.docx) · [Presentación](docs/presentacion/Entrega2_VetPetConnect_Presentacion.pptx) |
 
 ---
 
