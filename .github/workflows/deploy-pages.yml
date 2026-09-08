@@ -34,10 +34,33 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Configurar GitHub Pages
+        id: configuracion
         uses: actions/configure-pages@v5
         with:
-          # Intenta habilitar Pages automaticamente si aun no lo esta.
+          # Intenta habilitar Pages automaticamente. Solo funciona si el
+          # token del flujo tiene permiso de administracion sobre el
+          # repositorio; si no, hay que activarlo una vez a mano.
           enablement: true
+
+      - name: Como activar Pages si el paso anterior fallo
+        if: failure() && steps.configuracion.outcome == 'failure'
+        run: |
+          {
+            echo "## Falta activar GitHub Pages"
+            echo ""
+            echo "El token de Actions no tiene permiso para crear el sitio."
+            echo "Se activa una sola vez y de forma manual:"
+            echo ""
+            echo "1. Abre **Settings -> Pages** en este repositorio."
+            echo "2. En **Source**, elige **GitHub Actions**."
+            echo "3. Vuelve a **Actions** y re-ejecuta el flujo *Desplegar sitio web*."
+            echo ""
+            echo "A partir de ahi cada push a \`sitio-web/\` se publica solo."
+            echo ""
+            echo "Alternativa sin configuracion: arrastra la carpeta \`sitio-web/\`"
+            echo "a https://app.netlify.com/drop"
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "Pages aun no esta activado. Revisa el resumen del flujo."
 
       - name: Empaquetar el sitio estatico
         uses: actions/upload-pages-artifact@v3
