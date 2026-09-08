@@ -1,0 +1,17 @@
+# Compilados de Java
+backend/out/
+*.class
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
+*.swp
+
+# Temporales de Office
+~$*.docx
+~$*.xlsx
+~$*.pptx

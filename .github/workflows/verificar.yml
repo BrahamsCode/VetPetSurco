@@ -1,0 +1,56 @@
+# Verificacion basica del proyecto en cada push y pull request.
+name: Verificar proyecto
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  carrito-java:
+    name: Carrito de compras (Java)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Compilar y ejecutar la demostracion
+        working-directory: backend
+        run: |
+          javac -d out src/pe/vetpetsurco/carrito/*.java
+          java -cp out pe.vetpetsurco.carrito.DemoCarrito
+
+  sitio-web:
+    name: Sitio web estatico
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Revisar enlaces internos y archivos referenciados
+        run: |
+          cd sitio-web
+          estado=0
+          for pagina in *.html; do
+            # Enlaces a otras paginas del sitio
+            for destino in $(grep -o 'href="[a-z0-9_.-]*\.html"' "$pagina" | cut -d'"' -f2 | sort -u); do
+              if [ ! -f "$destino" ]; then
+                echo "FALTA: $pagina enlaza a $destino"; estado=1
+              fi
+            done
+            # Hojas de estilo e imagenes
+            for recurso in $(grep -o -E '(src|href)="(css|img)/[^"]+"' "$pagina" | cut -d'"' -f2 | sort -u); do
+              if [ ! -f "$recurso" ]; then
+                echo "FALTA: $pagina referencia $recurso"; estado=1
+              fi
+            done
+          done
+          if [ "$estado" -eq 0 ]; then echo "Todos los enlaces y recursos existen."; fi
+          exit $estado

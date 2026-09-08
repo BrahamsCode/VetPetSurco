@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 420" width="520" height="420" role="img" aria-label="Ilustración de un perro y un gato">
+  <!-- fondo -->
+  <circle cx="260" cy="215" r="185" fill="#ffffff"/>
+  <circle cx="260" cy="215" r="185" fill="none" stroke="#d9e5df" stroke-width="2"/>
+  <path d="M75 300 A185 185 0 0 0 445 300 Z" fill="#dceae3"/>
+
+  <!-- PERRO -->
+  <g>
+    <!-- cuerpo -->
+    <ellipse cx="195" cy="290" rx="80" ry="62" fill="#c8873f"/>
+    <!-- cola -->
+    <path d="M270 285 q45 -12 40 -55 q-3 -22 -20 -22 q16 12 8 34 q-8 24 -32 30 z" fill="#b57733"/>
+    <!-- cabeza -->
+    <circle cx="180" cy="192" r="62" fill="#d99a4e"/>
+    <!-- orejas -->
+    <path d="M132 152 q-26 -34 -8 -52 q22 -12 40 20 z" fill="#b57733"/>
+    <path d="M228 152 q26 -34 8 -52 q-22 -12 -40 20 z" fill="#b57733"/>
+    <!-- hocico -->
+    <ellipse cx="180" cy="216" rx="34" ry="26" fill="#f0dcc0"/>
+    <ellipse cx="180" cy="200" rx="11" ry="8" fill="#1c2321"/>
+    <path d="M180 208 v12 M180 220 q-11 9 -20 0 M180 220 q11 9 20 0" fill="none" stroke="#1c2321" stroke-width="3" stroke-linecap="round"/>
+    <!-- ojos -->
+    <circle cx="158" cy="172" r="7" fill="#1c2321"/>
+    <circle cx="202" cy="172" r="7" fill="#1c2321"/>
+    <circle cx="160" cy="169" r="2.4" fill="#ffffff"/>
+    <circle cx="204" cy="169" r="2.4" fill="#ffffff"/>
+    <!-- collar -->
+    <rect x="140" y="243" width="80" height="15" rx="7" fill="#14524a"/>
+    <circle cx="180" cy="264" r="11" fill="#e8a33d"/>
+    <path d="M176 261 h8 M180 258 v10" stroke="#14524a" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- GATO -->
+  <g>
+    <!-- cuerpo -->
+    <path d="M300 345 q0 -78 46 -78 q46 0 46 78 z" fill="#7d8b93"/>
+    <!-- cola -->
+    <path d="M392 340 q40 4 42 -34 q2 -22 -14 -26 q12 14 2 30 q-10 16 -32 18 z" fill="#6b7880"/>
+    <!-- cabeza -->
+    <circle cx="346" cy="240" r="47" fill="#8d9aa2"/>
+    <!-- orejas -->
+    <path d="M312 210 l-6 -42 l36 20 z" fill="#8d9aa2"/>
+    <path d="M380 210 l6 -42 l-36 20 z" fill="#8d9aa2"/>
+    <path d="M316 208 l-3 -25 l21 12 z" fill="#e8b9b1"/>
+    <path d="M376 208 l3 -25 l-21 12 z" fill="#e8b9b1"/>
+    <!-- rayas -->
+    <path d="M334 200 v-12 M346 197 v-14 M358 200 v-12" stroke="#6b7880" stroke-width="4" stroke-linecap="round"/>
+    <!-- ojos -->
+    <ellipse cx="330" cy="236" rx="8" ry="10" fill="#2f7d4f"/>
+    <ellipse cx="362" cy="236" rx="8" ry="10" fill="#2f7d4f"/>
+    <ellipse cx="330" cy="236" rx="2.6" ry="9" fill="#1c2321"/>
+    <ellipse cx="362" cy="236" rx="2.6" ry="9" fill="#1c2321"/>
+    <!-- nariz y boca -->
+    <path d="M340 256 h12 l-6 7 z" fill="#e8b9b1"/>
+    <path d="M346 263 v5 M346 268 q-8 7 -15 1 M346 268 q8 7 15 1" fill="none" stroke="#1c2321" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- bigotes -->
+    <path d="M320 258 h-26 M320 266 h-24 M372 258 h26 M372 266 h24" stroke="#5d6b66" stroke-width="2" stroke-linecap="round"/>
+    <!-- collar -->
+    <rect x="316" y="278" width="60" height="12" rx="6" fill="#e8a33d"/>
+  </g>
+
+  <!-- corazón / salud -->
+  <path d="M262 92 c-14 -20 -44 -10 -44 14 c0 22 30 36 44 48 c14 -12 44 -26 44 -48 c0 -24 -30 -34 -44 -14 z" fill="#14524a" opacity="0.12"/>
+  <path d="M226 116 h14 l7 -13 l10 26 l8 -18 l6 5 h15" fill="none" stroke="#14524a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

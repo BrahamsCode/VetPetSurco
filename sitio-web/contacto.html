@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contacto | VetPet Surco</title>
+  <meta name="description" content="Reserva una cita veterinaria o escribenos. Av. Velasco Astete 1245, Santiago de Surco, Lima.">
+  <meta name="author" content="Equipo 4 - Curso de E-business">
+  <meta name="theme-color" content="#14524a">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="VetPet Surco">
+  <meta property="og:title" content="Contacto | VetPet Surco">
+  <meta property="og:description" content="Reserva una cita veterinaria o escribenos. Av. Velasco Astete 1245, Santiago de Surco, Lima.">
+  <meta property="og:image" content="img/logo.svg">
+  <meta property="og:locale" content="es_PE">
+  <link rel="icon" href="img/logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Karla:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+
+  <a class="saltar" href="#contenido">Saltar al contenido principal</a>
+
+  <!-- ENCABEZADO -->
+  <header class="encabezado">
+    <div class="contenedor barra-superior">
+      <a class="logo" href="index.html">
+        <img src="img/logo.svg" alt="Logotipo de VetPet Surco" width="42" height="42">
+        <span class="logo-texto">VetPet <span>Surco</span></span>
+      </a>
+      <nav aria-label="Navegacion principal">
+        <ul class="menu">
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="nosotros.html">Nosotros</a></li>
+          <li><a href="productos.html">Productos y servicios</a></li>
+          <li><a href="contacto.html" aria-current="page">Contacto</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="contenido">
+
+  <section class="portada">
+    <div class="contenedor">
+      <span class="etiqueta">Contacto</span>
+      <h1>Reserva una cita o escr&iacute;benos</h1>
+      <p class="entrada">
+        Respondemos el mismo d&iacute;a en horario de atenci&oacute;n. Si es una urgencia, ll&aacute;manos al
+        <a href="tel:+5114458820">(01) 445-8820</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="seccion">
+    <div class="contenedor columnas">
+
+      <!-- FORMULARIO -->
+      <div class="columna">
+        <h2>Escr&iacute;benos</h2>
+        <form class="formulario" action="#" method="post">
+          <div class="campo">
+            <label for="nombre">Nombre y apellido</label>
+            <input type="text" id="nombre" name="nombre" placeholder="Ana Quispe" autocomplete="name" required>
+          </div>
+          <div class="campo">
+            <label for="correo">Correo electr&oacute;nico</label>
+            <input type="email" id="correo" name="correo" placeholder="ana@correo.com" autocomplete="email" required>
+          </div>
+          <div class="campo">
+            <label for="telefono">Tel&eacute;fono</label>
+            <input type="tel" id="telefono" name="telefono" placeholder="987 654 321" autocomplete="tel">
+          </div>
+          <div class="campo">
+            <label for="mascota">Nombre de tu mascota</label>
+            <input type="text" id="mascota" name="mascota" placeholder="Rocky">
+          </div>
+          <div class="campo">
+            <label for="motivo">Motivo</label>
+            <select id="motivo" name="motivo">
+              <option value="consulta">Reservar consulta veterinaria</option>
+              <option value="vacuna">Vacunaci&oacute;n o desparasitaci&oacute;n</option>
+              <option value="grooming">Ba&ntilde;o y grooming</option>
+              <option value="suscripcion">Suscripci&oacute;n mensual de alimento</option>
+              <option value="pedido">Consulta sobre un pedido</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label for="mensaje">Mensaje</label>
+            <textarea id="mensaje" name="mensaje" placeholder="Cu&eacute;ntanos qu&eacute; necesita tu mascota"></textarea>
+          </div>
+          <button type="submit" class="boton">Enviar mensaje</button>
+          <p class="nota">
+            Sitio est&aacute;tico de demostraci&oacute;n acad&eacute;mica: el formulario no env&iacute;a datos a
+            ning&uacute;n servidor. En la plataforma VetPet Connect este env&iacute;o corresponde al
+            RF-04 (m&oacute;dulo de agenda de citas).
+          </p>
+        </form>
+      </div>
+
+      <!-- DATOS -->
+      <div class="columna">
+        <h2>D&oacute;nde estamos</h2>
+        <div class="tabla-envoltura">
+          <table class="tabla-datos">
+            <caption class="oculto-visual">Datos de contacto y ubicaci&oacute;n</caption>
+            <tbody>
+              <tr><th scope="row">Direcci&oacute;n</th><td>Av. Velasco Astete 1245, Santiago de Surco, Lima</td></tr>
+              <tr><th scope="row">Tel&eacute;fono fijo</th><td><a href="tel:+5114458820">(01) 445-8820</a></td></tr>
+              <tr><th scope="row">WhatsApp</th><td><a href="tel:+51987654321">987 654 321</a></td></tr>
+              <tr><th scope="row">Correo</th><td><a href="mailto:contacto@vetpetsurco.pe">contacto@vetpetsurco.pe</a></td></tr>
+              <tr><th scope="row">Referencia</th><td>A media cuadra del Parque Loma Verde</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="bloque">
+          <h2>Horario de atenci&oacute;n</h2>
+          <ul class="lista-servicios">
+            <li>Lunes a viernes: 9:00 a 20:00</li>
+            <li>S&aacute;bados: 9:00 a 14:00</li>
+            <li>Domingos y feriados: cerrado</li>
+            <li>Delivery en Surco: 10:00 a 19:00</li>
+          </ul>
+        </div>
+
+        <div class="bloque">
+          <h2>S&iacute;guenos</h2>
+          <p>Publicamos tips de cuidado y recordatorios de salud en nuestras redes.</p>
+          <ul class="lista-servicios">
+            <li>Instagram: @vetpetsurco</li>
+            <li>TikTok: @vetpetsurco</li>
+            <li>Facebook: VetPet Surco</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+  </main>
+
+  <!-- PIE DE PAGINA -->
+  <footer class="pie">
+    <div class="contenedor pie-columnas">
+      <div class="pie-columna">
+        <h3>VetPet Surco</h3>
+        <p>Veterinaria y pet shop de barrio. Cuidamos a las mascotas de Santiago de Surco desde el 2019.</p>
+      </div>
+      <div class="pie-columna">
+        <h3>Contacto</h3>
+        <ul>
+          <li>Av. Velasco Astete 1245, Surco</li>
+          <li><a href="tel:+5114458820">(01) 445-8820</a> / <a href="tel:+51987654321">987 654 321</a></li>
+          <li><a href="mailto:contacto@vetpetsurco.pe">contacto@vetpetsurco.pe</a></li>
+        </ul>
+      </div>
+      <div class="pie-columna">
+        <h3>Horario</h3>
+        <ul>
+          <li>Lunes a viernes: 9:00 a 20:00</li>
+          <li>S&aacute;bados: 9:00 a 14:00</li>
+          <li>Domingos y feriados: cerrado</li>
+        </ul>
+      </div>
+    </div>
+    <div class="contenedor pie-final">
+      <p>Sitio web acad&eacute;mico &mdash; Curso de E-business, Equipo 4, 2026. Empresa ficticia con fines educativos.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

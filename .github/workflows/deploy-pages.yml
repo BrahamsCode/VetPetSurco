@@ -1,0 +1,49 @@
+# Publica la carpeta sitio-web/ en GitHub Pages.
+# Requiere que en Settings -> Pages la fuente sea "GitHub Actions".
+name: Desplegar sitio web
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - 'claude/**'
+    paths:
+      - 'sitio-web/**'
+      - '.github/workflows/deploy-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Un solo despliegue a la vez; no cancela el que ya esta en curso.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  desplegar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.despliegue.outputs.page_url }}
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v5
+        with:
+          # Intenta habilitar Pages automaticamente si aun no lo esta.
+          enablement: true
+
+      - name: Empaquetar el sitio estatico
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: sitio-web
+
+      - name: Publicar en GitHub Pages
+        id: despliegue
+        uses: actions/deploy-pages@v4
