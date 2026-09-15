@@ -1,0 +1,503 @@
+/* =====================================================
+   VetPet Surco - Hoja de estilos principal
+   Curso de E-business - Equipo 4 - 2026
+   HTML5 + CSS3, sin frameworks ni preprocesadores.
+   ===================================================== */
+
+/* ---------- 1. Variables y reset ---------- */
+:root {
+  --verde-oscuro: #14524a;
+  --verde-medio:  #2c7a6b;
+  --menta:        #eef5f1;
+  --ambar:        #e8a33d;
+  --tinta:        #1c2321;
+  --gris:         #5d6b66;
+  --blanco:       #ffffff;
+  --borde:        #d9e5df;
+  --radio:        14px;
+  --sombra:       0 1px 2px rgba(20, 82, 74, .05), 0 8px 24px rgba(20, 82, 74, .06);
+  --transicion:   180ms ease;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: "Karla", "Segoe UI", Arial, sans-serif;
+  color: var(--tinta);
+  background-color: var(--blanco);
+  font-size: 17px;
+  line-height: 1.65;
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3 {
+  font-family: "Fraunces", Georgia, "Times New Roman", serif;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--verde-oscuro);
+  text-wrap: balance;
+}
+
+h1 { font-size: 44px; }
+h2 { font-size: 31px; margin-bottom: 14px; }
+h3 { font-size: 21px; margin-bottom: 8px; }
+
+p  { margin-bottom: 14px; }
+p:last-child { margin-bottom: 0; }
+a  { color: var(--verde-medio); }
+
+img { max-width: 100%; display: block; }
+
+/* Foco visible y consistente en todo el sitio (accesibilidad). */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--ambar);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.contenedor {
+  width: 92%;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+/* Texto disponible solo para lectores de pantalla. */
+.oculto-visual {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Enlace para saltar la navegacion con el teclado. */
+.saltar {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background-color: var(--verde-oscuro);
+  color: var(--blanco);
+  padding: 12px 20px;
+  border-radius: 0 0 var(--radio) 0;
+  font-weight: 700;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.saltar:focus {
+  left: 0;
+}
+
+/* ---------- 2. Encabezado y navegacion ---------- */
+.encabezado {
+  background-color: rgba(255, 255, 255, .92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--borde);
+  padding: 16px 0;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.barra-superior {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.logo img { width: 42px; }
+
+.logo-texto {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--verde-oscuro);
+}
+
+.logo-texto span { color: var(--ambar); }
+
+.menu {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.menu li { margin-left: 26px; }
+.menu li:first-child { margin-left: 0; }
+
+.menu a {
+  text-decoration: none;
+  color: var(--gris);
+  font-weight: 600;
+  font-size: 16px;
+  padding-bottom: 4px;
+  border-bottom: 2px solid transparent;
+  transition: color var(--transicion), border-color var(--transicion);
+}
+
+.menu a:hover,
+.menu a:focus {
+  color: var(--verde-oscuro);
+  border-bottom-color: var(--ambar);
+}
+
+.menu a[aria-current="page"] {
+  color: var(--verde-oscuro);
+  border-bottom-color: var(--ambar);
+}
+
+/* ---------- 3. Botones ---------- */
+.boton {
+  display: inline-block;
+  background-color: var(--verde-oscuro);
+  color: var(--blanco);
+  text-decoration: none;
+  font-weight: 700;
+  padding: 13px 26px;
+  border-radius: 40px;
+  border: 2px solid var(--verde-oscuro);
+  font-size: 16px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color var(--transicion), border-color var(--transicion), transform var(--transicion);
+}
+
+.boton:hover {
+  background-color: var(--verde-medio);
+  border-color: var(--verde-medio);
+  transform: translateY(-1px);
+}
+
+.boton-claro {
+  background-color: transparent;
+  color: var(--verde-oscuro);
+}
+
+.boton-claro:hover { background-color: var(--menta); color: var(--verde-oscuro); }
+
+.grupo-botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+/* ---------- 4. Portada (hero) ---------- */
+.portada {
+  background-color: var(--menta);
+  padding: 60px 0;
+}
+
+.portada-fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 40px;
+}
+
+.portada-texto { flex: 1 1 380px; }
+.portada-imagen { flex: 1 1 320px; }
+
+.portada-texto p.entrada,
+.portada p.entrada {
+  font-size: 19px;
+  color: var(--gris);
+  margin: 18px 0 26px 0;
+  max-width: 52ch;
+}
+
+.etiqueta {
+  display: inline-block;
+  background-color: var(--blanco);
+  color: var(--verde-medio);
+  border: 1px solid var(--borde);
+  border-radius: 30px;
+  padding: 5px 15px;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+/* ---------- 5. Secciones y tarjetas ---------- */
+.seccion { padding: 55px 0; }
+
+.seccion-menta { background-color: var(--menta); }
+
+.titulo-seccion { margin-bottom: 30px; max-width: 60ch; }
+.titulo-seccion p { color: var(--gris); margin-bottom: 0; }
+
+.tarjetas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 22px;
+  align-items: start;
+}
+
+.tarjeta {
+  background-color: var(--blanco);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 26px;
+  height: 100%;
+  transition: transform var(--transicion), box-shadow var(--transicion);
+}
+
+.tarjeta:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--sombra);
+}
+
+.tarjeta img { width: 54px; margin-bottom: 14px; }
+
+.tarjeta p { color: var(--gris); margin-bottom: 0; font-size: 16px; }
+
+.tarjeta .precio {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 26px;
+  color: var(--verde-oscuro);
+  font-weight: 600;
+  margin: 10px 0;
+}
+
+/* ---------- 6. Listas ---------- */
+.lista-servicios {
+  list-style: none;
+  margin-top: 10px;
+}
+
+.lista-servicios li {
+  padding: 9px 0 9px 26px;
+  border-bottom: 1px dashed var(--borde);
+  position: relative;
+  font-size: 16px;
+  color: var(--gris);
+}
+
+.lista-servicios li:last-child { border-bottom: none; }
+
+.lista-servicios li::before {
+  content: "\2022";
+  color: var(--ambar);
+  font-size: 24px;
+  position: absolute;
+  left: 4px;
+  top: 2px;
+}
+
+.lista-pasos {
+  list-style: none;
+  counter-reset: paso;
+  margin-top: 10px;
+}
+
+.lista-pasos li {
+  counter-increment: paso;
+  padding: 9px 0 9px 40px;
+  border-bottom: 1px dashed var(--borde);
+  position: relative;
+  font-size: 16px;
+  color: var(--gris);
+}
+
+.lista-pasos li:last-child { border-bottom: none; }
+
+.lista-pasos li::before {
+  content: counter(paso);
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background-color: var(--ambar);
+  color: var(--verde-oscuro);
+  font-weight: 700;
+  font-size: 14px;
+  text-align: center;
+  line-height: 26px;
+}
+
+/* ---------- 7. Tablas de datos ---------- */
+/* La envoltura permite desplazamiento lateral en pantallas angostas
+   sin romper el ancho de la pagina. */
+.tabla-envoltura {
+  overflow-x: auto;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background-color: var(--blanco);
+}
+
+.tabla-datos {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+}
+
+.tabla-datos th,
+.tabla-datos td {
+  text-align: left;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--borde);
+}
+
+.tabla-datos tbody th {
+  background-color: var(--menta);
+  color: var(--verde-oscuro);
+  width: 34%;
+  font-weight: 700;
+}
+
+.tabla-datos thead th {
+  background-color: var(--verde-oscuro);
+  color: var(--blanco);
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  width: auto;
+}
+
+.tabla-datos tbody tr:last-child th,
+.tabla-datos tbody tr:last-child td { border-bottom: none; }
+
+/* ---------- 8. Formulario de contacto ---------- */
+.formulario {
+  background-color: var(--blanco);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 28px;
+}
+
+.campo { margin-bottom: 18px; }
+
+.campo label {
+  display: block;
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 6px;
+  color: var(--verde-oscuro);
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--tinta);
+  background-color: var(--blanco);
+}
+
+.campo textarea { min-height: 120px; resize: vertical; }
+
+.nota {
+  font-size: 14px;
+  color: var(--gris);
+  margin-top: 14px;
+  margin-bottom: 0;
+}
+
+.columnas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.columna { flex: 1 1 320px; min-width: 0; }
+
+.bloque { margin-top: 34px; }
+
+/* ---------- 9. Pie de pagina ---------- */
+.pie {
+  background-color: var(--verde-oscuro);
+  color: #cfe3dc;
+  padding: 42px 0 26px 0;
+  font-size: 15px;
+}
+
+.pie h3 { color: var(--blanco); font-size: 18px; }
+
+.pie a { color: #cfe3dc; text-decoration: none; }
+.pie a:hover { color: var(--ambar); text-decoration: underline; }
+
+.pie-columnas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 34px;
+}
+
+.pie-columna { flex: 1 1 240px; }
+
+.pie ul { list-style: none; }
+.pie li { padding: 4px 0; }
+
+.pie-final {
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  margin-top: 28px;
+  padding-top: 16px;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* ---------- 10. Pagina de error 404 ---------- */
+.error-404 {
+  text-align: center;
+  padding: 90px 0;
+}
+
+.error-404 img { width: 120px; margin: 0 auto 24px auto; }
+
+/* ---------- 11. Adaptacion a moviles ---------- */
+@media (max-width: 760px) {
+  body { font-size: 16px; }
+  h1 { font-size: 32px; }
+  h2 { font-size: 25px; }
+
+  .encabezado { position: static; }
+  .barra-superior { justify-content: center; text-align: center; }
+  .menu { justify-content: center; gap: 18px; }
+  .menu li { margin-left: 0; }
+  .portada { padding: 40px 0; }
+  .seccion { padding: 38px 0; }
+  .tabla-datos tbody th { width: 42%; }
+}
+
+/* ---------- 12. Preferencias del usuario ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition: none !important; }
+  .tarjeta:hover, .boton:hover { transform: none; }
+}
+
+/* ---------- 13. Impresion ---------- */
+@media print {
+  .encabezado, .pie, .grupo-botones, .boton { display: none; }
+  body { font-size: 12pt; color: #000; }
+  .portada, .seccion-menta { background: none; }
+  .seccion, .portada { padding: 12pt 0; }
+  .tarjeta, .tabla-envoltura { border: 1pt solid #999; break-inside: avoid; }
+}
