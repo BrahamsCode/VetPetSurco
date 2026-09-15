@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Politica de ImageMagick. La instalacion por omision bloquea PDF y
+     algunos formatos por CVE-2016-3714; aqui se permiten solo los que el
+     proyecto necesita para las imagenes de producto. -->
+<policymap>
+  <policy domain="resource" name="memory" value="256MiB"/>
+  <policy domain="resource" name="map" value="512MiB"/>
+  <policy domain="resource" name="width" value="16KP"/>
+  <policy domain="resource" name="height" value="16KP"/>
+  <policy domain="resource" name="disk" value="1GiB"/>
+
+  <policy domain="coder" rights="read|write" pattern="{PNG,JPEG,JPG,GIF,WEBP,SVG}"/>
+
+  <!-- Se mantienen bloqueados los formatos que permiten ejecutar codigo. -->
+  <policy domain="coder" rights="none" pattern="{PS,PS2,PS3,EPS,PDF,XPS,MSL,MVG,EPHEMERAL,URL,HTTPS,HTTP}"/>
+  <policy domain="delegate" rights="none" pattern="*"/>
+</policymap>

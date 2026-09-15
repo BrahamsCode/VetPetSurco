@@ -1,5 +1,17 @@
+/* =====================================================================
+   Genera las capturas anotadas de docs/capturas-reglas/.
+   Recorre los elementos marcados con data-rn en el DOM de la aplicacion y
+   dibuja el marco y la chapa sobre el control real, de modo que senalan el
+   elemento exacto que aplica cada regla.
+
+   Requisitos: la aplicacion levantada y la base recien sembrada, para que
+   el estado sea el mismo en cada ejecucion.
+
+     cd public_html && php artisan migrate:fresh --seed && php artisan serve
+     node herramientas/capturas-anotadas.mjs
+   ===================================================================== */
 import { chromium } from 'playwright';
-const BASE = 'http://127.0.0.1:8010/';
+const BASE = 'http://127.0.0.1:8011/';
 const DEST = '/home/user/VetPetSurco/docs/capturas-reglas';
 
 // Dibuja el marco y la chapa de cada [data-rn] leyendo el DOM real.

@@ -42,18 +42,21 @@ jobs:
       - name: Cachear dependencias de Composer
         uses: actions/cache@v4
         with:
-          path: vendor
-          key: composer-${{ hashFiles('composer.lock') }}
+          path: public_html/vendor
+          key: composer-${{ hashFiles('public_html/composer.lock') }}
 
       - name: Instalar dependencias
+        working-directory: public_html
         run: composer install --no-interaction --prefer-dist --no-progress
 
       - name: Preparar el entorno
+        working-directory: public_html
         run: |
           cp .env.example .env
           php artisan key:generate
 
       - name: Ejecutar las pruebas de las 20 reglas de negocio
+        working-directory: public_html
         env:
           DB_CONNECTION: mysql
           DB_HOST: 127.0.0.1
@@ -69,12 +72,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Aqui si hay demonio de Docker: se comprueba lo que en el entorno de
-      # desarrollo no se pudo, que la imagen de PHP 8.2 realmente construye.
-      - name: Validar compose.yaml
+      - name: Preparar las variables del compose
+        run: cp docker/.env.example docker/.env
+
+      - name: Validar el compose
+        working-directory: docker/dockerfile
         run: docker compose config --quiet
 
+      # Aqui si hay demonio de Docker: se comprueba lo que en el entorno de
+      # desarrollo no se pudo, que la imagen de PHP 8.2 con Apache construye.
       - name: Construir la imagen de la aplicacion
+        working-directory: docker/dockerfile
         run: docker compose build app
 
   carrito-java:

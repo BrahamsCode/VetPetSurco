@@ -13,29 +13,41 @@ recordatorios automáticos de vacunación.
 
 ## Estructura del repositorio
 
+La aplicación vive en `public_html/` y toda la configuración de Docker queda fuera, en
+`docker/`, siguiendo la convención de trabajo del equipo.
+
 ```
 .
-├── app/              Aplicación Laravel: modelos, servicios de dominio, controladores
-├── database/         Migraciones con las restricciones, semillas y factories
-├── resources/views/  Vistas Blade: sitio institucional y plataforma
-├── routes/           Rutas con nombre y guardia de acceso por rol
-├── tests/            Las 20 reglas comprobadas contra MySQL real
-├── docker/           Imagen PHP 8.2-fpm, nginx y entrypoint
-├── basedatos/        Esquema MySQL de la Entrega 2 (referencia histórica)
-├── backend/          Carrito en Java de la Entrega 2 (superado por app/Services)
-├── docs/             Entregas del curso, reglas de negocio y capturas anotadas
-└── pruebas/          Recorrido del navegador sobre la plataforma
+├── docker/                 Entorno: Apache + PHP 8.2, MySQL 8.0 y MailHog
+│   ├── dockerfile/         Dockerfile y docker-compose.yml
+│   ├── 000-default.conf    Apache en HTTP
+│   ├── default-ssl.conf    Apache en HTTPS
+│   ├── php.ini             Ajustes de PHP
+│   └── policy.xml          Política de ImageMagick
+│
+├── public_html/            La aplicación Laravel
+│   ├── app/                Modelos, enums, servicios de dominio, controladores
+│   ├── database/           Migraciones con las restricciones, semillas y factories
+│   ├── resources/views/    Vistas Blade: sitio institucional y plataforma
+│   ├── routes/             Rutas con nombre y guardia de acceso por rol
+│   ├── public/             Raíz web: CSS, imágenes y el index.php
+│   └── tests/              Las 20 reglas comprobadas contra MySQL real
+│
+├── docs/                   Entregas del curso, reglas de negocio y capturas anotadas
+├── basedatos/              Esquema MySQL de la Entrega 2 (referencia histórica)
+├── backend/                Carrito en Java de la Entrega 2 (superado por app/Services)
+├── herramientas/           Generador de las capturas anotadas
+└── pruebas/                Recorrido del navegador sobre la plataforma
 ```
 
 | Carpeta | Contenido |
 | --- | --- |
-| [`app/`](app/) | Modelos Eloquent, enums, los cinco servicios de dominio con las 20 reglas, controladores y Form Requests. |
-| [`resources/views/`](resources/views/) | Vistas Blade del sitio institucional y de los módulos de los cuatro roles. |
-| [`basedatos/`](basedatos/) | `01_esquema.sql`, `02_datos_prueba.sql`, `03_transaccion_compra.sql`, `04_consultas_ejemplo.sql` |
-| [`backend/`](backend/) | `CarritoCompra`, `ItemCarrito` y `DemoCarrito` en `pe.vetpetsurco.carrito` |
-| [`docs/`](docs/) | [Entrega 1](docs/entrega-1-modelo-de-negocio.md), [Entrega 2](docs/entrega-2-arquitectura-software.md), [modelo de datos](docs/modelo-de-datos.md), las [presentaciones](docs/presentacion/), capturas y los `.docx` originales |
-
----
+| [`public_html/app/`](public_html/app/) | Modelos Eloquent, enums, los cinco servicios de dominio con las 20 reglas, controladores y Form Requests. |
+| [`public_html/resources/views/`](public_html/resources/views/) | Vistas Blade del sitio institucional y de los módulos de los cuatro roles. |
+| [`public_html/database/`](public_html/database/) | Las ocho tablas con sus `UNIQUE`, `CHECK` y claves foráneas, más semillas y factories. |
+| [`public_html/tests/`](public_html/tests/) | 112 pruebas que comprueban las 20 reglas contra MySQL. |
+| [`docker/`](docker/) | Imagen de PHP 8.2 sobre Apache, compose con MySQL y MailHog. Ver [`docker/README.md`](docker/README.md). |
+| [`docs/`](docs/) | [Entrega 1](docs/entrega-1-modelo-de-negocio.md), [Entrega 2](docs/entrega-2-arquitectura-software.md), [reglas de negocio](docs/reglas-de-negocio.md), presentaciones y capturas. |
 
 ## Entregas del curso
 
@@ -58,20 +70,26 @@ recordatorios automáticos de vacunación.
 ### 1. Levantar el proyecto con Docker
 
 ```bash
-cp .env.example .env
-make build && make up
-make migrate && make seed
-# sitio institucional y plataforma: http://localhost:8080
+cp docker/.env.example docker/.env
+sh docker/generar-certificados.sh
+cp public_html/.env.example public_html/.env
+
+cd docker/dockerfile
+docker compose up -d --build
+docker compose exec app composer install
+docker compose exec app php artisan key:generate
+docker compose exec app php artisan migrate --seed
 ```
 
-Detalle de los servicios y de cada objetivo del Makefile en [`docs/docker.md`](docs/docker.md).
+Aplicación en http://localhost y https://localhost; correo de prueba en
+http://localhost:8025. Detalle completo en [`docker/README.md`](docker/README.md).
 
 ### 1b. Sin Docker, con PHP 8.2 y MySQL locales
 
 ```bash
+cd public_html
 composer install
 cp .env.example .env && php artisan key:generate
-# apuntar DB_HOST a 127.0.0.1 en .env
 php artisan migrate --seed
 php artisan serve
 ```

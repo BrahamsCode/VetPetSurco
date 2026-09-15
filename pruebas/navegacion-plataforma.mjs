@@ -1,5 +1,5 @@
 import { chromium } from 'playwright';
-const BASE = 'http://127.0.0.1:8010';
+const BASE = 'http://127.0.0.1:8011';
 const b = await chromium.launch({ executablePath: process.env.PW_CHROME });
 const pg = await (await b.newContext({ viewport: { width: 1320, height: 1000 } })).newPage();
 const errores = [];

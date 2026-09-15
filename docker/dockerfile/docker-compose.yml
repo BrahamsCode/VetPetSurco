@@ -1,0 +1,52 @@
+# Las rutas relativas salen de esta carpeta (docker/dockerfile/):
+#   ../../public_html  ->  la aplicacion Laravel
+#   ../                ->  los archivos de configuracion de docker/
+services:
+  app:
+    build: .
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - vendor:/var/www/vendor
+      - ../../public_html:/var/www/
+      - ../policy.xml:/etc/ImageMagick-6/policy.xml
+      - ../php.ini:/usr/local/etc/php/php.ini
+      - ../000-default.conf:/etc/apache2/sites-available/000-default.conf
+      - ../default-ssl.conf:/etc/apache2/sites-enabled/default-ssl.conf
+      - ../my.crt:/etc/ssl/certs/my.crt
+      - ../my.key:/etc/ssl/private/my.key
+    working_dir: /var/www
+    privileged: true
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.0
+    ports:
+      - 13306:${MYSQL_PORT}
+    volumes:
+      - dbdata:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_TCP_PORT: ${MYSQL_PORT}
+      TZ: America/Lima
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - 8025:8025
+
+volumes:
+  dbdata:
+  vendor:

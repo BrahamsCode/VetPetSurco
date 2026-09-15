@@ -5,9 +5,9 @@ pantalla del prototipo se puede ver funcionando.
 
 - Presentación: [`docs/presentacion/ReglasDeNegocio_VetPetConnect.pptx`](presentacion/ReglasDeNegocio_VetPetConnect.pptx)
 - Capturas anotadas: [`docs/capturas-reglas/`](capturas-reglas/)
-- Aplicación Laravel: [`app/`](../app/)
-- Servicios de dominio: [`app/Services/`](../app/Services/)
-- Pruebas de las 20 reglas: [`tests/Feature/`](../tests/Feature/)
+- Aplicación Laravel: [`public_html/app/`](../public_html/app/)
+- Servicios de dominio: [`public_html/app/Services/`](../public_html/app/Services/)
+- Pruebas de las 20 reglas: [`public_html/tests/Feature/`](../public_html/tests/Feature/)
 - Implementación en la base de datos: [`basedatos/01_esquema.sql`](../basedatos/01_esquema.sql)
 
 ## Catálogo
@@ -62,7 +62,7 @@ La aplicación Laravel sirve tanto el sitio institucional como los módulos de l
 ### Cuentas de demostración
 
 Todas usan la contraseña `demo123`. Son cuentas ficticias de un proyecto académico, sembradas
-por `database/seeders/UsuarioSeeder.php`.
+por `public_html/database/seeders/UsuarioSeeder.php`.
 
 | Correo | Rol |
 | --- | --- |
@@ -76,9 +76,9 @@ por `database/seeders/UsuarioSeeder.php`.
 ### Cómo probarlo
 
 ```bash
-make up && make migrate && make seed     # con Docker
+cd docker/dockerfile && docker compose up -d   # con Docker
 # o, con PHP y MySQL locales:
-php artisan migrate --seed && php artisan serve
+cd public_html && php artisan migrate --seed && php artisan serve
 ```
 
 ## Cómo se comprueba que se cumplen
