@@ -7,6 +7,7 @@ use App\Http\Requests\CrearProductoRequest;
 use App\Models\Pedido;
 use App\Models\Producto;
 use App\Models\Suscripcion;
+use App\Models\Usuario;
 use App\Services\InventarioService;
 use App\Services\HistoriaClinicaService;
 use App\Services\PedidoService;
@@ -52,8 +53,17 @@ class AdminController extends Controller
             return ($origen instanceof \BackedEnum ? $origen->value : (string) $origen) === 'SUSCRIPCION';
         })->sum('monto_total');
 
+        // Clientes de los pedidos, indexados para pintar su nombre.
+        $clientes = $pedidos->isEmpty()
+            ? collect()
+            : Usuario::query()
+                ->whereIn('usuario_id', $pedidos->pluck('cliente_id')->unique())
+                ->get()
+                ->keyBy('usuario_id');
+
         return view('app.admin', [
             'productos' => $productos,
+            'clientes' => $clientes,
             'semaforos' => $semaforos,
             'pedidos' => $pedidos,
             'indicadores' => [

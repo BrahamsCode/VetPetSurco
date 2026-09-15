@@ -45,7 +45,7 @@
                       <button type="submit" class="boton-mini">Actualizar</button>
                     </form>
                   </td>
-                  <td>S/ {{ number_format($precio * $cantidad, 2) }}</td>
+                  <td>S/ {{ number_format((float) data_get($linea, 'subtotal', $precio * $cantidad), 2) }}</td>
                   <td>
                     <form method="POST" action="{{ route('carrito.quitar', $productoId) }}">
                       @csrf

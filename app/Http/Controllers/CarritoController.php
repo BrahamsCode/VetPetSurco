@@ -131,7 +131,6 @@ class CarritoController extends Controller
                 'regla' => $e->regla(),
                 'mensaje' => $e->getMessage(),
                 'ok' => false,
-                'faltantes' => $e->faltantes(),
             ]);
         } catch (ReglaDeNegocioException $e) {
             return back()->with('resultado', [

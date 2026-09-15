@@ -103,7 +103,7 @@
                     <td>{{ data_get($recordatorio, 'mascota') }}</td>
                     <td>{{ data_get($recordatorio, 'cliente') }}</td>
                     <td>{{ data_get($recordatorio, 'proxima_fecha') }}</td>
-                    <td>{{ data_get($recordatorio, 'dias') }} d&iacute;as</td>
+                    <td>{{ data_get($recordatorio, 'dias_restantes', data_get($recordatorio, 'dias')) }} d&iacute;as</td>
                   </tr>
                 @empty
                   <tr><td colspan="4">Sin controles en los pr&oacute;ximos 15 d&iacute;as.</td></tr>

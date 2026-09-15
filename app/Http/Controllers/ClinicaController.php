@@ -7,6 +7,7 @@ use App\Exceptions\ReglaDeNegocioException;
 use App\Http\Requests\RegistrarAtencionRequest;
 use App\Models\Cita;
 use App\Models\HistoriaClinica;
+use App\Models\Mascota;
 use App\Services\AgendaService;
 use App\Services\HistoriaClinicaService;
 use Illuminate\Http\RedirectResponse;
@@ -29,7 +30,7 @@ class ClinicaController extends Controller
 
     public function index(Request $request): View
     {
-        $veterinarioId = $request->user()->getAuthIdentifier();
+        $veterinarioId = $request->user()->usuario_id;
 
         $citas = Cita::query()
             ->where('veterinario_id', $veterinarioId)
@@ -49,8 +50,17 @@ class ClinicaController extends Controller
             $citaElegida = $citas->firstWhere('cita_id', (int) $request->query('cita'));
         }
 
+        // Mascotas de esas citas, indexadas por su clave primaria.
+        $mascotas = $citas->isEmpty()
+            ? collect()
+            : Mascota::query()
+                ->whereIn('mascota_id', $citas->pluck('mascota_id')->merge($historias->pluck('mascota_id'))->unique())
+                ->get()
+                ->keyBy('mascota_id');
+
         return view('app.clinica', [
             'citas' => $citas,
+            'mascotas' => $mascotas,
             'historias' => $historias,
             'citaElegida' => $citaElegida,
             'proximaSugerida' => now()->addDays(30)->toDateString(),
@@ -59,7 +69,7 @@ class ClinicaController extends Controller
 
     public function atender(RegistrarAtencionRequest $solicitud, Cita $cita): RedirectResponse
     {
-        abort_if($cita->veterinario_id !== $solicitud->user()->getAuthIdentifier(), 403);
+        abort_if((int) $cita->veterinario_id !== (int) $solicitud->user()->usuario_id, 403);
 
         try {
             // RN-19 y RN-20 viven dentro del servicio.
@@ -86,7 +96,7 @@ class ClinicaController extends Controller
 
     public function desenlace(Request $request, Cita $cita): RedirectResponse
     {
-        abort_if($cita->veterinario_id !== $request->user()->getAuthIdentifier(), 403);
+        abort_if((int) $cita->veterinario_id !== (int) $request->user()->usuario_id, 403);
 
         // RN-18: el desenlace tiene que ser uno de los estados previstos.
         $datos = $request->validate([

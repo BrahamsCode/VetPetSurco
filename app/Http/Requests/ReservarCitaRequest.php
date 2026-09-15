@@ -22,7 +22,7 @@ class ReservarCitaRequest extends SolicitudDeRegla
                 'required',
                 'integer',
                 Rule::exists('mascotas', 'mascota_id')
-                    ->where('cliente_id', $this->user()?->getAuthIdentifier()),
+                    ->where('cliente_id', $this->user()?->usuario_id),
             ],
             'veterinario_id' => [
                 'required',

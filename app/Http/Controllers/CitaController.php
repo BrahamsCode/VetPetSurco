@@ -33,7 +33,7 @@ class CitaController extends Controller
         $cliente = $request->user();
 
         // RN-04: el desplegable solo ofrece las mascotas de este cliente.
-        $mias = Mascota::deCliente($cliente->getAuthIdentifier())->orderBy('nombre')->get();
+        $mias = Mascota::deCliente($cliente)->orderBy('nombre')->get();
 
         $veterinarios = Usuario::query()->where('rol', 'VETERINARIO')->orderBy('nombre')->get();
 

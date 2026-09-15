@@ -17,7 +17,7 @@ class SuscripcionController extends Controller
     public function estado(Request $request, Suscripcion $suscripcion): RedirectResponse
     {
         // La suscripcion tiene que ser de la cuenta que inicio sesion.
-        abort_if($suscripcion->cliente_id !== $request->user()->getAuthIdentifier(), 403);
+        abort_if((int) $suscripcion->cliente_id !== (int) $request->user()->usuario_id, 403);
 
         $datos = $request->validate([
             'estado' => ['required', 'in:ACTIVA,PAUSADA,CANCELADA'],
