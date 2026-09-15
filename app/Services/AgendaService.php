@@ -6,13 +6,13 @@ namespace App\Services;
 
 use App\Enums\EstadoCita;
 use App\Enums\Servicio;
+use App\Exceptions\DesenlaceInvalidoException;
 use App\Exceptions\HorarioOcupadoException;
 use App\Models\Cita;
 use App\Models\Mascota;
 use App\Models\Usuario;
 use Carbon\CarbonInterface;
 use DateTimeInterface;
-use DomainException;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
 
@@ -117,18 +117,18 @@ final class AgendaService
      * Solo una cita RESERVADA puede cerrarse, y una vez cerrada su desenlace
      * ya no se reescribe.
      *
-     * @throws DomainException si el desenlace no es válido o la cita ya está cerrada
+     * @throws DesenlaceInvalidoException si el desenlace no es válido o la cita ya está cerrada
      */
     public function cerrar(Cita $cita, EstadoCita $desenlace): Cita
     {
         if ($desenlace === EstadoCita::RESERVADA) {
-            throw new DomainException('RESERVADA no es un desenlace: la cita debe quedar ATENDIDA, CANCELADA o NO_ASISTIO.');
+            throw new DesenlaceInvalidoException('RESERVADA no es un desenlace: la cita debe quedar ATENDIDA, CANCELADA o NO_ASISTIO.');
         }
 
         $actual = $this->estadoDe($cita);
 
         if ($actual !== EstadoCita::RESERVADA) {
-            throw new DomainException('La cita ya tiene un desenlace registrado: ' . $actual->value . '.');
+            throw new DesenlaceInvalidoException('La cita ya tiene un desenlace registrado: ' . $actual->value . '.');
         }
 
         $cita->estado = $desenlace;

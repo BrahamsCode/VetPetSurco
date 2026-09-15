@@ -7,12 +7,12 @@ namespace App\Services;
 use App\Enums\EstadoPedido;
 use App\Enums\TipoOrigen;
 use App\Exceptions\CantidadInvalidaException;
+use App\Exceptions\EstadoPedidoInvalidoException;
 use App\Exceptions\StockInsuficienteException;
 use App\Models\DetallePedido;
 use App\Models\Pedido;
 use App\Models\Producto;
 use App\Models\Usuario;
-use DomainException;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -163,20 +163,20 @@ final class PedidoService
      * RN-13: avanza el pedido al siguiente estado de la secuencia
      * PENDIENTE → PAGADO → ENVIADO → ENTREGADO.
      *
-     * @throws DomainException si el pedido está ANULADO o ya fue ENTREGADO
+     * @throws EstadoPedidoInvalidoException si el pedido está ANULADO o ya fue ENTREGADO
      */
     public function avanzarEstado(Pedido $pedido): Pedido
     {
         $actual = $this->estadoDe($pedido);
 
         if ($actual === EstadoPedido::ANULADO) {
-            throw new DomainException('Un pedido anulado no puede cambiar de estado.');
+            throw new EstadoPedidoInvalidoException('Un pedido anulado no puede cambiar de estado.');
         }
 
         $siguiente = $actual->siguiente();   // RN-13
 
         if ($siguiente === null) {
-            throw new DomainException('El pedido ya está ENTREGADO.');
+            throw new EstadoPedidoInvalidoException('El pedido ya está ENTREGADO.');
         }
 
         $pedido->estado = $siguiente;
