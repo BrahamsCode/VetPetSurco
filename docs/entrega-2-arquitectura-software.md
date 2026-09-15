@@ -206,6 +206,14 @@ descuenta el inventario y hace `ROLLBACK` completo ante cualquier faltante.
 
 ---
 
+> **Nota posterior a la entrega.** El sitio estático y el prototipo en JavaScript que describe
+> este anexo fueron migrados después a una aplicación Laravel sobre PHP 8.2 y MySQL, con Docker.
+> Este anexo se conserva como el registro de lo que se entregó en la Semana 5; el estado actual
+> del proyecto está en [`README.md`](../README.md) y en
+> [`docs/reglas-de-negocio.md`](reglas-de-negocio.md). Las rutas `sitio-web/…` que se citan a
+> continuación corresponden a esa versión y ya no existen en el repositorio: su contenido vive
+> ahora en `resources/views/` y `public/`.
+
 ## Anexo: Evidencia del Sitio Web Estático
 
 Como evidencia práctica de esta entrega se desarrolló el sitio web estático institucional de

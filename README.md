@@ -15,16 +15,22 @@ recordatorios automáticos de vacunación.
 
 ```
 .
-├── sitio-web/        Sitio web estático institucional (HTML5 + CSS3) — lo que se despliega
-├── basedatos/        Esquema MySQL, datos de prueba, transacción de compra y consultas
-├── backend/          Algoritmo del carrito de compras en Java
-├── docs/             Entregas del curso en Markdown, modelo de datos y capturas
-└── .github/workflows Despliegue automático del sitio a GitHub Pages
+├── app/              Aplicación Laravel: modelos, servicios de dominio, controladores
+├── database/         Migraciones con las restricciones, semillas y factories
+├── resources/views/  Vistas Blade: sitio institucional y plataforma
+├── routes/           Rutas con nombre y guardia de acceso por rol
+├── tests/            Las 20 reglas comprobadas contra MySQL real
+├── docker/           Imagen PHP 8.2-fpm, nginx y entrypoint
+├── basedatos/        Esquema MySQL de la Entrega 2 (referencia histórica)
+├── backend/          Carrito en Java de la Entrega 2 (superado por app/Services)
+├── docs/             Entregas del curso, reglas de negocio y capturas anotadas
+└── pruebas/          Recorrido del navegador sobre la plataforma
 ```
 
 | Carpeta | Contenido |
 | --- | --- |
-| [`sitio-web/`](sitio-web/) | 5 páginas institucionales estáticas y [`app/`](sitio-web/app/), el prototipo navegable de la plataforma con los cuatro roles. |
+| [`app/`](app/) | Modelos Eloquent, enums, los cinco servicios de dominio con las 20 reglas, controladores y Form Requests. |
+| [`resources/views/`](resources/views/) | Vistas Blade del sitio institucional y de los módulos de los cuatro roles. |
 | [`basedatos/`](basedatos/) | `01_esquema.sql`, `02_datos_prueba.sql`, `03_transaccion_compra.sql`, `04_consultas_ejemplo.sql` |
 | [`backend/`](backend/) | `CarritoCompra`, `ItemCarrito` y `DemoCarrito` en `pe.vetpetsurco.carrito` |
 | [`docs/`](docs/) | [Entrega 1](docs/entrega-1-modelo-de-negocio.md), [Entrega 2](docs/entrega-2-arquitectura-software.md), [modelo de datos](docs/modelo-de-datos.md), las [presentaciones](docs/presentacion/), capturas y los `.docx` originales |
@@ -49,21 +55,26 @@ recordatorios automáticos de vacunación.
 
 ## Cómo ejecutar cada parte
 
-### 1. Sitio web y prototipo de la plataforma
-
-No necesita compilación. Levanta un servidor local para que las rutas relativas se comporten
-como en producción:
+### 1. Levantar el proyecto con Docker
 
 ```bash
-cd sitio-web
-python3 -m http.server 8000
-# sitio institucional:  http://localhost:8000
-# plataforma:           http://localhost:8000/app/
+cp .env.example .env
+make build && make up
+make migrate && make seed
+# sitio institucional y plataforma: http://localhost:8080
 ```
 
-El prototipo de [`sitio-web/app/`](sitio-web/app/) implementa las **20 reglas de negocio** del
-sistema en los módulos de los cuatro roles. Cuentas de demostración y trazabilidad completa en
-[`docs/reglas-de-negocio.md`](docs/reglas-de-negocio.md).
+Detalle de los servicios y de cada objetivo del Makefile en [`docs/docker.md`](docs/docker.md).
+
+### 1b. Sin Docker, con PHP 8.2 y MySQL locales
+
+```bash
+composer install
+cp .env.example .env && php artisan key:generate
+# apuntar DB_HOST a 127.0.0.1 en .env
+php artisan migrate --seed
+php artisan serve
+```
 
 ### 2. Base de datos (MySQL 8.0)
 
@@ -91,45 +102,22 @@ total y rechazar cantidades inválidas.
 
 ---
 
-## Despliegue del sitio web
+## Despliegue
 
-El sitio es 100% estático, así que funciona en cualquier hosting gratuito.
+El proyecto dejó de ser un sitio estático: ahora es una aplicación Laravel que necesita PHP y
+MySQL, así que **GitHub Pages ya no aplica** y su flujo de trabajo se retiró. Las opciones
+razonables son un servicio que ejecute contenedores (Render, Railway, Fly.io) o un VPS con
+Docker, apuntando a `compose.yaml`.
 
-### Opción A — GitHub Pages (ya configurado)
+## Características técnicas
 
-El flujo de trabajo [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml)
-publica la carpeta `sitio-web/` en cada push. Solo hay que habilitarlo una vez:
-
-1. Ir a **Settings → Pages** del repositorio.
-2. En **Source**, elegir **GitHub Actions**.
-3. Volver a la pestaña **Actions** y, si hace falta, re-ejecutar el flujo *Desplegar sitio web*.
-
-La URL queda como `https://<usuario>.github.io/<repositorio>/`.
-
-### Opción B — Netlify
-
-Arrastrar la carpeta `sitio-web/` a [app.netlify.com/drop](https://app.netlify.com/drop), o
-conectar el repositorio: la configuración ya está en [`netlify.toml`](netlify.toml)
-(sin comando de build, directorio de publicación `sitio-web`).
-
-### Opción C — Vercel
-
-Importar el repositorio en [vercel.com/new](https://vercel.com/new). La configuración está en
-[`vercel.json`](vercel.json); no requiere framework ni build.
-
-### Opción D — Cloudflare Pages
-
-Conectar el repositorio, dejar el comando de build vacío y usar `sitio-web` como directorio de salida.
-
----
-
-## Características técnicas del sitio
-
-- **HTML5 semántico**: `header`, `nav`, `main`, `section`, `article`, `footer`.
+- **Laravel 12 sobre PHP 8.2**, con `composer.json` fijado a `"php": "^8.2"`.
+- **HTML5 semántico** en las vistas Blade: `header`, `nav`, `main`, `section`, `article`, `footer`.
 - **CSS3 sin frameworks**: variables personalizadas, Flexbox, CSS Grid y un punto de quiebre en 760 px (RNF-01).
 - **Accesibilidad**: enlace para saltar al contenido, `aria-current` en la página activa, `scope` en
   cabeceras de tabla, `caption` para lectores de pantalla, foco visible y soporte de `prefers-reduced-motion`.
 - **Rendimiento** (RNF-04): las páginas institucionales no cargan JavaScript; íconos SVG y una sola hoja de estilos.
+- **Reglas en el motor**: las restricciones `UNIQUE` y `CHECK` viven en las migraciones, no solo en el código.
 - **Extras**: página 404, metadatos Open Graph, favicon SVG y hoja de estilos de impresión.
 
 ---

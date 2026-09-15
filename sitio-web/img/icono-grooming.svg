@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Grooming y baño">
-  <rect x="2" y="2" width="60" height="60" rx="16" fill="#eef5f1"/>
-  <path d="M18 34 h28 a14 14 0 0 1 -28 0 z" fill="#14524a"/>
-  <path d="M14 34 h36" stroke="#2c7a6b" stroke-width="4" stroke-linecap="round"/>
-  <circle cx="26" cy="18" r="3.5" fill="#e8a33d"/>
-  <circle cx="34" cy="13" r="4.5" fill="#e8a33d"/>
-  <circle cx="41" cy="21" r="3" fill="#e8a33d"/>
-  <path d="M22 48 h20" stroke="#d9e5df" stroke-width="4" stroke-linecap="round"/>
-</svg>

@@ -5,8 +5,9 @@ pantalla del prototipo se puede ver funcionando.
 
 - Presentación: [`docs/presentacion/ReglasDeNegocio_VetPetConnect.pptx`](presentacion/ReglasDeNegocio_VetPetConnect.pptx)
 - Capturas anotadas: [`docs/capturas-reglas/`](capturas-reglas/)
-- Prototipo navegable: [`sitio-web/app/`](../sitio-web/app/)
-- Implementación en el navegador: [`sitio-web/app/js/reglas.js`](../sitio-web/app/js/reglas.js)
+- Aplicación Laravel: [`app/`](../app/)
+- Servicios de dominio: [`app/Services/`](../app/Services/)
+- Pruebas de las 20 reglas: [`tests/Feature/`](../tests/Feature/)
 - Implementación en la base de datos: [`basedatos/01_esquema.sql`](../basedatos/01_esquema.sql)
 
 ## Catálogo
@@ -44,58 +45,73 @@ pantalla del prototipo se puede ver funcionando.
 | Procedimiento almacenado | RN-12 | 1 |
 | Solo en la aplicación | RN-03 | 1 |
 
-## El prototipo
+## La plataforma
 
-`sitio-web/app/` es una demostración navegable de la plataforma, sin servidor: los datos viven en
-`localStorage` y se reinician limpiando el almacenamiento del navegador.
+La aplicación Laravel sirve tanto el sitio institucional como los módulos de los cuatro roles.
 
-| Pantalla | Rol | Reglas que demuestra |
+| Ruta | Rol | Reglas que aplica |
 | --- | --- | --- |
-| `index.html` | — | RN-01, RN-02, RN-03 |
-| `catalogo.html` | Cliente | RN-05, RN-06, RN-08, RN-09, RN-10 |
-| `carrito.html` | Cliente | RN-10, RN-11, RN-12, RN-14 |
-| `citas.html` | Cliente | RN-04, RN-17 |
-| `mascotas.html` | Cliente | RN-04, RN-15, RN-16 |
-| `clinica.html` | Veterinario | RN-18, RN-19, RN-20 |
-| `admin.html` | Administrador | RN-05, RN-06, RN-07, RN-08, RN-13, RN-14, RN-20 |
+| `/ingresar`, `/registro` | — | RN-01, RN-02, RN-03 |
+| `/app/catalogo` | Cliente | RN-05, RN-06, RN-08, RN-09, RN-10 |
+| `/app/carrito` | Cliente | RN-10, RN-11, RN-12, RN-14 |
+| `/app/citas` | Cliente | RN-04, RN-17 |
+| `/app/mascotas` | Cliente | RN-04, RN-15, RN-16 |
+| `/app/clinica` | Veterinario | RN-18, RN-19, RN-20 |
+| `/app/admin` | Administrador | RN-05, RN-06, RN-07, RN-08, RN-13, RN-14, RN-20 |
 
 ### Cuentas de demostración
 
-Todas usan la contraseña `demo123`. Son cuentas ficticias de un prototipo académico.
+Todas usan la contraseña `demo123`. Son cuentas ficticias de un proyecto académico, sembradas
+por `database/seeders/UsuarioSeeder.php`.
 
 | Correo | Rol |
 | --- | --- |
-| `ana@correo.com` | Cliente |
-| `marco@correo.com` | Cliente |
+| `ana.quispe@correo.com` | Cliente |
+| `marco.s@correo.com` | Cliente |
+| `rosa.ibanez@correo.com` | Cliente |
 | `lbernal@vetpetsurco.pe` | Veterinario |
+| `dpalacios@vetpetsurco.pe` | Veterinario |
 | `admin@vetpetsurco.pe` | Administrador |
 
 ### Cómo probarlo
 
 ```bash
-cd sitio-web
-python3 -m http.server 8000
-# abrir http://localhost:8000/app/
+make up && make migrate && make seed     # con Docker
+# o, con PHP y MySQL locales:
+php artisan migrate --seed && php artisan serve
 ```
 
-## Qué está y qué no está implementado
+## Cómo se comprueba que se cumplen
 
-El prototipo **sí** aplica las veinte reglas del lado del cliente, y su comportamiento fue
-verificado con un recorrido automatizado de 32 comprobaciones sobre el navegador real
-(ver el flujo `Verificar proyecto` de GitHub Actions).
+`php artisan test` ejecuta la suite completa contra **MySQL real**, no contra SQLite: eso
+importa porque las restricciones `CHECK` y `UNIQUE` solo existen en el motor.
 
-El prototipo **no** es el sistema en producción. En particular:
+Cada regla que vive en dos capas se comprueba en las dos:
 
-- No hay servidor ni base de datos: los datos viven en el navegador de cada persona.
-- El hash de la contraseña se calcula con SHA-256 del navegador solo para demostrar que no se
-  almacena el texto en claro. En producción es BCrypt del lado del servidor (RNF-02).
-- Las reglas que en el diseño viven en el motor de datos (`UNIQUE`, `CHECK`, `FOR UPDATE`) aquí
-  están reimplementadas en JavaScript. Es exactamente la diferencia que explica la presentación:
-  una regla en la aplicación se puede saltar; la misma regla en la base de datos, no.
+1. Que el servicio lanza su excepción con el código `RN-xx`.
+2. Que la restricción del motor rechaza el dato aunque alguien salte el servicio e inserte
+   directo con `DB::table(...)->insert(...)`.
+
+Hay además un recorrido de navegador en [`pruebas/navegacion-plataforma.mjs`](../pruebas/navegacion-plataforma.mjs)
+que maneja la aplicación como lo haría una persona.
+
+### Advertencia sobre SQLite
+
+Las restricciones `CHECK` se crean con `DB::statement` solo bajo MySQL y MariaDB, porque SQLite
+no admite `ALTER TABLE ADD CONSTRAINT`. Si alguien cambiara la suite a SQLite, esa capa de
+protección desaparecería y las pruebas del motor dejarían de significar nada.
+
+### Límite heredado del esquema
+
+El `UNIQUE uk_agenda (veterinario_id, fecha_hora)` no distingue el estado de la cita, así que un
+horario cuya cita fue **cancelada** no se puede volver a reservar: lo rechaza el motor. Viene del
+esquema de la Entrega 2 y se resolvería con un índice parcial o incluyendo el estado en la clave.
 
 ### Capturas anotadas
 
-Las imágenes de [`docs/capturas-reglas/`](capturas-reglas/) se generan automáticamente: un script
-abre el prototipo, recorre los elementos marcados con `data-rn` en el DOM y dibuja el marco y la
-chapa sobre el control real. Por eso señalan el elemento exacto que aplica cada regla y no una
-anotación colocada a mano.
+Las imágenes de [`docs/capturas-reglas/`](capturas-reglas/) se generan automáticamente con
+[`herramientas/capturas-anotadas.mjs`](../herramientas/capturas-anotadas.mjs): el script abre la
+aplicación, recorre los elementos marcados con `data-rn` en el DOM y dibuja el marco y la chapa
+sobre el control real. Por eso señalan el elemento exacto que aplica cada regla y no una
+anotación colocada a mano. Las vistas Blade conservan esas marcas, así que el generador sigue
+funcionando después de la migración.

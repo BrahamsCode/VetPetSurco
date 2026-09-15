@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Models\Usuario;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 /**
@@ -24,7 +25,7 @@ final class RutasTest extends TestCase
         ];
     }
 
-    /** @dataProvider rutasPublicas */
+    #[DataProvider('rutasPublicas')]
     public function test_la_pagina_publica_responde_sin_sesion(string $ruta): void
     {
         $this->get(route($ruta))->assertOk();
@@ -49,7 +50,7 @@ final class RutasTest extends TestCase
         ];
     }
 
-    /** @dataProvider modulosPorRol */
+    #[DataProvider('modulosPorRol')]
     public function test_el_rol_correcto_entra_a_su_modulo(string $ruta, string $rol): void
     {
         $usuario = Usuario::factory()->{$rol}()->create();
@@ -57,7 +58,7 @@ final class RutasTest extends TestCase
         $this->actingAs($usuario)->get(route($ruta))->assertOk();
     }
 
-    /** @dataProvider modulosPorRol */
+    #[DataProvider('modulosPorRol')]
     public function test_rn01_un_rol_ajeno_no_entra_al_modulo(string $ruta, string $rol): void
     {
         // Se elige a propósito un rol distinto del que la ruta exige.
@@ -69,7 +70,7 @@ final class RutasTest extends TestCase
         $this->assertNotSame(200, $respuesta->getStatusCode());
     }
 
-    /** @dataProvider modulosPorRol */
+    #[DataProvider('modulosPorRol')]
     public function test_sin_sesion_la_plataforma_redirige_al_ingreso(string $ruta): void
     {
         $this->get(route($ruta))->assertRedirect(route('ingresar'));
