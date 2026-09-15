@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mis mascotas | VetPet Connect</title>
+  <meta name="description" content="Prototipo de la plataforma VetPet Connect: mis mascotas.">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="../img/logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Karla:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/estilos.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+  <a class="saltar" href="#contenido">Saltar al contenido principal</a>
+
+  <header class="encabezado" data-cabecera></header>
+
+  <main id="contenido" class="panel">
+    <div class="contenedor">
+      <div class="panel-titulo">
+        <h1>Mis mascotas y suscripciones</h1>
+        <p>Cada mascota pertenece a una sola cuenta: aquí ves únicamente las tuyas.</p>
+      </div>
+
+      <div class="aviso" id="aviso-mascotas" hidden></div>
+
+      <div class="rejilla rejilla-3" id="lista-mascotas" data-rn="RN-04" data-rn-nota="Mascotas del cliente"></div>
+
+      <div class="bloque" style="margin-top:24px;">
+        <h2>Suscripción mensual</h2>
+        <p>Puedes pausarla o cancelarla en cualquier momento.</p>
+        <div style="overflow-x:auto;margin-top:14px;">
+          <table class="tabla-app">
+            <thead>
+              <tr><th scope="col">Plan</th><th scope="col">Mascota</th><th scope="col">Producto</th>
+                  <th scope="col">Monto</th>
+                  <th scope="col" data-rn="RN-16" data-rn-nota="Frecuencia y próximo despacho">Próximo despacho</th>
+                  <th scope="col">Estado</th>
+                  <th scope="col" data-rn="RN-15" data-rn-nota="Pausar o cancelar">Acciones</th></tr>
+            </thead>
+            <tbody id="cuerpo-suscripciones"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="pie">
+    <div class="contenedor pie-final">
+      <p>Prototipo académico de VetPet Connect &mdash; Curso de E-business, Equipo 4, 2026.
+         Los datos se guardan solo en este navegador.</p>
+    </div>
+  </footer>
+
+  <script src="js/datos.js"></script>
+  <script src="js/reglas.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/pagina-mascotas.js"></script>
+</body>
+</html>

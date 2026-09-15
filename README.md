@@ -24,7 +24,7 @@ recordatorios automáticos de vacunación.
 
 | Carpeta | Contenido |
 | --- | --- |
-| [`sitio-web/`](sitio-web/) | 5 páginas estáticas, hoja de estilos e íconos SVG. Sin JavaScript ni frameworks. |
+| [`sitio-web/`](sitio-web/) | 5 páginas institucionales estáticas y [`app/`](sitio-web/app/), el prototipo navegable de la plataforma con los cuatro roles. |
 | [`basedatos/`](basedatos/) | `01_esquema.sql`, `02_datos_prueba.sql`, `03_transaccion_compra.sql`, `04_consultas_ejemplo.sql` |
 | [`backend/`](backend/) | `CarritoCompra`, `ItemCarrito` y `DemoCarrito` en `pe.vetpetsurco.carrito` |
 | [`docs/`](docs/) | [Entrega 1](docs/entrega-1-modelo-de-negocio.md), [Entrega 2](docs/entrega-2-arquitectura-software.md), [modelo de datos](docs/modelo-de-datos.md), las [presentaciones](docs/presentacion/), capturas y los `.docx` originales |
@@ -43,22 +43,27 @@ recordatorios automáticos de vacunación.
 | Presentación | Contenido |
 | --- | --- |
 | [Entrega 2](docs/presentacion/Entrega2_VetPetConnect_Presentacion.pptx) | Arquitectura de software y core transaccional: requerimientos, modelo de datos, pantallas y flujo de compra |
-| [Reglas de negocio](docs/presentacion/ReglasDeNegocio_VetPetConnect.pptx) | Las 20 reglas del sistema, dónde se hace cumplir cada una y dos casos trazados de principio a fin |
+| [Reglas de negocio](docs/presentacion/ReglasDeNegocio_VetPetConnect.pptx) | Las 20 reglas del sistema, enmarcadas sobre capturas del prototipo, más dos casos trazados de principio a fin |
 
 ---
 
 ## Cómo ejecutar cada parte
 
-### 1. Sitio web
+### 1. Sitio web y prototipo de la plataforma
 
-No necesita compilación. Basta con abrir `sitio-web/index.html` en el navegador, o levantar un
-servidor local para que las rutas relativas se comporten como en producción:
+No necesita compilación. Levanta un servidor local para que las rutas relativas se comporten
+como en producción:
 
 ```bash
 cd sitio-web
 python3 -m http.server 8000
-# abrir http://localhost:8000
+# sitio institucional:  http://localhost:8000
+# plataforma:           http://localhost:8000/app/
 ```
+
+El prototipo de [`sitio-web/app/`](sitio-web/app/) implementa las **20 reglas de negocio** del
+sistema en los módulos de los cuatro roles. Cuentas de demostración y trazabilidad completa en
+[`docs/reglas-de-negocio.md`](docs/reglas-de-negocio.md).
 
 ### 2. Base de datos (MySQL 8.0)
 
@@ -124,7 +129,7 @@ Conectar el repositorio, dejar el comando de build vacío y usar `sitio-web` com
 - **CSS3 sin frameworks**: variables personalizadas, Flexbox, CSS Grid y un punto de quiebre en 760 px (RNF-01).
 - **Accesibilidad**: enlace para saltar al contenido, `aria-current` en la página activa, `scope` en
   cabeceras de tabla, `caption` para lectores de pantalla, foco visible y soporte de `prefers-reduced-motion`.
-- **Rendimiento** (RNF-04): sin JavaScript, íconos SVG vectoriales y una sola hoja de estilos.
+- **Rendimiento** (RNF-04): las páginas institucionales no cargan JavaScript; íconos SVG y una sola hoja de estilos.
 - **Extras**: página 404, metadatos Open Graph, favicon SVG y hoja de estilos de impresión.
 
 ---

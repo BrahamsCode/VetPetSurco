@@ -1,0 +1,132 @@
+/* =====================================================================
+   VetPet Connect - Estilos de la plataforma
+   Extiende css/estilos.css; reutiliza sus variables de marca.
+   ===================================================================== */
+
+.sesion { display: flex; align-items: center; gap: 10px; }
+.sesion-nombre { font-weight: 700; font-size: 15px; color: var(--verde-oscuro); }
+
+.pastilla-rol {
+  background-color: var(--verde-oscuro); color: var(--blanco);
+  border-radius: 30px; padding: 4px 13px; font-size: 12px;
+  font-weight: 700; letter-spacing: .3px;
+}
+
+.boton-mini {
+  background: none; border: 1px solid var(--borde); color: var(--gris);
+  border-radius: 30px; padding: 5px 14px; font: inherit; font-size: 13px;
+  font-weight: 700; cursor: pointer;
+}
+.boton-mini:hover { border-color: var(--verde-medio); color: var(--verde-oscuro); }
+
+.panel { padding: 34px 0 48px 0; }
+
+.panel-titulo { margin-bottom: 22px; }
+.panel-titulo h1 { font-size: 32px; }
+.panel-titulo p { color: var(--gris); margin: 6px 0 0 0; }
+
+.rejilla { display: grid; gap: 20px; }
+.rejilla-2 { grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); }
+.rejilla-3 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+
+.bloque {
+  background-color: var(--blanco); border: 1px solid var(--borde);
+  border-radius: var(--radio); padding: 22px;
+}
+.bloque h2 { font-size: 20px; margin-bottom: 4px; }
+.bloque > p { color: var(--gris); font-size: 14px; }
+
+/* ---------- Catalogo ---------- */
+.producto { display: flex; flex-direction: column; height: 100%; }
+.producto-nombre { font-family: "Fraunces", Georgia, serif; font-size: 17px;
+  font-weight: 600; color: var(--verde-oscuro); margin-bottom: 2px; }
+.producto-sku { font-family: "Courier New", monospace; font-size: 12px; color: var(--gris); }
+.producto-precio { font-family: "Fraunces", Georgia, serif; font-size: 23px;
+  font-weight: 600; color: var(--verde-oscuro); margin: 10px 0 4px 0; }
+.producto-pie { margin-top: auto; padding-top: 14px; display: flex; gap: 8px; align-items: center; }
+.producto-pie input[type="number"] { width: 74px; padding: 9px 10px;
+  border: 1px solid var(--borde); border-radius: 9px; font: inherit; font-size: 15px; }
+
+/* ---------- Semaforo de inventario ---------- */
+.semaforo { display: inline-flex; align-items: center; gap: 7px;
+  font-size: 13px; font-weight: 700; }
+.semaforo::before { content: ""; width: 11px; height: 11px; border-radius: 50%; }
+.semaforo-ROJO         { color: #b3261e; }
+.semaforo-ROJO::before { background-color: #b3261e; }
+.semaforo-AMBAR        { color: #8a5a00; }
+.semaforo-AMBAR::before{ background-color: #d98c00; }
+.semaforo-VERDE        { color: #2e7d5b; }
+.semaforo-VERDE::before{ background-color: #2e7d5b; }
+
+/* ---------- Avisos de reglas ---------- */
+.aviso { border-radius: 11px; padding: 13px 16px; font-size: 14.5px;
+  margin: 16px 0; border: 1px solid; }
+.aviso-ok    { background-color: var(--menta); border-color: #b9d8c9; color: var(--verde-oscuro); }
+.aviso-error { background-color: #fdeceb; border-color: #f0c2bd; color: #8c1d18; }
+.aviso-regla { font-family: "Courier New", monospace; font-weight: 700;
+  background-color: rgba(0,0,0,.07); border-radius: 5px; padding: 1px 7px; }
+
+/* ---------- Tablas de la plataforma ---------- */
+.tabla-app { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+.tabla-app th, .tabla-app td { text-align: left; padding: 11px 13px;
+  border-bottom: 1px solid var(--borde); }
+.tabla-app thead th { background-color: var(--menta); color: var(--verde-oscuro);
+  font-family: "Fraunces", Georgia, serif; font-weight: 600; }
+.tabla-app tbody tr:last-child td { border-bottom: none; }
+
+.estado { border-radius: 30px; padding: 3px 11px; font-size: 12px;
+  font-weight: 700; background-color: var(--menta); color: var(--verde-oscuro); }
+.estado-ANULADO, .estado-CANCELADA, .estado-NO_ASISTIO {
+  background-color: #fdeceb; color: #8c1d18; }
+.estado-ENTREGADO, .estado-ATENDIDA, .estado-ACTIVA {
+  background-color: #e3f1e9; color: #2e7d5b; }
+
+.origen-SUSCRIPCION { color: var(--ambar); font-weight: 700; }
+
+/* ---------- Horarios de la agenda ---------- */
+.horarios { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 10px; }
+.horario {
+  border: 1px solid var(--borde); background-color: var(--blanco);
+  color: var(--verde-oscuro); border-radius: 9px; padding: 10px 15px;
+  font: inherit; font-size: 15px; font-weight: 700; cursor: pointer;
+}
+.horario:hover:not(:disabled) { border-color: var(--verde-medio); background-color: var(--menta); }
+.horario[aria-pressed="true"] { background-color: var(--verde-oscuro);
+  border-color: var(--verde-oscuro); color: var(--blanco); }
+.horario:disabled { background-color: #f2f4f3; color: #a8b3ae;
+  border-color: #e6eae8; cursor: not-allowed; text-decoration: line-through; }
+
+/* ---------- Indicadores del dashboard ---------- */
+.indicadores { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; }
+.indicador { background-color: var(--menta); border-radius: var(--radio); padding: 18px 20px; }
+.indicador-valor { font-family: "Fraunces", Georgia, serif; font-size: 34px;
+  font-weight: 600; color: var(--verde-oscuro); line-height: 1.1; }
+.indicador-etiqueta { font-size: 13px; color: var(--gris); margin-top: 3px; }
+
+/* ---------- Ingreso ---------- */
+.ingreso { max-width: 440px; margin: 0 auto; }
+.cuentas-demo { margin-top: 18px; }
+.cuenta-demo {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  width: 100%; text-align: left; background-color: var(--menta);
+  border: 1px solid var(--borde); border-radius: 11px; padding: 11px 15px;
+  margin-bottom: 9px; font: inherit; cursor: pointer;
+}
+.cuenta-demo:hover { border-color: var(--verde-medio); }
+.cuenta-demo strong { color: var(--verde-oscuro); font-size: 14.5px; }
+.cuenta-demo small { color: var(--gris); display: block; font-size: 12.5px;
+  font-family: "Courier New", monospace; }
+
+.lista-simple { list-style: none; }
+.lista-simple li { padding: 9px 0; border-bottom: 1px dashed var(--borde);
+  font-size: 14.5px; color: var(--gris); }
+.lista-simple li:last-child { border-bottom: none; }
+
+.nota-regla { font-size: 12.5px; color: var(--gris); margin-top: 9px; }
+.nota-regla code { font-family: "Courier New", monospace; color: var(--verde-medio);
+  font-weight: 700; }
+
+@media (max-width: 760px) {
+  .sesion { order: 3; width: 100%; justify-content: center; }
+  .panel-titulo h1 { font-size: 26px; }
+}

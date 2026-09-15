@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | VetPet Connect</title>
+  <meta name="description" content="Prototipo de la plataforma VetPet Connect: dashboard.">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="../img/logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Karla:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/estilos.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+  <a class="saltar" href="#contenido">Saltar al contenido principal</a>
+
+  <header class="encabezado" data-cabecera></header>
+
+  <main id="contenido" class="panel">
+    <div class="contenedor">
+      <div class="panel-titulo">
+        <h1>Dashboard administrativo</h1>
+        <p>Inventario, pedidos, ingreso recurrente y recordatorios de salud.</p>
+      </div>
+
+      <div class="aviso" id="aviso-admin" hidden></div>
+
+      <div class="indicadores" style="margin-bottom:24px;" id="indicadores"></div>
+
+      <div class="bloque" id="bloque-inventario" style="margin-bottom:22px;">
+        <h2>Inventario</h2>
+        <p>El semáforo compara el stock con el punto de reorden de cada producto.</p>
+        <div style="overflow-x:auto;margin-top:14px;">
+          <table class="tabla-app">
+            <thead>
+              <tr><th scope="col">SKU</th><th scope="col">Producto</th><th scope="col">Precio</th>
+                  <th scope="col" data-rn="RN-07" data-rn-nota="Stock nunca negativo">Stock</th>
+                  <th scope="col">Reorden</th>
+                  <th scope="col" data-rn="RN-08" data-rn-nota="Semáforo de reposición">Semáforo</th></tr>
+            </thead>
+            <tbody id="cuerpo-inventario"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="rejilla rejilla-2" style="margin-bottom:22px;">
+        <div class="bloque" id="bloque-alta">
+          <h2>Alta de producto</h2>
+          <p>Prueba a repetir un SKU existente o a poner precio cero.</p>
+          <div class="campo" data-rn="RN-05" data-rn-nota="SKU irrepetible">
+            <label for="nuevo-sku">Código SKU</label>
+            <input type="text" id="nuevo-sku" placeholder="ALI-PER-15K">
+          </div>
+          <div class="campo">
+            <label for="nuevo-nombre">Nombre del producto</label>
+            <input type="text" id="nuevo-nombre">
+          </div>
+          <div class="campo" data-rn="RN-06" data-rn-nota="Precio mayor que cero">
+            <label for="nuevo-precio">Precio</label>
+            <input type="number" id="nuevo-precio" step="0.10" value="0">
+          </div>
+          <div class="campo">
+            <label for="nuevo-stock">Stock inicial</label>
+            <input type="number" id="nuevo-stock" min="0" value="0">
+          </div>
+          <button type="button" class="boton" id="btn-alta">Registrar producto</button>
+        </div>
+
+        <div class="bloque">
+          <h2 data-rn="RN-20" data-rn-nota="Aviso 15 días antes">Recordatorios de salud</h2>
+          <p>Controles programados dentro de los próximos 15 días.</p>
+          <div style="overflow-x:auto;margin-top:12px;">
+            <table class="tabla-app">
+              <thead>
+                <tr><th scope="col">Mascota</th><th scope="col">Cliente</th>
+                    <th scope="col">Fecha</th><th scope="col">Faltan</th></tr>
+              </thead>
+              <tbody id="cuerpo-recordatorios"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="bloque" id="bloque-pedidos">
+        <h2>Pedidos</h2>
+        <p>Cada pedido avanza de PENDIENTE a ENTREGADO, sin saltarse pasos.</p>
+        <div style="overflow-x:auto;margin-top:14px;">
+          <table class="tabla-app">
+            <thead>
+              <tr><th scope="col">N.°</th><th scope="col">Cliente</th><th scope="col">Monto</th>
+                  <th scope="col" data-rn="RN-14" data-rn-nota="Compra o suscripción">Origen</th>
+                  <th scope="col" data-rn="RN-13" data-rn-nota="Secuencia de estados">Estado</th>
+                  <th scope="col"><span class="oculto-visual">Acciones</span></th></tr>
+            </thead>
+            <tbody id="cuerpo-pedidos"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="pie">
+    <div class="contenedor pie-final">
+      <p>Prototipo académico de VetPet Connect &mdash; Curso de E-business, Equipo 4, 2026.
+         Los datos se guardan solo en este navegador.</p>
+    </div>
+  </footer>
+
+  <script src="js/datos.js"></script>
+  <script src="js/reglas.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/pagina-admin.js"></script>
+</body>
+</html>

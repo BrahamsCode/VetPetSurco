@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reservar cita | VetPet Connect</title>
+  <meta name="description" content="Prototipo de la plataforma VetPet Connect: reservar cita.">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="../img/logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Karla:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/estilos.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+  <a class="saltar" href="#contenido">Saltar al contenido principal</a>
+
+  <header class="encabezado" data-cabecera></header>
+
+  <main id="contenido" class="panel">
+    <div class="contenedor">
+      <div class="panel-titulo">
+        <h1>Reservar una cita</h1>
+        <p>Elige mascota, servicio y horario. Los bloques ya ocupados no se pueden seleccionar.</p>
+      </div>
+
+      <div class="aviso" id="aviso-citas" hidden></div>
+
+      <div class="rejilla rejilla-2">
+        <div class="bloque">
+          <h2>Nueva cita</h2>
+          <div class="campo" data-rn="RN-04" data-rn-nota="Solo tus mascotas">
+            <label for="mascota">Mascota</label>
+            <select id="mascota"></select>
+          </div>
+          <div class="campo">
+            <label for="servicio">Servicio</label>
+            <select id="servicio">
+              <option value="CONSULTA">Consulta general</option>
+              <option value="VACUNACION">Vacunación</option>
+              <option value="DESPARASITACION">Desparasitación</option>
+              <option value="GROOMING">Baño y grooming</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label for="veterinario">Veterinario</label>
+            <select id="veterinario"></select>
+          </div>
+          <div class="campo">
+            <label for="fecha">Fecha</label>
+            <input type="date" id="fecha">
+          </div>
+          <div class="campo" data-rn="RN-17" data-rn-nota="Horario único por veterinario">
+            <span style="display:block;font-weight:700;font-size:15px;margin-bottom:6px;color:var(--verde-oscuro);">Horario disponible</span>
+            <div class="horarios" id="horarios" role="group" aria-label="Horarios disponibles"></div>
+          </div>
+          <p style="margin-top:16px;">
+            <button type="button" class="boton" id="btn-reservar">Reservar cita</button>
+          </p>
+          <p class="nota-regla">Un horario ocupado aparece tachado y deshabilitado. Si dos clientes
+             compiten por el mismo bloque, la restricción <code>uk_agenda</code> decide.</p>
+        </div>
+
+        <div class="bloque">
+          <h2>Mis citas</h2>
+          <p>Reservas registradas para tus mascotas.</p>
+          <div style="overflow-x:auto;margin-top:12px;">
+            <table class="tabla-app">
+              <thead>
+                <tr><th scope="col">Mascota</th><th scope="col">Servicio</th>
+                    <th scope="col">Fecha y hora</th><th scope="col">Estado</th></tr>
+              </thead>
+              <tbody id="cuerpo-citas"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="pie">
+    <div class="contenedor pie-final">
+      <p>Prototipo académico de VetPet Connect &mdash; Curso de E-business, Equipo 4, 2026.
+         Los datos se guardan solo en este navegador.</p>
+    </div>
+  </footer>
+
+  <script src="js/datos.js"></script>
+  <script src="js/reglas.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/pagina-citas.js"></script>
+</body>
+</html>

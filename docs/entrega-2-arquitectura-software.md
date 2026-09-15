@@ -248,6 +248,13 @@ sitio-web/
 
 Las capturas de pantalla del sitio se encuentran en [`docs/capturas/`](capturas/).
 
+### Prototipo navegable de la plataforma
+
+Sobre el sitio institucional se añadió `sitio-web/app/`, un prototipo funcional de VetPet Connect
+con los módulos de los cuatro roles. Implementa las veinte reglas de negocio del sistema y sirve
+de evidencia de que el diseño de esta entrega es ejecutable. No tiene servidor: los datos viven en
+el navegador. Su documentación está en [`docs/reglas-de-negocio.md`](reglas-de-negocio.md).
+
 ### Contenido de cada página
 
 | Página | Contenido |
@@ -261,8 +268,9 @@ Las capturas de pantalla del sitio se encuentran en [`docs/capturas/`](capturas/
 
 - **RNF-01 (responsivo).** Diseño fluido con Flexbox y CSS Grid, un único punto de quiebre en 760 px,
   imágenes con `max-width: 100%` y tablas dentro de un contenedor con desplazamiento lateral.
-- **RNF-04 (rendimiento).** Sitio 100% estático, sin JavaScript ni frameworks; los íconos son SVG
-  vectoriales de pocos kilobytes.
+- **RNF-04 (rendimiento).** Las páginas institucionales son 100% estáticas, sin JavaScript ni
+  frameworks; los íconos son SVG vectoriales de pocos kilobytes. El prototipo de la plataforma
+  (`sitio-web/app/`) añade JavaScript propio, sin librerías externas ni proceso de compilación.
 - **Accesibilidad.** Marcado semántico (`header`, `nav`, `main`, `section`, `footer`), enlace para
   saltar al contenido, `aria-current` en la página activa, `scope` en las cabeceras de tabla,
   foco visible en todos los controles y respeto por `prefers-reduced-motion`.

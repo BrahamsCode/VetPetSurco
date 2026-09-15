@@ -28,6 +28,26 @@ jobs:
           javac -d out src/pe/vetpetsurco/carrito/*.java
           java -cp out pe.vetpetsurco.carrito.DemoCarrito
 
+  reglas-de-negocio:
+    name: Reglas de negocio en el prototipo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar Playwright con Chromium
+        run: npm init -y && npm install --no-save playwright && npx playwright install --with-deps chromium
+
+      - name: Levantar el sitio
+        run: npx --yes http-server sitio-web -p 8099 --silent &
+
+      - name: Recorrer el prototipo y comprobar las 20 reglas
+        run: node pruebas/reglas-de-negocio.mjs
+
   sitio-web:
     name: Sitio web estatico
     runs-on: ubuntu-latest
