@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\EstadoSuscripcion;
 use App\Models\Mascota;
 use App\Models\Producto;
 use App\Models\Suscripcion;
+use App\Services\SuscripcionService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -35,10 +37,21 @@ class MascotaController extends Controller
                 ->get()
                 ->keyBy('producto_id');
 
+        // RN-22: lo que cada mascota ya tiene vigente no se vuelve a ofrecer.
+        // Una pausada tambien cuenta: sigue siendo un contrato, solo detenido.
+        $vigentesPorMascota = $suscripciones
+            ->whereIn('estado', [EstadoSuscripcion::ACTIVA, EstadoSuscripcion::PAUSADA])
+            ->groupBy('mascota_id')
+            ->map(fn ($grupo) => $grupo->pluck('producto_id')->map(intval(...))->values()->all());
+
         return view('app.mascotas', [
             'mascotas' => $mascotas,
             'suscripciones' => $suscripciones,
             'productos' => $productos,
+            // Para el formulario de contratacion.
+            'catalogo' => Producto::query()->activos()->orderBy('nombre')->get(),
+            'planes' => SuscripcionService::planes(),
+            'vigentesPorMascota' => $vigentesPorMascota,
         ]);
     }
 }

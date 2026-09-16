@@ -70,13 +70,10 @@
           <p class="indicador-valor" id="total-carrito">S/ {{ number_format((float) $total, 2) }}</p>
           <form method="POST" action="{{ route('carrito.confirmar') }}">
             @csrf
-            <div class="campo" style="margin-top:16px;" data-rn="RN-14" data-rn-nota="Origen del pedido">
-              <label for="origen">Origen del pedido</label>
-              <select id="origen" name="origen">
-                <option value="COMPRA_DIRECTA">Compra directa</option>
-                <option value="SUSCRIPCION">Despacho de suscripci&oacute;n</option>
-              </select>
-            </div>
+            <p class="nota-regla" style="margin-top:16px;" data-rn="RN-14" data-rn-nota="Origen del pedido">
+              Esto es una <strong>compra directa</strong>. Los despachos de
+              suscripci&oacute;n los emite el sistema solo, al vencer el plan.
+            </p>
             <p style="margin-top:16px;" data-rn="RN-12" data-rn-nota="Sin stock no hay pedido">
               <button type="submit" class="boton" id="btn-confirmar">Confirmar pedido</button>
             </p>

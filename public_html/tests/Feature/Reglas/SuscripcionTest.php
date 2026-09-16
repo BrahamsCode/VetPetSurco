@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tests\Feature\Reglas;
 
 use App\Enums\EstadoSuscripcion;
+use App\Models\Mascota;
+use App\Models\Producto;
 use App\Models\Suscripcion;
 use App\Models\Usuario;
 use Illuminate\Database\QueryException;
@@ -189,12 +191,139 @@ final class SuscripcionTest extends TestCase
         $ana = Usuario::factory()->cliente()->create();
         $marco = Usuario::factory()->cliente()->create(['nombre' => 'Marco Salazar']);
 
-        Suscripcion::factory()->create(['cliente_id' => $ana->getKey(), 'plan' => 'BASICO']);
-        Suscripcion::factory()->create(['cliente_id' => $marco->getKey(), 'plan' => 'INTEGRAL']);
+        Suscripcion::factory()->create([
+            'cliente_id' => $ana->getKey(), 'plan' => 'BASICO', 'monto_mensual' => '99.00',
+        ]);
+        // Se compara por el monto y no por el nombre del plan: los tres planes
+        // figuran en el formulario de contratacion, asi que verlos ahi no
+        // significa estar viendo la suscripcion de otra cuenta.
+        Suscripcion::factory()->create([
+            'cliente_id' => $marco->getKey(), 'plan' => 'INTEGRAL', 'monto_mensual' => '987.65',
+        ]);
 
         $respuesta = $this->actingAs($ana)->get(route('mascotas'));
 
         $respuesta->assertOk();
-        $respuesta->assertDontSee('INTEGRAL');
+        $respuesta->assertDontSee('987.65');
+    }
+
+    // -----------------------------------------------------------------
+    // Contratacion del plan: como entra el cliente al ingreso recurrente
+    // -----------------------------------------------------------------
+
+    /** RN-16: la suscripcion nace ACTIVA, con su cuota y su primer despacho. */
+    public function test_el_cliente_contrata_un_plan_para_su_mascota(): void
+    {
+        $cliente = Usuario::factory()->cliente()->create();
+        $mascota = Mascota::factory()->create(['cliente_id' => $cliente->getKey()]);
+        $producto = Producto::factory()->create(['activo' => true]);
+
+        $respuesta = $this->actingAs($cliente)->post(route('suscripciones.contratar'), [
+            'mascota_id' => $mascota->getKey(),
+            'producto_id' => $producto->getKey(),
+            'plan' => 'CUIDADO',
+        ]);
+
+        $respuesta->assertRedirect();
+        $this->assertDatabaseHas('suscripciones', [
+            'cliente_id' => $cliente->getKey(),
+            'mascota_id' => $mascota->getKey(),
+            'producto_id' => $producto->getKey(),
+            'plan' => 'CUIDADO',
+            'monto_mensual' => '149.00',
+            'frecuencia_dias' => 30,
+            'estado' => EstadoSuscripcion::ACTIVA->value,
+        ]);
+
+        $suscripcion = Suscripcion::query()->where('mascota_id', $mascota->getKey())->sole();
+        $this->assertSame(
+            now()->addDays(30)->toDateString(),
+            $suscripcion->proximo_despacho->toDateString(),
+        );
+    }
+
+    /** RN-04: no se contrata un plan para la mascota de otra cuenta. */
+    public function test_el_cliente_no_puede_contratar_para_la_mascota_de_otro(): void
+    {
+        $ana = Usuario::factory()->cliente()->create();
+        $marco = Usuario::factory()->cliente()->create();
+        $deMarco = Mascota::factory()->create(['cliente_id' => $marco->getKey()]);
+        $producto = Producto::factory()->create(['activo' => true]);
+
+        $this->actingAs($ana)->post(route('suscripciones.contratar'), [
+            'mascota_id' => $deMarco->getKey(),
+            'producto_id' => $producto->getKey(),
+            'plan' => 'BASICO',
+        ])->assertSessionHasErrors('mascota_id');
+
+        $this->assertDatabaseMissing('suscripciones', ['mascota_id' => $deMarco->getKey()]);
+    }
+
+    /** RN-22: el mismo plan vigente no se contrata dos veces. */
+    public function test_rn22_no_se_duplica_un_plan_vigente_de_la_misma_mascota(): void
+    {
+        $cliente = Usuario::factory()->cliente()->create();
+        $mascota = Mascota::factory()->create(['cliente_id' => $cliente->getKey()]);
+        $producto = Producto::factory()->create(['activo' => true]);
+
+        Suscripcion::factory()->create([
+            'cliente_id' => $cliente->getKey(),
+            'mascota_id' => $mascota->getKey(),
+            'producto_id' => $producto->getKey(),
+            'estado' => EstadoSuscripcion::ACTIVA,
+        ]);
+
+        $this->actingAs($cliente)->post(route('suscripciones.contratar'), [
+            'mascota_id' => $mascota->getKey(),
+            'producto_id' => $producto->getKey(),
+            'plan' => 'INTEGRAL',
+        ]);
+
+        // Sigue habiendo una sola: la segunda no entro.
+        $this->assertSame(1, Suscripcion::query()->where('mascota_id', $mascota->getKey())->count());
+    }
+
+    /**
+     * La otra cara de RN-15: si el plan anterior quedo CANCELADO, contratar de
+     * nuevo si esta permitido. Es la unica forma de "reactivar".
+     */
+    public function test_rn15_tras_cancelar_se_puede_contratar_de_nuevo(): void
+    {
+        $cliente = Usuario::factory()->cliente()->create();
+        $mascota = Mascota::factory()->create(['cliente_id' => $cliente->getKey()]);
+        $producto = Producto::factory()->create(['activo' => true]);
+
+        Suscripcion::factory()->cancelada()->create([
+            'cliente_id' => $cliente->getKey(),
+            'mascota_id' => $mascota->getKey(),
+            'producto_id' => $producto->getKey(),
+        ]);
+
+        $this->actingAs($cliente)->post(route('suscripciones.contratar'), [
+            'mascota_id' => $mascota->getKey(),
+            'producto_id' => $producto->getKey(),
+            'plan' => 'BASICO',
+        ]);
+
+        $this->assertSame(2, Suscripcion::query()->where('mascota_id', $mascota->getKey())->count());
+        $this->assertSame(
+            1,
+            Suscripcion::query()->where('mascota_id', $mascota->getKey())->activas()->count(),
+        );
+    }
+
+    public function test_no_se_admite_un_plan_que_no_existe(): void
+    {
+        $cliente = Usuario::factory()->cliente()->create();
+        $mascota = Mascota::factory()->create(['cliente_id' => $cliente->getKey()]);
+        $producto = Producto::factory()->create(['activo' => true]);
+
+        $this->actingAs($cliente)->post(route('suscripciones.contratar'), [
+            'mascota_id' => $mascota->getKey(),
+            'producto_id' => $producto->getKey(),
+            'plan' => 'PREMIUM',
+        ])->assertSessionHasErrors('plan');
+
+        $this->assertDatabaseMissing('suscripciones', ['mascota_id' => $mascota->getKey()]);
     }
 }

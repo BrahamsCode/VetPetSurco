@@ -101,14 +101,6 @@ class CarritoController extends Controller
 
     public function confirmar(Request $request): RedirectResponse
     {
-        // RN-14: el origen viaja con el pedido.
-        $datos = $request->validate([
-            'origen' => ['required', 'in:COMPRA_DIRECTA,SUSCRIPCION'],
-        ], [
-            'origen.required' => 'Indica el origen del pedido.',
-            'origen.in' => 'Ese origen de pedido no existe.',
-        ]);
-
         $lineas = $this->carrito->items();
 
         if ($lineas === []) {
@@ -121,10 +113,12 @@ class CarritoController extends Controller
 
         try {
             // RN-12: transaccion con bloqueo de filas; o entra todo o no entra nada.
+            // RN-14: lo que sale del carrito es siempre una compra directa; los
+            // despachos recurrentes los emite DespachoService al vencer el plan.
             $pedido = $this->pedidos->confirmar(
                 $request->user(),
                 $lineas,
-                TipoOrigen::from($datos['origen']),
+                TipoOrigen::COMPRA_DIRECTA,
             );
         } catch (StockInsuficienteException $e) {
             return back()->with('resultado', [

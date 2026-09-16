@@ -1,13 +1,13 @@
 # Reglas de negocio de VetPet Connect
 
-Las veinte reglas que gobiernan el sistema, dónde se hace cumplir cada una y en qué
+Las veintidós reglas que gobiernan el sistema, dónde se hace cumplir cada una y en qué
 pantalla del prototipo se puede ver funcionando.
 
 - Presentación: [`docs/presentacion/ReglasDeNegocio_VetPetConnect.pptx`](presentacion/ReglasDeNegocio_VetPetConnect.pptx)
 - Capturas anotadas: [`docs/capturas-reglas/`](capturas-reglas/)
 - Aplicación Laravel: [`public_html/app/`](../public_html/app/)
 - Servicios de dominio: [`public_html/app/Services/`](../public_html/app/Services/)
-- Pruebas de las 20 reglas: [`public_html/tests/Feature/`](../public_html/tests/Feature/)
+- Pruebas de las 22 reglas: [`public_html/tests/Feature/`](../public_html/tests/Feature/)
 - Implementación en la base de datos: [`basedatos/01_esquema.sql`](../basedatos/01_esquema.sql)
 
 ## Catálogo
@@ -34,16 +34,18 @@ pantalla del prototipo se puede ver funcionando.
 | **RN-18** | Toda cita registra su desenlace | `estado ENUM` | `rn18CerrarCita()` | 07 |
 | **RN-19** | Cada atención genera un único registro clínico | `cita_id UNIQUE` | `rn19RegistrarAtencion()` | 07 |
 | **RN-20** | Se avisa 15 días antes del próximo control | `v_recordatorios_salud` | `rn20Recordatorios()` | 07, 08 |
+| **RN-21** | Un pedido solo pasa a PAGADO si la pasarela aprueba | `pagos.estado ENUM` | `PagoService::cobrar()` | — |
+| **RN-22** | Una mascota no repite un plan vigente del mismo producto | — | `SuscripcionService::contratar()` | — |
 
 ## Reparto por capa
 
 | Capa | Reglas | Total |
 | --- | --- | --- |
 | Restricción de la base de datos | RN-01, 02, 04, 05, 06, 07, 11, 13, 14, 15, 16, 17, 18, 19 | 14 |
-| Base de datos y aplicación | RN-09, RN-10 | 2 |
+| Base de datos y aplicación | RN-09, RN-10, RN-21 | 3 |
 | Vista SQL | RN-08, RN-20 | 2 |
 | Procedimiento almacenado | RN-12 | 1 |
-| Solo en la aplicación | RN-03 | 1 |
+| Solo en la aplicación | RN-03, RN-22 | 2 |
 
 ## La plataforma
 
@@ -54,10 +56,40 @@ La aplicación Laravel sirve tanto el sitio institucional como los módulos de l
 | `/ingresar`, `/registro` | — | RN-01, RN-02, RN-03 |
 | `/app/catalogo` | Cliente | RN-05, RN-06, RN-08, RN-09, RN-10 |
 | `/app/carrito` | Cliente | RN-10, RN-11, RN-12, RN-14 |
+| `/app/pedidos/{id}/pagar` | Cliente | RN-13, RN-21 |
 | `/app/citas` | Cliente | RN-04, RN-17 |
-| `/app/mascotas` | Cliente | RN-04, RN-15, RN-16 |
+| `/app/mascotas` | Cliente | RN-04, RN-15, RN-16, RN-22 |
 | `/app/clinica` | Veterinario | RN-18, RN-19, RN-20 |
 | `/app/admin` | Administrador | RN-05, RN-06, RN-07, RN-08, RN-13, RN-14, RN-20 |
+
+### Los tres planes
+
+Lo que separa un plan de otro es cuántas unidades del producto entran en cada despacho.
+No es una etiqueta comercial: la cantidad se usa de verdad al generar el pedido, así que
+se ve en el detalle y en el stock descontado.
+
+| Plan | Cuota mensual | Unidades por despacho |
+| --- | --- | --- |
+| BASICO | S/ 99.00 | 1 |
+| CUIDADO | S/ 149.00 | 2 |
+| INTEGRAL | S/ 219.00 | 3 |
+
+Las cuotas son las que ya usaba `SuscripcionSeeder`; viven en un solo sitio,
+`SuscripcionService::PLANES`.
+
+### Proceso automático
+
+El ingreso recurrente no depende de que el cliente pida nada: cuando una suscripción activa
+llega a su `proximo_despacho`, el sistema emite el pedido por su cuenta y lo marca como
+`SUSCRIPCION` (RN-14). Por eso el carrito ya no pregunta el origen: lo que sale de ahí es
+siempre una compra directa.
+
+| Tarea | Cuándo corre | Reglas |
+| --- | --- | --- |
+| `php artisan suscripciones:despachar` | Cada día a las 03:00 (`routes/console.php`) | RN-12, RN-14, RN-15, RN-16 |
+
+Si un producto no tiene stock, ese despacho se omite y la fecha **no** avanza, así que se
+recupera solo en la siguiente pasada, en cuanto el administrador reponga (RN-12).
 
 ### Cuentas de demostración
 

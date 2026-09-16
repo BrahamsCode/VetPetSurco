@@ -185,6 +185,79 @@
 .nota-regla code { font-family: "Courier New", monospace; color: var(--verde-medio);
   font-weight: 700; }
 
+/* ---------- Contratacion del plan mensual ---------- */
+.paso-plan { margin-top: 20px; }
+.paso-titulo {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 13px; font-weight: 700; color: var(--verde-oscuro);
+  text-transform: uppercase; letter-spacing: .4px; margin-bottom: 11px;
+}
+.paso-numero {
+  width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+  background-color: var(--verde-oscuro); color: var(--blanco);
+  display: grid; place-items: center; font-size: 12px;
+}
+
+/* El radio real queda accesible pero invisible: la tarjeta es la que se ve. */
+.opcion-radio { position: absolute; width: 1px; height: 1px; opacity: 0; }
+
+.mascotas-opciones { display: flex; flex-wrap: wrap; gap: 10px; }
+.mascota-chip {
+  display: flex; align-items: center; gap: 9px; cursor: pointer;
+  border: 1px solid var(--borde); border-radius: 30px; padding: 9px 17px 9px 11px;
+  background-color: var(--blanco); transition: var(--transicion);
+}
+.mascota-chip:hover { border-color: var(--verde-medio); }
+.mascota-avatar {
+  width: 27px; height: 27px; border-radius: 50%; flex-shrink: 0;
+  background-color: var(--menta); color: var(--verde-oscuro);
+  display: grid; place-items: center; font-size: 13px; font-weight: 700;
+}
+.mascota-nombre { font-size: 14.5px; font-weight: 700; color: var(--tinta); }
+.mascota-especie { font-size: 12px; color: var(--gris); }
+.opcion-radio:checked + .mascota-chip {
+  border-color: var(--verde-oscuro); background-color: var(--menta);
+}
+.opcion-radio:checked + .mascota-chip .mascota-avatar {
+  background-color: var(--verde-oscuro); color: var(--blanco);
+}
+.opcion-radio:focus-visible + .mascota-chip,
+.opcion-radio:focus-visible + .plan-tarjeta { outline: 2px solid var(--ambar); outline-offset: 2px; }
+
+.planes-opciones { display: grid; grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); gap: 12px; }
+.plan-tarjeta {
+  display: block; cursor: pointer; height: 100%;
+  border: 1px solid var(--borde); border-radius: var(--radio); padding: 16px;
+  background-color: var(--blanco); transition: var(--transicion);
+}
+.plan-tarjeta:hover { border-color: var(--verde-medio); }
+.plan-nombre {
+  font-size: 12px; font-weight: 700; letter-spacing: .6px;
+  color: var(--verde-medio); text-transform: uppercase;
+}
+.plan-precio {
+  font-family: "Fraunces", Georgia, serif; font-size: 27px; font-weight: 600;
+  color: var(--verde-oscuro); line-height: 1.2; margin: 5px 0 1px 0;
+}
+.plan-periodo { font-size: 12.5px; color: var(--gris); }
+.plan-detalle {
+  font-size: 12.5px; color: var(--gris); margin-top: 10px;
+  padding-top: 10px; border-top: 1px dashed var(--borde);
+}
+.opcion-radio:checked + .plan-tarjeta {
+  border-color: var(--verde-oscuro); background-color: var(--menta);
+  box-shadow: 0 0 0 1px var(--verde-oscuro);
+}
+
+/* Lo que se va a contratar, en una frase, antes de confirmar. */
+.resumen-plan {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+  margin-top: 22px; padding: 15px 17px;
+  background-color: var(--menta); border-radius: var(--radio);
+}
+.resumen-plan p { margin: 0; font-size: 14px; color: var(--verde-oscuro); flex: 1; min-width: 210px; }
+.resumen-plan strong { font-weight: 700; }
+
 /* ---------- Pago con tarjeta ---------- */
 .aviso-simulado {
   display: flex; gap: 11px; align-items: flex-start;
