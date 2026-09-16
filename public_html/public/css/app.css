@@ -58,13 +58,72 @@
 .semaforo-VERDE        { color: #2e7d5b; }
 .semaforo-VERDE::before{ background-color: #2e7d5b; }
 
-/* ---------- Avisos de reglas ---------- */
-.aviso { border-radius: 11px; padding: 13px 16px; font-size: 14.5px;
-  margin: 16px 0; border: 1px solid; }
-.aviso-ok    { background-color: var(--menta); border-color: #b9d8c9; color: var(--verde-oscuro); }
-.aviso-error { background-color: #fdeceb; border-color: #f0c2bd; color: #8c1d18; }
-.aviso-regla { font-family: "Courier New", monospace; font-weight: 700;
+/* ---------- Avisos de reglas (notificacion flotante) ---------- */
+.avisos {
+  position: fixed; top: 88px; right: 22px; z-index: 60;
+  width: min(370px, calc(100vw - 32px)); pointer-events: none;
+}
+
+.toast {
+  position: relative; display: flex; gap: 12px; align-items: flex-start;
+  background-color: var(--blanco); border: 1px solid var(--borde);
+  border-left: 4px solid var(--verde-medio);
+  border-radius: 12px; padding: 14px 15px 15px 15px;
+  box-shadow: 0 4px 12px rgba(20, 82, 74, .10), 0 14px 38px rgba(20, 82, 74, .13);
+  overflow: hidden; pointer-events: auto;
+  animation: toast-entra 280ms cubic-bezier(.16, 1, .3, 1);
+}
+.toast-ok    { border-left-color: var(--verde-medio); }
+.toast-error { border-left-color: #c5362c; }
+
+.toast-icono {
+  flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%;
+  display: grid; place-items: center;
+}
+.toast-ok .toast-icono    { background-color: var(--menta); color: var(--verde-medio); }
+.toast-error .toast-icono { background-color: #fdeceb; color: #c5362c; }
+
+.toast-cuerpo { flex: 1; min-width: 0; }
+.toast-titulo {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  font-size: 14.5px; font-weight: 700; color: var(--tinta); margin: 0 0 2px 0;
+}
+.toast-error .toast-titulo { color: #8c1d18; }
+.toast-mensaje { font-size: 13.5px; color: var(--gris); margin: 0; line-height: 1.5; }
+
+.toast-cerrar {
+  flex-shrink: 0; background: none; border: none; color: #9aa8a3;
+  cursor: pointer; padding: 3px; border-radius: 6px; line-height: 0;
+}
+.toast-cerrar:hover { background-color: var(--menta); color: var(--verde-oscuro); }
+
+/* Se consume sola: avisa cuanto le queda al aviso antes de irse. */
+.toast-barra {
+  position: absolute; left: 0; bottom: 0; height: 3px; width: 100%;
+  transform-origin: left; background-color: var(--verde-medio); opacity: .30;
+  animation: toast-barra 6s linear forwards;
+}
+.toast-error .toast-barra { background-color: #c5362c; }
+.toast-quieto .toast-barra { animation-play-state: paused; }
+
+.toast-saliendo { animation: toast-sale 240ms ease forwards; }
+
+@keyframes toast-entra {
+  from { opacity: 0; transform: translateX(28px) scale(.97); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+@keyframes toast-sale {
+  to { opacity: 0; transform: translateX(28px) scale(.97); }
+}
+@keyframes toast-barra { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
+.aviso-regla { font-family: "Courier New", monospace; font-weight: 700; font-size: 11.5px;
   background-color: rgba(0,0,0,.07); border-radius: 5px; padding: 1px 7px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .toast { animation: none; }
+  .toast-barra { animation-duration: 0s; }
+}
 
 /* ---------- Tablas de la plataforma ---------- */
 .tabla-app { width: 100%; border-collapse: collapse; font-size: 14.5px; }
@@ -126,7 +185,110 @@
 .nota-regla code { font-family: "Courier New", monospace; color: var(--verde-medio);
   font-weight: 700; }
 
+/* ---------- Pago con tarjeta ---------- */
+.aviso-simulado {
+  display: flex; gap: 11px; align-items: flex-start;
+  background-color: #fff8ec; border: 1px solid #f0dcb8;
+  border-radius: 11px; padding: 12px 15px; margin-bottom: 18px;
+}
+.aviso-simulado::before {
+  content: "SIMULADO"; flex-shrink: 0; font-family: "Courier New", monospace;
+  font-size: 11px; font-weight: 700; letter-spacing: .5px; color: #8a5a00;
+  background-color: rgba(233, 163, 61, .22); border-radius: 5px; padding: 3px 8px;
+}
+.aviso-simulado p { font-size: 13px; color: var(--gris); margin: 0; }
+
+/* Tarjeta de dos caras que refleja en vivo lo que se escribe en el formulario
+   y se voltea al pasar al CVV. */
+.tarjeta-escena { perspective: 1200px; margin-bottom: 20px; }
+
+.tarjeta-visual {
+  position: relative; min-height: 196px;
+  transform-style: preserve-3d; transition: transform 620ms cubic-bezier(.3, 1, .35, 1);
+}
+.tarjeta-visual.tarjeta-volteada { transform: rotateY(180deg); }
+
+.tarjeta-cara {
+  position: absolute; inset: 0; backface-visibility: hidden;
+  border-radius: var(--radio); overflow: hidden;
+  background: linear-gradient(135deg, var(--verde-oscuro) 0%, var(--verde-medio) 100%);
+  color: var(--blanco); box-shadow: var(--sombra);
+}
+.tarjeta-frente {
+  padding: 20px; display: flex; flex-direction: column; justify-content: space-between;
+}
+.tarjeta-reverso { transform: rotateY(180deg); }
+
+.tarjeta-chip {
+  width: 40px; height: 29px; border-radius: 6px;
+  background: linear-gradient(135deg, #e8c87d 0%, #c9a24a 100%);
+}
+.tarjeta-numero {
+  font-family: "Courier New", monospace; font-size: 21px; font-weight: 700;
+  letter-spacing: 2px; margin: 14px 0 0 0;
+}
+.tarjeta-pie { display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; }
+.tarjeta-etiqueta { font-size: 9.5px; letter-spacing: 1px; opacity: .70; text-transform: uppercase; }
+.tarjeta-dato {
+  font-family: "Courier New", monospace; font-size: 14.5px; font-weight: 700;
+  text-transform: uppercase; white-space: nowrap;
+}
+/* Solo el nombre se recorta: el vencimiento y el logo nunca ceden espacio. */
+.tarjeta-titular { min-width: 0; flex: 1; }
+.tarjeta-titular .tarjeta-dato { overflow: hidden; text-overflow: ellipsis; }
+.tarjeta-pie > div:not(.tarjeta-titular) { flex-shrink: 0; }
+.tarjeta-marca { display: flex; align-items: center; justify-content: flex-end; min-height: 32px; }
+
+/* El trozo de la tarjeta que corresponde al campo que se esta escribiendo. */
+.segmento {
+  display: inline-block; max-width: 100%;
+  border-radius: 7px; padding: 3px 7px; margin: -3px -7px;
+  transition: background-color var(--transicion), box-shadow var(--transicion);
+}
+.segmento-activo {
+  background-color: rgba(255, 255, 255, .16);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .28);
+}
+
+/* Reverso: banda magnetica y franja de firma con el CVV. */
+.tarjeta-banda { height: 44px; background-color: #14201d; margin-top: 22px; }
+.tarjeta-firma {
+  display: flex; align-items: center; gap: 10px; margin: 18px 20px 0 20px;
+}
+.tarjeta-firma-fondo {
+  flex: 1; height: 34px; border-radius: 4px;
+  background: repeating-linear-gradient(-45deg, #f4f1ea 0 7px, #e6e1d6 7px 14px);
+}
+.tarjeta-cvv {
+  min-width: 62px; height: 34px; border-radius: 4px; background-color: var(--blanco);
+  color: var(--tinta); font-family: "Courier New", monospace; font-weight: 700;
+  font-size: 15px; display: grid; place-items: center; letter-spacing: 2px;
+}
+.tarjeta-reverso-nota { font-size: 10px; opacity: .70; margin: 12px 20px 0 20px; text-align: right; }
+
+/* Se controlan por clase y no por el atributo `hidden`: esa propiedad es de
+   HTMLElement y no surte efecto al asignarla sobre un SVG. */
+.marca-logo { display: none; }
+.marca-logo.marca-activa { display: block; }
+
+.campos-tarjeta { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.atajos-tarjeta { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 4px 0; }
+.atajo-tarjeta {
+  background-color: var(--menta); border: 1px solid var(--borde); color: var(--verde-oscuro);
+  border-radius: 30px; padding: 6px 14px; font: inherit; font-size: 12.5px;
+  font-weight: 700; cursor: pointer;
+}
+.atajo-tarjeta:hover { border-color: var(--verde-medio); }
+.atajo-tarjeta[data-resultado="rechaza"] { background-color: #fdeceb; color: #8c1d18; border-color: #f0c2bd; }
+
+.campo-invalido { border-color: #d98c82 !important; }
+.error-campo { color: #8c1d18; font-size: 12.5px; margin-top: 5px; }
+
 @media (max-width: 760px) {
   .sesion { order: 3; width: 100%; justify-content: center; }
   .panel-titulo h1 { font-size: 26px; }
+  .campos-tarjeta { grid-template-columns: 1fr; }
+  .tarjeta-numero { font-size: 17px; letter-spacing: 1px; }
+  .avisos { top: 74px; right: 12px; left: 12px; width: auto; }
 }

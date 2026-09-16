@@ -116,8 +116,12 @@ final class PedidoService
             $pedido->cliente_id   = $cliente->getKey();
             $pedido->fecha_pedido = now();
             $pedido->monto_total  = CarritoService::aDecimal($totalCentimos);
-            $pedido->tipo_origen  = $origen;                 // RN-14
-            $pedido->estado       = EstadoPedido::PAGADO;    // RN-13: primer paso de la secuencia
+            $pedido->tipo_origen  = $origen;                    // RN-14
+            // RN-13: el pedido nace PENDIENTE y solo pasa a PAGADO cuando la
+            // pasarela aprueba el cobro (ver PagoService). El stock ya se
+            // descuento aqui mismo, asi que un pedido sin pagar mantiene la
+            // reserva hasta que se anule.
+            $pedido->estado       = EstadoPedido::PENDIENTE;
             $pedido->save();
 
             foreach ($pedidas as $productoId => $cantidad) {

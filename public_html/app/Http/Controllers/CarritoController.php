@@ -142,9 +142,10 @@ class CarritoController extends Controller
 
         $this->carrito->vaciar();
 
-        return redirect()->route('carrito')->with('resultado', [
+        // RN-21: el pedido queda PENDIENTE; el cobro se hace en la pantalla de pago.
+        return redirect()->route('pago', $pedido)->with('resultado', [
             'regla' => null,
-            'mensaje' => 'Pedido '.$pedido->pedido_id.' registrado y stock descontado.',
+            'mensaje' => 'Pedido '.$pedido->pedido_id.' registrado y stock descontado. Falta pagarlo.',
             'ok' => true,
         ]);
     }

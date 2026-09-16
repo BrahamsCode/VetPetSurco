@@ -18,5 +18,7 @@ backend/out/
 
 # Docker: variables y certificados propios de cada maquina
 docker/.env
+docker/dockerfile/.env
+docker/dockerfile/docker-compose.override.yml
 docker/my.crt
 docker/my.key

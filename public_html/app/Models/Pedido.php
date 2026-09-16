@@ -67,4 +67,10 @@ class Pedido extends Model
     {
         return $this->detalles();
     }
+
+    /** Intentos de cobro contra la pasarela. — RN-21 */
+    public function pagos(): HasMany
+    {
+        return $this->hasMany(Pago::class, 'pedido_id', 'pedido_id');
+    }
 }

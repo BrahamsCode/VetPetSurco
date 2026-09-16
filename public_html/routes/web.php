@@ -8,6 +8,7 @@ use App\Http\Controllers\CitaController;
 use App\Http\Controllers\ClinicaController;
 use App\Http\Controllers\MascotaController;
 use App\Http\Controllers\PaginaPublicaController;
+use App\Http\Controllers\PagoController;
 use App\Http\Controllers\SuscripcionController;
 use Illuminate\Support\Facades\Route;
 
@@ -53,6 +54,10 @@ Route::middleware('auth')->prefix('app')->group(function (): void {
         Route::post('/carrito/confirmar', [CarritoController::class, 'confirmar'])->name('carrito.confirmar');
         Route::patch('/carrito/{producto}', [CarritoController::class, 'actualizar'])->name('carrito.actualizar');
         Route::delete('/carrito/{producto}', [CarritoController::class, 'quitar'])->name('carrito.quitar');
+
+        // RN-21: el pedido nace PENDIENTE y se paga aqui con tarjeta.
+        Route::get('/pedidos/{pedido}/pagar', [PagoController::class, 'mostrar'])->name('pago');
+        Route::post('/pedidos/{pedido}/pagar', [PagoController::class, 'procesar'])->name('pago.procesar');
 
         Route::get('/citas', [CitaController::class, 'index'])->name('citas');
         Route::post('/citas', [CitaController::class, 'reservar'])->name('citas.reservar');
