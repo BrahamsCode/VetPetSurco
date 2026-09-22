@@ -33,7 +33,7 @@
           <h2>Resumen del pedido</h2>
           <p>Estos son los productos que ya descontaron stock.</p>
 
-          <div style="overflow-x:auto;margin-top:14px;">
+          <div class="tabla-scroll" style="margin-top:14px;">
             <table class="tabla-app">
               <caption class="oculto-visual">Detalle del pedido a pagar</caption>
               <thead>
@@ -46,9 +46,9 @@
               <tbody>
                 @foreach ($pedido->detalles as $detalle)
                   <tr>
-                    <td>{{ $detalle->producto->nombre ?? 'Producto '.$detalle->producto_id }}</td>
-                    <td>{{ $detalle->cantidad }}</td>
-                    <td>S/ {{ number_format((float) $detalle->subtotal, 2) }}</td>
+                    <td data-label="Producto">{{ $detalle->producto->nombre ?? 'Producto '.$detalle->producto_id }}</td>
+                    <td data-label="Cant.">{{ $detalle->cantidad }}</td>
+                    <td data-label="Subtotal">S/ {{ number_format((float) $detalle->subtotal, 2) }}</td>
                   </tr>
                 @endforeach
               </tbody>
@@ -68,7 +68,7 @@
             <p data-rn="RN-21" data-rn-nota="Todo intento deja rastro">
               Queda registrado tanto el que aprueba como el que no.
             </p>
-            <div style="overflow-x:auto;margin-top:12px;">
+            <div class="tabla-scroll" style="margin-top:12px;">
               <table class="tabla-app">
                 <caption class="oculto-visual">Historial de intentos de cobro</caption>
                 <thead>
@@ -81,19 +81,19 @@
                 <tbody>
                   @foreach ($intentos as $intento)
                     <tr>
-                      <td>
+                      <td data-label="Resultado">
                         <span class="estado estado-{{ $intento->estado === \App\Enums\EstadoPago::APROBADO ? 'ENTREGADO' : 'ANULADO' }}">
                           {{ $intento->estado->etiqueta() }}
                         </span>
                       </td>
-                      <td>
+                      <td data-label="Tarjeta">
                         @if ($intento->ultimos_cuatro !== null)
                           {{ $intento->marca }} &middot;&middot;&middot;&middot; {{ $intento->ultimos_cuatro }}
                         @else
                           &mdash;
                         @endif
                       </td>
-                      <td>{{ $intento->mensaje ?? $intento->cargo_culqi }}</td>
+                      <td data-label="Detalle">{{ $intento->mensaje ?? $intento->cargo_culqi }}</td>
                     </tr>
                   @endforeach
                 </tbody>

@@ -39,6 +39,11 @@
           @if ($regla)<span class="aviso-regla">{{ $regla }}</span>@endif
         </p>
         <p class="toast-mensaje">{{ $mensaje }}</p>
+        @if (! empty($aviso['accion']['url']))
+          <p class="toast-pie">
+            <a class="toast-accion" href="{{ $aviso['accion']['url'] }}">{{ $aviso['accion']['texto'] ?? 'Ver' }}</a>
+          </p>
+        @endif
       </div>
 
       <button type="button" class="toast-cerrar" aria-label="Cerrar aviso">

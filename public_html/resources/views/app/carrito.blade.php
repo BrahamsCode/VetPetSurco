@@ -13,7 +13,7 @@
       @include('components.aviso')
 
       <div class="bloque" style="margin-bottom:22px;">
-        <div style="overflow-x:auto;">
+        <div class="tabla-scroll">
           <table class="tabla-app" id="tabla-carrito">
             <caption class="oculto-visual">L&iacute;neas del carrito de compras</caption>
             <thead>
@@ -33,9 +33,9 @@
                     $cantidad = (int) data_get($linea, 'cantidad');
                 @endphp
                 <tr>
-                  <td>{{ data_get($linea, 'nombre') }}</td>
-                  <td>S/ {{ number_format($precio, 2) }}</td>
-                  <td>
+                  <td data-label="Producto">{{ data_get($linea, 'nombre') }}</td>
+                  <td data-label="Precio unitario">S/ {{ number_format($precio, 2) }}</td>
+                  <td data-label="Cantidad">
                     <form method="POST" action="{{ route('carrito.actualizar', $productoId) }}" style="display:flex;gap:8px;align-items:center;">
                       @csrf
                       @method('PATCH')
@@ -45,7 +45,7 @@
                       <button type="submit" class="boton-mini">Actualizar</button>
                     </form>
                   </td>
-                  <td>S/ {{ number_format((float) data_get($linea, 'subtotal', $precio * $cantidad), 2) }}</td>
+                  <td data-label="Subtotal">S/ {{ number_format((float) data_get($linea, 'subtotal', $precio * $cantidad), 2) }}</td>
                   <td>
                     <form method="POST" action="{{ route('carrito.quitar', $productoId) }}">
                       @csrf

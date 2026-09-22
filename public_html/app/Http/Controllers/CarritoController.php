@@ -57,6 +57,8 @@ class CarritoController extends Controller
             'regla' => null,
             'mensaje' => 'Producto agregado al carrito.',
             'ok' => true,
+            // Atajo para llegar al carrito sin buscarlo (el aviso lo muestra como boton).
+            'accion' => ['url' => route('carrito'), 'texto' => 'Ir al carrito'],
         ]);
     }
 

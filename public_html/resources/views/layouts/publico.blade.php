@@ -15,7 +15,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>@yield('titulo', 'VetPet Surco')</title>
   <meta name="description" content="@yield('descripcion', 'Veterinaria y pet shop en Santiago de Surco.')">
   <meta name="author" content="Equipo 4 - Curso de E-business">
@@ -29,8 +29,8 @@
   <link rel="icon" href="{{ asset('img/logo.svg') }}" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Karla:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ asset('css/estilos.css') }}?v={{ filemtime(public_path('css/estilos.css')) }}">
 </head>
 <body>
 
@@ -43,15 +43,31 @@
         <img src="{{ asset('img/logo.svg') }}" alt="Logotipo de VetPet Surco" width="42" height="42">
         <span class="logo-texto">VetPet <span>Surco</span></span>
       </a>
-      <nav aria-label="Navegacion principal">
-        <ul class="menu">
-          <li><a href="{{ route('inicio') }}" @if (request()->routeIs('inicio')) aria-current="page" @endif>Inicio</a></li>
-          <li><a href="{{ route('nosotros') }}" @if (request()->routeIs('nosotros')) aria-current="page" @endif>Nosotros</a></li>
-          <li><a href="{{ route('productos') }}" @if (request()->routeIs('productos')) aria-current="page" @endif>Productos y servicios</a></li>
-          <li><a href="{{ $enlacePlataforma }}">Plataforma</a></li>
-          <li><a href="{{ route('contacto') }}" @if (request()->routeIs('contacto')) aria-current="page" @endif>Contacto</a></li>
-        </ul>
-      </nav>
+      {{-- Menu hamburguesa (moviles): se abre con un checkbox, sin JavaScript. --}}
+      <input type="checkbox" id="menu-movil" class="menu-check" aria-label="Mostrar menu de navegacion">
+      <label for="menu-movil" class="menu-hamburguesa">
+        <span></span><span></span><span></span>
+      </label>
+      <div class="menu-panel">
+        <nav aria-label="Navegacion principal">
+          <ul class="menu">
+            <li><a href="{{ route('inicio') }}" @if (request()->routeIs('inicio')) aria-current="page" @endif>Inicio</a></li>
+            <li><a href="{{ route('nosotros') }}" @if (request()->routeIs('nosotros')) aria-current="page" @endif>Nosotros</a></li>
+            <li><a href="{{ route('productos') }}" @if (request()->routeIs('productos')) aria-current="page" @endif>Productos y servicios</a></li>
+            <li><a href="{{ route('contacto') }}" @if (request()->routeIs('contacto')) aria-current="page" @endif>Contacto</a></li>
+            @auth
+            <li>
+              <form method="POST" action="{{ route('salir') }}">
+                @csrf
+                <button type="submit" class="menu-salir">Cerrar sesi&oacute;n</button>
+              </form>
+            </li>
+            @endauth
+          </ul>
+        </nav>
+      </div>
+      {{-- Acceso a la plataforma: siempre visible, sin abrir el menu. --}}
+      <a class="boton-barra" href="{{ $enlacePlataforma }}">{{ auth()->check() ? 'Mi cuenta' : 'Ingresar' }}</a>
     </div>
   </header>
 

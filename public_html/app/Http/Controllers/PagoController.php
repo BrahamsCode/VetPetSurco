@@ -58,7 +58,7 @@ class PagoController extends Controller
                 'regla' => $e->regla(),
                 'mensaje' => $e->getMessage(),
                 'ok' => false,
-            ]);
+            ])->with('pago_estado', 'rechazado');
         }
 
         return redirect()->route('catalogo')->with('resultado', [
@@ -66,7 +66,7 @@ class PagoController extends Controller
             'mensaje' => 'Pago aprobado. El pedido '.$pedido->getKey().' quedo PAGADO.'
                 .($pago->ultimos_cuatro !== null ? ' Tarjeta terminada en '.$pago->ultimos_cuatro.'.' : ''),
             'ok' => true,
-        ]);
+        ])->with('pago_estado', 'aprobado');
     }
 
     /** Un cliente solo puede pagar sus propios pedidos. — RN-01 */

@@ -87,7 +87,7 @@
         <div class="bloque">
           <h2>Mis citas</h2>
           <p>Reservas registradas para tus mascotas.</p>
-          <div style="overflow-x:auto;margin-top:12px;">
+          <div class="tabla-scroll" style="margin-top:12px;">
             <table class="tabla-app">
               <caption class="oculto-visual">Citas reservadas para mis mascotas</caption>
               <thead>
@@ -102,10 +102,10 @@
                       $servicioCita = $cita->servicio instanceof \App\Enums\Servicio ? $cita->servicio->value : (string) $cita->servicio;
                   @endphp
                   <tr>
-                    <td>{{ $porMascota[$cita->mascota_id]->nombre ?? '?' }}</td>
-                    <td>{{ $servicioCita }}</td>
-                    <td>{{ $momento->format('Y-m-d') }} &middot; {{ $momento->format('H:i') }}</td>
-                    <td><span class="estado estado-{{ $estado }}">{{ $estado }}</span></td>
+                    <td data-label="Mascota">{{ $porMascota[$cita->mascota_id]->nombre ?? '?' }}</td>
+                    <td data-label="Servicio">{{ $servicioCita }}</td>
+                    <td data-label="Fecha y hora">{{ $momento->format('Y-m-d') }} &middot; {{ $momento->format('H:i') }}</td>
+                    <td data-label="Estado"><span class="estado estado-{{ $estado }}">{{ $estado }}</span></td>
                   </tr>
                 @empty
                   <tr><td colspan="4">Todav&iacute;a no tienes citas reservadas.</td></tr>

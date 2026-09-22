@@ -14,8 +14,9 @@
 
 .boton-mini {
   background: none; border: 1px solid var(--borde); color: var(--gris);
-  border-radius: 30px; padding: 5px 14px; font: inherit; font-size: 13px;
-  font-weight: 700; cursor: pointer;
+  border-radius: 30px; padding: 8px 18px; font: inherit; font-size: 13px;
+  font-weight: 700; cursor: pointer; min-height: 40px;
+  transition: border-color var(--transicion), color var(--transicion);
 }
 .boton-mini:hover { border-color: var(--verde-medio); color: var(--verde-oscuro); }
 
@@ -31,7 +32,7 @@
 
 .bloque {
   background-color: var(--blanco); border: 1px solid var(--borde);
-  border-radius: var(--radio); padding: 22px;
+  border-radius: var(--radio); padding: 22px; box-shadow: var(--sombra);
 }
 .bloque h2 { font-size: 20px; margin-bottom: 4px; }
 .bloque > p { color: var(--gris); font-size: 14px; }
@@ -67,29 +68,49 @@
 .toast {
   position: relative; display: flex; gap: 12px; align-items: flex-start;
   background-color: var(--blanco); border: 1px solid var(--borde);
-  border-left: 4px solid var(--verde-medio);
-  border-radius: 12px; padding: 14px 15px 15px 15px;
-  box-shadow: 0 4px 12px rgba(20, 82, 74, .10), 0 14px 38px rgba(20, 82, 74, .13);
+  border-left: 5px solid var(--verde-medio);
+  border-radius: 16px; padding: 16px 16px 17px 15px;
+  box-shadow: 0 6px 16px rgba(20, 82, 74, .12), 0 18px 44px rgba(20, 82, 74, .16);
   overflow: hidden; pointer-events: auto;
-  animation: toast-entra 280ms cubic-bezier(.16, 1, .3, 1);
+  animation: toast-entra 320ms cubic-bezier(.16, 1, .3, 1);
 }
-.toast-ok    { border-left-color: var(--verde-medio); }
-.toast-error { border-left-color: #c5362c; }
+.toast-ok    {
+  border-left-color: var(--verde-medio);
+  background: linear-gradient(135deg, #f3faf6 0%, var(--blanco) 55%);
+}
+.toast-error {
+  border-left-color: var(--peligro);
+  background: linear-gradient(135deg, #fdf3f2 0%, var(--blanco) 55%);
+}
 
 .toast-icono {
-  flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%;
+  flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%;
   display: grid; place-items: center;
+  animation: toast-icono-entra 380ms cubic-bezier(.2, 1.4, .4, 1);
 }
-.toast-ok .toast-icono    { background-color: var(--menta); color: var(--verde-medio); }
-.toast-error .toast-icono { background-color: #fdeceb; color: #c5362c; }
+.toast-ok .toast-icono    { background-color: var(--menta); color: var(--exito); }
+.toast-error .toast-icono { background-color: #fdeceb; color: var(--peligro); }
 
 .toast-cuerpo { flex: 1; min-width: 0; }
 .toast-titulo {
   display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-  font-size: 14.5px; font-weight: 700; color: var(--tinta); margin: 0 0 2px 0;
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 15.5px; font-weight: 600; color: var(--tinta); margin: 0 0 3px 0;
 }
-.toast-error .toast-titulo { color: #8c1d18; }
-.toast-mensaje { font-size: 13.5px; color: var(--gris); margin: 0; line-height: 1.5; }
+.toast-error .toast-titulo { color: var(--peligro); }
+.toast-ok .toast-titulo    { color: var(--verde-oscuro); }
+.toast-mensaje { font-size: 13.5px; color: var(--gris); margin: 0; line-height: 1.55; }
+
+/* Boton de accion dentro del aviso (por ejemplo "Ir al carrito"). */
+.toast-pie { margin: 11px 0 0 0; }
+.toast-accion {
+  display: inline-flex; align-items: center; min-height: 38px;
+  background-color: var(--verde-oscuro); color: var(--blanco);
+  text-decoration: none; font-weight: 700; font-size: 13.5px;
+  padding: 8px 18px; border-radius: 30px;
+  transition: background-color var(--transicion);
+}
+.toast-accion:hover { background-color: var(--verde-medio); color: var(--blanco); }
 
 .toast-cerrar {
   flex-shrink: 0; background: none; border: none; color: #9aa8a3;
@@ -99,11 +120,12 @@
 
 /* Se consume sola: avisa cuanto le queda al aviso antes de irse. */
 .toast-barra {
-  position: absolute; left: 0; bottom: 0; height: 3px; width: 100%;
-  transform-origin: left; background-color: var(--verde-medio); opacity: .30;
+  position: absolute; left: 0; bottom: 0; height: 4px; width: 100%;
+  transform-origin: left; opacity: .45;
+  background: linear-gradient(90deg, var(--ambar) 0%, var(--verde-medio) 100%);
   animation: toast-barra 6s linear forwards;
 }
-.toast-error .toast-barra { background-color: #c5362c; }
+.toast-error .toast-barra { background: linear-gradient(90deg, var(--ambar) 0%, var(--peligro) 100%); }
 .toast-quieto .toast-barra { animation-play-state: paused; }
 
 .toast-saliendo { animation: toast-sale 240ms ease forwards; }
@@ -116,12 +138,16 @@
   to { opacity: 0; transform: translateX(28px) scale(.97); }
 }
 @keyframes toast-barra { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+@keyframes toast-icono-entra {
+  from { transform: scale(.4); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
 
 .aviso-regla { font-family: "Courier New", monospace; font-weight: 700; font-size: 11.5px;
   background-color: rgba(0,0,0,.07); border-radius: 5px; padding: 1px 7px; }
 
 @media (prefers-reduced-motion: reduce) {
-  .toast { animation: none; }
+  .toast, .toast-icono { animation: none; }
   .toast-barra { animation-duration: 0s; }
 }
 
@@ -358,10 +384,290 @@
 .campo-invalido { border-color: #d98c82 !important; }
 .error-campo { color: #8c1d18; font-size: 12.5px; margin-top: 5px; }
 
+/* ---------- Atajo del carrito (siempre visible) ---------- */
+.carrito-atajo {
+  position: relative;
+  margin-left: auto;
+  order: 2;
+  width: 42px; height: 42px;
+  flex-shrink: 0;
+  display: grid; place-items: center;
+  background-color: var(--menta);
+  color: var(--verde-oscuro);
+  border-radius: 50%;
+  text-decoration: none;
+  transition: background-color var(--transicion);
+}
+.carrito-atajo:hover { background-color: var(--borde); }
+
+.carrito-badge {
+  position: absolute; top: -4px; right: -5px;
+  min-width: 20px; height: 20px; padding: 0 5px;
+  background-color: var(--ambar); color: var(--verde-oscuro);
+  border: 2px solid var(--blanco); border-radius: 30px;
+  font-family: "Karla", sans-serif; font-size: 12px; font-weight: 700;
+  line-height: 16px; text-align: center;
+  animation: toast-icono-entra 320ms cubic-bezier(.2, 1.4, .4, 1);
+}
+
+/* ---------- Animacion de resultado del pago ---------- */
+.pago-overlay {
+  position: fixed; inset: 0; z-index: 90;
+  display: grid; place-items: center;
+  padding: 24px;
+  background: rgba(20, 82, 74, .55);
+  backdrop-filter: blur(4px);
+  animation: pago-fondo 300ms ease;
+}
+.pago-overlay--rechazado { background: rgba(140, 29, 24, .50); }
+
+.pago-caja {
+  position: relative; z-index: 2;
+  width: min(430px, 100%);
+  background-color: var(--blanco);
+  border-radius: 24px;
+  padding: 40px 30px 32px 30px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .28);
+  animation: pago-caja-entra 480ms cubic-bezier(.16, 1, .3, 1);
+}
+
+.pago-figura { position: relative; display: inline-grid; place-items: center; margin-bottom: 16px; }
+.pago-huella { color: var(--menta); fill: currentColor; }
+.pago-overlay--rechazado .pago-huella { color: #fdeceb; }
+.pago-simbolo {
+  position: absolute; color: var(--exito);
+  animation: pago-simbolo-entra 520ms cubic-bezier(.2, 1.4, .4, 1) 180ms both;
+}
+.pago-overlay--rechazado .pago-simbolo { color: var(--peligro); }
+.pago-trazo {
+  fill: none; stroke: currentColor; stroke-width: 4.5;
+  stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: 40; stroke-dashoffset: 40;
+  animation: pago-trazo 520ms ease 320ms forwards;
+}
+
+.pago-caja h2 { margin-bottom: 8px; }
+.pago-texto { color: var(--gris); font-size: 15px; margin-bottom: 22px; }
+.pago-acciones {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 12px;
+}
+.pago-acciones .boton { flex: 1 1 180px; }
+
+/* Confeti de patitas que cae sobre la caja. */
+.pago-confeti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.pago-confeti span {
+  position: absolute; top: -40px; left: var(--x);
+  width: 18px; height: 18px; opacity: .9;
+  background-color: var(--ambar);
+  border-radius: 50% 50% 45% 45%;
+  transform: rotate(var(--giro));
+  animation: pago-confeti-cae 2600ms ease-in var(--retraso) infinite;
+}
+
+@keyframes pago-fondo { from { opacity: 0; } }
+@keyframes pago-caja-entra {
+  from { opacity: 0; transform: translateY(26px) scale(.94); }
+}
+@keyframes pago-simbolo-entra {
+  from { transform: scale(.3); opacity: 0; }
+}
+@keyframes pago-trazo { to { stroke-dashoffset: 0; } }
+@keyframes pago-confeti-cae {
+  0%   { transform: translateY(0) rotate(var(--giro)); }
+  100% { transform: translateY(110vh) rotate(calc(var(--giro) * 2)); }
+}
+
+/* ---------- Pelusa, el asistente de ayuda ---------- */
+.chat-ayudante { position: fixed; right: 18px; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 80; }
+
+.chat-fab {
+  position: relative;
+  width: 58px; height: 58px;
+  display: grid; place-items: center;
+  background-color: var(--verde-oscuro); color: var(--blanco);
+  border: none; border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(20, 82, 74, .35);
+  transition: transform var(--transicion), background-color var(--transicion);
+}
+.chat-fab:hover { background-color: var(--verde-medio); transform: translateY(-2px); }
+.chat-fab svg { fill: currentColor; }
+
+.chat-globo {
+  position: absolute; right: 66px; top: 8px;
+  width: max-content;
+  background-color: var(--blanco); color: var(--verde-oscuro);
+  border: 1px solid var(--borde); border-radius: 30px;
+  padding: 8px 15px; font-size: 13.5px; font-weight: 700;
+  box-shadow: var(--sombra);
+}
+
+.chat-panel {
+  position: absolute; right: 0; bottom: 74px;
+  width: min(360px, calc(100vw - 28px));
+  background-color: var(--blanco);
+  border: 1px solid var(--borde);
+  border-radius: 18px;
+  box-shadow: 0 14px 44px rgba(20, 82, 74, .22);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  max-height: min(560px, calc(100vh - 140px));
+}
+/* `hidden` solo aplica si el CSS no fija `display`; esta regla se asegura
+   de que el panel cerrado quede oculto (misma trampa que las marcas de
+   la tarjeta de credito). */
+.chat-panel[hidden] { display: none; }
+
+.chat-cabecera {
+  display: flex; align-items: center; gap: 11px;
+  background: linear-gradient(135deg, var(--verde-oscuro) 0%, var(--verde-medio) 100%);
+  color: var(--blanco);
+  padding: 14px 16px;
+}
+.chat-avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  background-color: rgba(255, 255, 255, .16);
+  display: grid; place-items: center;
+}
+.chat-avatar svg { fill: var(--blanco); }
+.chat-quien { flex: 1; line-height: 1.25; }
+.chat-quien strong { display: block; font-family: "Fraunces", Georgia, serif; font-size: 16px; }
+.chat-quien small { font-size: 12px; opacity: .85; }
+.chat-cerrar {
+  background: none; border: none; color: var(--blanco);
+  cursor: pointer; padding: 6px; border-radius: 8px; line-height: 0;
+}
+.chat-cerrar:hover { background-color: rgba(255, 255, 255, .15); }
+
+.chat-mensajes {
+  flex: 1; overflow-y: auto;
+  padding: 16px 14px 6px 14px;
+  background-color: #f7faf8;
+  min-height: 180px;
+}
+.chat-burbuja {
+  width: fit-content; max-width: 84%;
+  padding: 10px 14px;
+  border-radius: 15px;
+  font-size: 14px; line-height: 1.5;
+  margin-bottom: 10px;
+}
+.chat-burbuja--pelusa {
+  background-color: var(--blanco); color: var(--tinta);
+  border: 1px solid var(--borde);
+  border-bottom-left-radius: 5px;
+}
+.chat-burbuja--yo {
+  background-color: var(--verde-oscuro); color: var(--blanco);
+  margin-left: auto;
+  border-bottom-right-radius: 5px;
+}
+
+.chat-opciones {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  padding: 12px 14px 15px 14px;
+  border-top: 1px solid var(--borde);
+  background-color: var(--blanco);
+}
+.chat-opcion {
+  background-color: var(--menta); color: var(--verde-oscuro);
+  border: 1px solid var(--borde); border-radius: 30px;
+  padding: 9px 15px; min-height: 40px;
+  font-family: inherit; font-size: 13.5px; font-weight: 700;
+  cursor: pointer;
+  transition: border-color var(--transicion), background-color var(--transicion);
+}
+.chat-opcion:hover { border-color: var(--verde-medio); background-color: var(--blanco); }
+
+@media (prefers-reduced-motion: reduce) {
+  .pago-confeti span { animation: none; }
+  .pago-caja, .pago-simbolo, .pago-fondo { animation: none; }
+  .pago-trazo { stroke-dashoffset: 0; animation: none; }
+}
+
 @media (max-width: 760px) {
-  .sesion { order: 3; width: 100%; justify-content: center; }
+  /* La sesion vive dentro del panel del menu hamburguesa. */
+  .sesion {
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+    justify-content: space-between;
+    margin-top: 8px;
+    padding-top: 14px;
+    border-top: 1px solid var(--borde);
+  }
+  .sesion .boton-mini { min-height: 44px; }
   .panel-titulo h1 { font-size: 26px; }
   .campos-tarjeta { grid-template-columns: 1fr; }
   .tarjeta-numero { font-size: 17px; letter-spacing: 1px; }
   .avisos { top: 74px; right: 12px; left: 12px; width: auto; }
+
+  /* Indicadores del dashboard de dos en dos. */
+  .indicadores { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .indicador { padding: 15px 17px; }
+  .indicador-valor { font-size: 28px; }
+
+  /* Controles comodos de tocar: horarios, mascotas, atajos y cuentas demo. */
+  .horario { min-height: 46px; padding: 11px 16px; }
+  .mascota-chip { min-height: 46px; }
+  .atajo-tarjeta { min-height: 44px; padding: 9px 16px; }
+  .cuenta-demo { min-height: 52px; }
+
+  /* Las tablas se apilan como tarjetas: cada fila es una tarjeta y cada
+     celda muestra su etiqueta a la izquierda y el valor a la derecha. */
+  .tabla-app { display: block; width: 100%; }
+  .tabla-app thead { display: none; }
+  .tabla-app tbody { display: block; width: 100%; }
+  .tabla-app tr {
+    display: block;
+    width: 100%;
+    background-color: var(--blanco);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
+    margin-bottom: 14px;
+    padding: 4px 0;
+  }
+  .tabla-app td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 9px 15px;
+    border-bottom: 1px dashed var(--borde);
+    text-align: right;
+  }
+  .tabla-app tr td:last-child { border-bottom: none; }
+  .tabla-app td::before {
+    content: attr(data-label);
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600;
+    color: var(--verde-oscuro);
+    text-align: left;
+    flex-shrink: 0;
+  }
+  /* Celda de acciones (sin etiqueta): los botones ocupan todo el ancho. */
+  .tabla-app td:not([data-label]) {
+    justify-content: center;
+    text-align: center;
+  }
+  .tabla-app td:not([data-label])::before { display: none; }
+  .tabla-app td:not([data-label]) > *,
+  .tabla-app td:not([data-label]) > form { flex: 1 1 auto; }
+  .tabla-app td:not([data-label]) .boton-mini { width: 100%; min-height: 44px; }
+  /* Mensaje de tabla vacia: centrado, sin etiqueta. */
+  .tabla-app td[colspan] {
+    justify-content: center;
+    text-align: center;
+    color: var(--gris);
+    font-size: 14.5px;
+  }
+
+  /* Bloques que en el celular se apilan en lugar de ir en fila. */
+  .resumen-plan { flex-direction: column; align-items: stretch; }
+  .resumen-plan .boton { width: 100%; }
+  .aviso-simulado { flex-wrap: wrap; }
+  .planes-opciones { grid-template-columns: 1fr 1fr; }
 }

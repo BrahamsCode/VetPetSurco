@@ -33,7 +33,7 @@
       <div class="bloque" style="margin-top:24px;">
         <h2>Suscripci&oacute;n mensual</h2>
         <p>Puedes pausarla o cancelarla en cualquier momento.</p>
-        <div style="overflow-x:auto;margin-top:14px;">
+        <div class="tabla-scroll" style="margin-top:14px;">
           <table class="tabla-app">
             <caption class="oculto-visual">Suscripciones mensuales de la cuenta</caption>
             <thead>
@@ -53,12 +53,12 @@
                     $dias = (int) \Illuminate\Support\Carbon::today()->diffInDays($despacho, false);
                 @endphp
                 <tr>
-                  <td>{{ $suscripcion->plan }}</td>
-                  <td>{{ $porMascota[$suscripcion->mascota_id]->nombre ?? '?' }}</td>
-                  <td>{{ $productos[$suscripcion->producto_id]->nombre ?? '?' }}</td>
-                  <td>S/ {{ number_format((float) $suscripcion->monto_mensual, 2) }}</td>
-                  <td>{{ $despacho->format('Y-m-d') }} <small>(en {{ $dias }} d&iacute;as, cada {{ $suscripcion->frecuencia_dias }})</small></td>
-                  <td><span class="estado estado-{{ $estado }}">{{ $estado }}</span></td>
+                  <td data-label="Plan">{{ $suscripcion->plan }}</td>
+                  <td data-label="Mascota">{{ $porMascota[$suscripcion->mascota_id]->nombre ?? '?' }}</td>
+                  <td data-label="Producto">{{ $productos[$suscripcion->producto_id]->nombre ?? '?' }}</td>
+                  <td data-label="Monto">S/ {{ number_format((float) $suscripcion->monto_mensual, 2) }}</td>
+                  <td data-label="Pr&oacute;ximo despacho">{{ $despacho->format('Y-m-d') }} <small>(en {{ $dias }} d&iacute;as, cada {{ $suscripcion->frecuencia_dias }})</small></td>
+                  <td data-label="Estado"><span class="estado estado-{{ $estado }}">{{ $estado }}</span></td>
                   <td>
                     @if ($estado === 'CANCELADA')
                       &mdash;

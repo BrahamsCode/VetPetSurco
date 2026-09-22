@@ -10,10 +10,13 @@
   --verde-medio:  #2c7a6b;
   --menta:        #eef5f1;
   --ambar:        #e8a33d;
+  --ambar-oscuro: #c9822a;
   --tinta:        #1c2321;
   --gris:         #5d6b66;
   --blanco:       #ffffff;
   --borde:        #d9e5df;
+  --exito:        #2e7d5b;
+  --peligro:      #b3261e;
   --radio:        14px;
   --sombra:       0 1px 2px rgba(20, 82, 74, .05), 0 8px 24px rgba(20, 82, 74, .06);
   --transicion:   180ms ease;
@@ -52,6 +55,19 @@ h3 { font-size: 21px; margin-bottom: 8px; }
 p  { margin-bottom: 14px; }
 p:last-child { margin-bottom: 0; }
 a  { color: var(--verde-medio); }
+
+/* Resalte de texto y feedback tactil con los colores de marca. */
+::selection { background-color: rgba(232, 163, 61, .30); color: var(--tinta); }
+a, button, label, summary { -webkit-tap-highlight-color: rgba(232, 163, 61, .18); }
+
+/* Cifras alineadas en precios, tablas e indicadores (look profesional). */
+.precio,
+.producto-precio,
+.indicador-valor,
+.plan-precio,
+.tarjeta-numero,
+.tabla-app td,
+.tabla-datos td { font-variant-numeric: tabular-nums; }
 
 img { max-width: 100%; display: block; }
 
@@ -170,13 +186,113 @@ textarea:focus-visible {
   border-bottom-color: var(--ambar);
 }
 
-/* ---------- 3. Botones ---------- */
-.boton {
-  display: inline-block;
+/* "Cerrar sesion" dentro del menu: mismo estilo que los enlaces. */
+.menu-salir {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--gris);
+  padding: 0 0 4px 0;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color var(--transicion), border-color var(--transicion);
+}
+
+.menu-salir:hover,
+.menu-salir:focus {
+  color: var(--verde-oscuro);
+  border-bottom-color: var(--ambar);
+}
+
+/* Boton hamburguesa para moviles. Se abre/cierra con un checkbox oculto
+   pero accesible por teclado: sin JavaScript (RNF-04). En escritorio
+   no se muestra. */
+.menu-check {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.menu-hamburguesa {
+  display: none;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  background-color: var(--menta);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color var(--transicion);
+}
+
+.menu-hamburguesa:hover { background-color: var(--borde); }
+
+.menu-hamburguesa span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  border-radius: 2px;
+  background-color: var(--verde-oscuro);
+  transition: transform var(--transicion), opacity var(--transicion), background-color var(--transicion);
+}
+
+/* Abierta: circulo verde con la cruz blanca. */
+.menu-check:checked ~ .menu-hamburguesa { background-color: var(--verde-oscuro); }
+.menu-check:checked ~ .menu-hamburguesa span { background-color: var(--blanco); }
+
+/* El foco del teclado se dibuja sobre el boton visible. */
+.menu-check:focus-visible ~ .menu-hamburguesa {
+  outline: 3px solid var(--ambar);
+  outline-offset: 2px;
+}
+
+/* En escritorio el panel es "transparente": nav y sesion cuelgan de la barra. */
+.menu-panel { display: contents; }
+
+/* Acceso directo a la plataforma: siempre visible en la barra, incluso
+   en moviles sin abrir el menu. */
+.boton-barra {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 9px 22px;
+  border: 2px solid var(--verde-oscuro);
+  border-radius: 30px;
   background-color: var(--verde-oscuro);
   color: var(--blanco);
   text-decoration: none;
   font-weight: 700;
+  font-size: 15px;
+  transition: background-color var(--transicion), border-color var(--transicion);
+}
+
+.boton-barra:hover,
+.boton-barra:focus {
+  background-color: var(--verde-medio);
+  border-color: var(--verde-medio);
+  color: var(--blanco);
+}
+
+/* ---------- 3. Botones ---------- */
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--verde-oscuro);
+  color: var(--blanco);
+  text-decoration: none;
+  font-weight: 700;
+  min-height: 46px;
   padding: 13px 26px;
   border-radius: 40px;
   border: 2px solid var(--verde-oscuro);
@@ -207,7 +323,7 @@ textarea:focus-visible {
 
 /* ---------- 4. Portada (hero) ---------- */
 .portada {
-  background-color: var(--menta);
+  background: linear-gradient(165deg, var(--menta) 0%, #f8fbf9 60%, var(--blanco) 100%);
   padding: 60px 0;
 }
 
@@ -262,12 +378,13 @@ textarea:focus-visible {
   border-radius: var(--radio);
   padding: 26px;
   height: 100%;
+  box-shadow: var(--sombra);
   transition: transform var(--transicion), box-shadow var(--transicion);
 }
 
 .tarjeta:hover {
   transform: translateY(-3px);
-  box-shadow: var(--sombra);
+  box-shadow: 0 4px 8px rgba(20, 82, 74, .08), 0 14px 32px rgba(20, 82, 74, .12);
 }
 
 .tarjeta img { width: 54px; margin-bottom: 14px; }
@@ -349,6 +466,20 @@ textarea:focus-visible {
   border-radius: var(--radio);
   background-color: var(--blanco);
 }
+
+/* Desplazamiento lateral estilizado para tablas anidadas en bloques. */
+.tabla-scroll {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--borde) transparent;
+}
+.tabla-scroll::-webkit-scrollbar { height: 8px; }
+.tabla-scroll::-webkit-scrollbar-thumb {
+  background-color: var(--borde);
+  border-radius: 8px;
+}
+.tabla-scroll::-webkit-scrollbar-thumb:hover { background-color: var(--verde-medio); }
+.tabla-scroll::-webkit-scrollbar-track { background-color: transparent; }
 
 .tabla-datos {
   width: 100%;
@@ -433,9 +564,9 @@ textarea:focus-visible {
 
 /* ---------- 9. Pie de pagina ---------- */
 .pie {
-  background-color: var(--verde-oscuro);
+  background: linear-gradient(180deg, var(--verde-oscuro) 0%, #0f423c 100%);
   color: #cfe3dc;
-  padding: 42px 0 26px 0;
+  padding: 42px 0 calc(26px + env(safe-area-inset-bottom, 0px)) 0;
   font-size: 15px;
 }
 
@@ -477,13 +608,103 @@ textarea:focus-visible {
   h1 { font-size: 32px; }
   h2 { font-size: 25px; }
 
-  .encabezado { position: static; }
-  .barra-superior { justify-content: center; text-align: center; }
-  .menu { justify-content: center; gap: 18px; }
-  .menu li { margin-left: 0; }
+  /* Encabezado compacto y fijo, con espacio para el notch del telefono.
+     Todo cabe en una sola fila: logo | Mi cuenta | hamburguesa. */
+  .encabezado {
+    padding: 12px 0;
+    padding-top: calc(12px + env(safe-area-inset-top, 0px));
+  }
+  .barra-superior {
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    text-align: left;
+    gap: 10px;
+  }
+  .logo { min-width: 0; gap: 8px; }
+  .logo img { width: 34px; }
+  .logo-texto { font-size: 18px; white-space: nowrap; }
+
+  .boton-barra {
+    padding: 8px 16px;
+    min-height: 42px;
+    font-size: 14px;
+    flex-shrink: 0;
+    order: 2;
+  }
+
+  /* Aparece el boton hamburguesa, siempre a la derecha del todo. */
+  .menu-hamburguesa { display: flex; order: 3; }
+
+  /* La X cuando el menu esta abierto. */
+  .menu-check:checked ~ .menu-hamburguesa span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .menu-check:checked ~ .menu-hamburguesa span:nth-child(2) { opacity: 0; }
+  .menu-check:checked ~ .menu-hamburguesa span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* Panel desplegable bajo el encabezado. */
+  .menu-panel {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: var(--blanco);
+    border-bottom: 1px solid var(--borde);
+    box-shadow: var(--sombra);
+    padding: 10px 4% calc(14px + env(safe-area-inset-bottom, 0px));
+    z-index: 60;
+  }
+  .menu-check:checked ~ .menu-panel { display: block; }
+
+  .menu { flex-direction: column; }
+  .menu li { margin-left: 0; border-bottom: 1px solid var(--borde); }
+  .menu li:last-child { border-bottom: none; }
+
+  /* Enlaces altos: comodo de tocar con el dedo (min 48px). */
+  .menu a,
+  .menu-salir {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 14px 8px;
+    min-height: 48px;
+    font-size: 17px;
+    border-bottom: none;
+    box-sizing: border-box;
+  }
+  .menu a:hover,
+  .menu a:focus,
+  .menu-salir:hover,
+  .menu-salir:focus { border-bottom: none; }
+  .menu a[aria-current="page"] {
+    background-color: var(--menta);
+    border-radius: 10px;
+  }
+
   .portada { padding: 40px 0; }
+  .portada-fila { gap: 26px; }
+  .portada-imagen { order: -1; max-width: 300px; margin: 0 auto; }
+  .portada-texto p.entrada, .portada p.entrada { font-size: 17px; }
   .seccion { padding: 38px 0; }
   .tabla-datos tbody th { width: 42%; }
+
+  /* Botones principales a todo el ancho, mas comodos en pantalla chica. */
+  .grupo-botones .boton { flex: 1 1 220px; }
+
+  /* El panel baja suave al abrirse. */
+  .menu-check:checked ~ .menu-panel { animation: menu-baja 180ms ease; }
+
+  /* Fila de compra de cada producto: el boton cede el ancho disponible. */
+  .producto-pie { flex-wrap: wrap; }
+  .producto-pie input[type="number"] { min-height: 44px; }
+  .producto-pie .boton { flex: 1 1 150px; }
+
+  /* Celdas con aire suficiente para el dedo. */
+  .tabla-app th, .tabla-app td { padding: 12px 13px; }
+}
+
+@keyframes menu-baja {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ---------- 12. Preferencias del usuario ---------- */
