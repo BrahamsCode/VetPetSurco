@@ -7,7 +7,7 @@
     <div class="contenedor">
       <div class="panel-titulo">
         <h1>Cat&aacute;logo</h1>
-        <p>Precios en soles. El stock que ves es el stock real del inventario.</p>
+        <p>Precios en soles con IGV 18% incluido (D.S. 055-99-EF). El stock que ves es el stock real del inventario.</p>
       </div>
 
       <div class="bloque" style="margin-bottom:22px;">
@@ -51,6 +51,7 @@
             <p class="producto-sku"@if ($marcar) data-rn="RN-05" data-rn-nota="SKU irrepetible"@endif>{{ $producto->codigo_sku }}</p>
             <h2 class="producto-nombre">{{ $producto->nombre }}</h2>
             <p class="producto-precio"@if ($marcar) data-rn="RN-06" data-rn-nota="Precio &gt; 0"@endif>S/ {{ number_format((float) $producto->precio, 2) }}</p>
+            <p class="producto-igv">Incluye IGV 18%</p>
             <p class="semaforo semaforo-{{ $semaforo }}">{{ $producto->stock_actual }} en stock</p>
             <form class="producto-pie" method="POST" action="{{ route('carrito.agregar') }}">
               @csrf

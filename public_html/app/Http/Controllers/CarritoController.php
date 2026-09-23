@@ -6,8 +6,10 @@ use App\Enums\TipoOrigen;
 use App\Exceptions\ReglaDeNegocioException;
 use App\Exceptions\StockInsuficienteException;
 use App\Http\Requests\AgregarAlCarritoRequest;
+use App\Mail\ConfirmacionPedidoMail;
 use App\Models\Producto;
 use App\Services\CarritoService;
+use App\Services\CorreoService;
 use App\Services\PedidoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -137,6 +139,12 @@ class CarritoController extends Controller
         }
 
         $this->carrito->vaciar();
+
+        // Confirmacion por correo con el detalle del pedido.
+        app(CorreoService::class)->enviar(
+            (string) $request->user()->correo,
+            new ConfirmacionPedidoMail($pedido->load('detalles.producto')),
+        );
 
         // RN-21: el pedido queda PENDIENTE; el cobro se hace en la pantalla de pago.
         return redirect()->route('pago', $pedido)->with('resultado', [

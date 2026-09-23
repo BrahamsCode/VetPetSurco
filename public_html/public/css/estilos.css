@@ -552,6 +552,24 @@ textarea:focus-visible {
   margin-bottom: 0;
 }
 
+/* Aviso del formulario de contacto (sin JavaScript). */
+.contacto-aviso {
+  border-radius: var(--radio);
+  padding: 13px 16px;
+  margin-bottom: 16px;
+  font-size: 15px;
+}
+.contacto-aviso--ok {
+  background-color: var(--menta);
+  color: var(--verde-oscuro);
+  border: 1px solid var(--borde);
+}
+.contacto-aviso--error {
+  background-color: #fdeceb;
+  color: var(--peligro);
+  border: 1px solid #f0c2bd;
+}
+
 .columnas {
   display: flex;
   flex-wrap: wrap;

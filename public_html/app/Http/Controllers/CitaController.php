@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Enums\Servicio;
 use App\Exceptions\ReglaDeNegocioException;
 use App\Http\Requests\ReservarCitaRequest;
+use App\Mail\ConfirmacionCitaMail;
 use App\Models\Cita;
 use App\Models\Mascota;
 use App\Models\Usuario;
 use App\Services\AgendaService;
+use App\Services\CorreoService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -89,6 +91,12 @@ class CitaController extends Controller
                 'ok' => false,
             ]);
         }
+
+        // Confirmacion por correo: un fallo del correo no rompe la reserva.
+        app(CorreoService::class)->enviar(
+            (string) $solicitud->user()->correo,
+            new ConfirmacionCitaMail($cita, $mascota, $veterinario, $solicitud->user()),
+        );
 
         return redirect()->route('citas', [
             'mascota_id' => $mascota->mascota_id,

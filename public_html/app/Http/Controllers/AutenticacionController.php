@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Enums\Rol;
 use App\Http\Requests\RegistroRequest;
+use App\Mail\BienvenidaMail;
 use App\Models\Usuario;
+use App\Services\CorreoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -81,6 +83,9 @@ class AutenticacionController extends Controller
 
         Auth::login($usuario);
         $solicitud->session()->regenerate();
+
+        // Bienvenida por correo: un fallo del correo no rompe el registro.
+        app(CorreoService::class)->enviar((string) $usuario->correo, new BienvenidaMail($usuario));
 
         return redirect()->route('catalogo')->with('resultado', [
             'regla' => null,

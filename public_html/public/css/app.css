@@ -384,6 +384,88 @@
 .campo-invalido { border-color: #d98c82 !important; }
 .error-campo { color: #8c1d18; font-size: 12.5px; margin-top: 5px; }
 
+/* ---------- Checkout: pasos, ticket del pedido y caja de pago ---------- */
+.pasos-checkout {
+  display: flex; align-items: center; gap: 10px;
+  list-style: none; margin: 0 0 24px 0; padding: 0; flex-wrap: wrap;
+}
+.paso {
+  display: flex; align-items: center; gap: 9px;
+  color: var(--gris); font-size: 13.5px; font-weight: 700;
+}
+.paso-num {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: grid; place-items: center;
+  background-color: var(--menta); color: var(--verde-oscuro);
+  font-family: "Fraunces", Georgia, serif; font-size: 15px;
+}
+.paso--activo { color: var(--verde-oscuro); }
+.paso--activo .paso-num { background-color: var(--verde-oscuro); color: var(--blanco); }
+.paso--hecho .paso-num { background-color: var(--exito); color: var(--blanco); }
+.paso-linea { flex: 0 0 34px; height: 2px; background-color: var(--borde); border-radius: 2px; }
+
+/* Ticket de compra: los productos y su desglose fiscal. */
+.ticket {
+  background: linear-gradient(180deg, #f7fbf8 0%, var(--blanco) 45%);
+  border: 1px solid var(--borde); border-radius: var(--radio);
+  padding: 22px 24px; box-shadow: var(--sombra);
+}
+.ticket-linea {
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 14px;
+  padding: 11px 0; border-bottom: 1px dashed var(--borde); font-size: 14.5px;
+}
+.ticket-linea:last-of-type { border-bottom: none; }
+.ticket-nombre { font-weight: 700; color: var(--tinta); margin: 0; }
+.ticket-detalle { color: var(--gris); font-size: 12.5px; margin: 2px 0 0 0; }
+.ticket-importe { white-space: nowrap; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* Desglose fiscal peruano: base imponible, IGV y total. */
+.total-desglose { margin-top: 14px; padding-top: 14px; border-top: 2px solid var(--borde); }
+.total-fila {
+  display: flex; justify-content: space-between; gap: 12px;
+  margin-bottom: 7px; font-size: 14.5px; color: var(--gris);
+  font-variant-numeric: tabular-nums;
+}
+.total-fila--final {
+  margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--borde);
+  font-family: "Fraunces", Georgia, serif; font-size: 23px; font-weight: 600;
+  color: var(--verde-oscuro);
+}
+.fiscal-nota { font-size: 12px; color: #8a978f; margin: 10px 0 0 0; }
+.producto-igv { font-size: 12px; color: var(--gris); margin: 2px 0 0 0; }
+
+/* Caja de pago: cabecera con candado y boton de cobro a todo el ancho. */
+.checkout-caja { border-top: 4px solid var(--verde-oscuro); }
+.checkout-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+.checkout-cabecera h2 { margin: 0; }
+.checkout-candado {
+  display: inline-flex; align-items: center; gap: 6px;
+  background-color: var(--menta); color: var(--verde-oscuro);
+  border-radius: 30px; padding: 6px 13px; font-size: 12px; font-weight: 700;
+}
+.boton-pagar {
+  width: 100%; min-height: 54px; font-size: 17px; gap: 9px;
+  box-shadow: 0 8px 20px rgba(20, 82, 74, .25);
+}
+.boton-pagar:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(20, 82, 74, .32);
+}
+.marcas-aceptadas {
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 14px; color: var(--gris); font-size: 12px;
+}
+.marcas-aceptadas svg { opacity: .55; }
+
+/* Pedido ya pagado. */
+.pago-listo { text-align: center; padding: 34px 24px; }
+.pago-listo-check {
+  width: 74px; height: 74px; margin: 0 auto 16px auto;
+  border-radius: 50%; background-color: var(--menta); color: var(--exito);
+  display: grid; place-items: center;
+  animation: toast-icono-entra 420ms cubic-bezier(.2, 1.4, .4, 1);
+}
+
 /* ---------- Atajo del carrito (siempre visible) ---------- */
 .carrito-atajo {
   position: relative;
@@ -579,6 +661,59 @@
   transition: border-color var(--transicion), background-color var(--transicion);
 }
 .chat-opcion:hover { border-color: var(--verde-medio); background-color: var(--blanco); }
+
+/* Campo de texto para preguntarle a Pelusa directamente. */
+.chat-form {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--borde);
+  background-color: var(--blanco);
+}
+.chat-form input {
+  flex: 1; min-width: 0;
+  border: 1px solid var(--borde); border-radius: 30px;
+  padding: 10px 15px; min-height: 42px;
+  font-family: inherit; font-size: 15px; color: var(--tinta);
+  background-color: var(--blanco);
+}
+.chat-enviar {
+  flex-shrink: 0;
+  width: 42px; height: 42px;
+  display: grid; place-items: center;
+  background-color: var(--verde-oscuro); color: var(--blanco);
+  border: none; border-radius: 50%;
+  cursor: pointer;
+  transition: background-color var(--transicion);
+}
+.chat-enviar:hover { background-color: var(--verde-medio); }
+
+/* Pelusa piensa la respuesta del backend. */
+.chat-pensando { color: var(--gris); font-style: italic; }
+.chat-pensando::after {
+  content: "\2026";
+  animation: chat-puntos 1s steps(4, end) infinite;
+}
+
+/* Ayuda directa cuando el navegador no ejecuta JavaScript. */
+.chat-sin-js {
+  position: fixed; right: 18px; bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  width: min(320px, calc(100vw - 32px));
+  background-color: var(--blanco); border: 1px solid var(--borde);
+  border-radius: 16px; padding: 16px 18px;
+  box-shadow: var(--sombra); font-size: 14px;
+}
+.chat-sin-js strong {
+  display: block; font-family: "Fraunces", Georgia, serif;
+  color: var(--verde-oscuro); margin-bottom: 6px;
+}
+.chat-sin-js p { margin-bottom: 8px; color: var(--gris); }
+
+@keyframes chat-puntos {
+  0%   { content: "\2026"; }
+  25%  { content: "."; }
+  50%  { content: ".."; }
+  75%  { content: "..."; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .pago-confeti span { animation: none; }

@@ -12,3 +12,8 @@ Artisan::command('inspire', function () {
 Schedule::command('suscripciones:despachar')
     ->dailyAt('03:00')
     ->timezone('America/Lima');
+
+// RN-20: cada manana se avisa de las vacunas y controles proximos.
+Schedule::command('vetpet:recordatorios')
+    ->dailyAt('08:00')
+    ->timezone('America/Lima');

@@ -10,6 +10,9 @@
     /* Sin llaves de Culqi entra la pasarela simulada (ver AppServiceProvider). */
     $faltaLlavePublica = ! $simulada && $llavePublica === '';
     $intentos = $pedido->pagos->sortByDesc('pago_id');
+    /* Desglose fiscal peruano: los precios al publico incluyen IGV 18%. */
+    $igv = round((float) $pedido->monto_total - ((float) $pedido->monto_total / 1.18), 2);
+    $base = round((float) $pedido->monto_total - $igv, 2);
 @endphp
 
 @section('contenido')
@@ -25,43 +28,47 @@
         </p>
       </div>
 
+      <ol class="pasos-checkout" aria-label="Progreso de la compra">
+        <li class="paso paso--hecho"><span class="paso-num" aria-hidden="true">&#10003;</span> Carrito</li>
+        <li class="paso-linea" aria-hidden="true"></li>
+        <li class="paso {{ $pagado ? 'paso--hecho' : 'paso--activo' }}"><span class="paso-num" aria-hidden="true">2</span> Pago</li>
+        <li class="paso-linea" aria-hidden="true"></li>
+        <li class="paso {{ $pagado ? 'paso--activo' : '' }}"><span class="paso-num" aria-hidden="true">3</span> Listo</li>
+      </ol>
+
       @include('components.aviso')
 
       <div class="rejilla rejilla-2">
         {{-- ---------- Columna izquierda: que se esta pagando ---------- --}}
         <div class="bloque">
-          <h2>Resumen del pedido</h2>
-          <p>Estos son los productos que ya descontaron stock.</p>
+          <h2>Tu pedido</h2>
+          <p>Productos que ya descontaron stock.</p>
 
-          <div class="tabla-scroll" style="margin-top:14px;">
-            <table class="tabla-app">
-              <caption class="oculto-visual">Detalle del pedido a pagar</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Producto</th>
-                  <th scope="col">Cant.</th>
-                  <th scope="col">Subtotal</th>
-                </tr>
-              </thead>
-              <tbody>
-                @foreach ($pedido->detalles as $detalle)
-                  <tr>
-                    <td data-label="Producto">{{ $detalle->producto->nombre ?? 'Producto '.$detalle->producto_id }}</td>
-                    <td data-label="Cant.">{{ $detalle->cantidad }}</td>
-                    <td data-label="Subtotal">S/ {{ number_format((float) $detalle->subtotal, 2) }}</td>
-                  </tr>
-                @endforeach
-              </tbody>
-            </table>
+          <div class="ticket" style="margin-top:14px;">
+            @foreach ($pedido->detalles as $detalle)
+              <div class="ticket-linea">
+                <div>
+                  <p class="ticket-nombre">{{ $detalle->producto->nombre ?? 'Producto '.$detalle->producto_id }}</p>
+                  <p class="ticket-detalle">{{ $detalle->cantidad }} &times; S/ {{ number_format((float) $detalle->subtotal / max(1, (int) $detalle->cantidad), 2) }} c/u</p>
+                </div>
+                <span class="ticket-importe">S/ {{ number_format((float) $detalle->subtotal, 2) }}</span>
+              </div>
+            @endforeach
+
+            <div class="total-desglose">
+              <p class="total-fila"><span>Subtotal (sin IGV)</span><span>S/ {{ number_format($base, 2) }}</span></p>
+              <p class="total-fila"><span>IGV 18%</span><span>S/ {{ number_format($igv, 2) }}</span></p>
+              <p class="total-fila total-fila--final"><span>Total a pagar</span><span>S/ {{ number_format((float) $pedido->monto_total, 2) }}</span></p>
+            </div>
           </div>
 
-          <div class="indicador" style="margin-top:18px;">
-            <p class="indicador-valor">S/ {{ number_format((float) $pedido->monto_total, 2) }}</p>
-            <p class="indicador-etiqueta">
-              Total a pagar &middot;
-              <span class="estado estado-{{ $pedido->estado->value }}">{{ $pedido->estado->etiqueta() }}</span>
-            </p>
-          </div>
+          <p class="fiscal-nota">Precios de venta al p&uacute;blico con IGV incluido (D.S. 055-99-EF).
+             Recibir&aacute;s tu comprobante por correo al aprobarse el cobro.</p>
+
+          <p class="indicador-etiqueta" style="margin-top:12px;">
+            Estado del pedido:
+            <span class="estado estado-{{ $pedido->estado->value }}">{{ $pedido->estado->etiqueta() }}</span>
+          </p>
 
           @if ($intentos->isNotEmpty())
             <h2 style="margin-top:22px;">Intentos de cobro</h2>
@@ -103,12 +110,28 @@
         </div>
 
         {{-- ---------- Columna derecha: el cobro ---------- --}}
-        <div class="bloque">
-          <h2>Pago con tarjeta</h2>
+        <div class="bloque checkout-caja">
+          <div class="checkout-cabecera">
+            <h2>Pago con tarjeta</h2>
+            <span class="checkout-candado">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+                <rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>
+              </svg>
+              Pago seguro cifrado
+            </span>
+          </div>
 
           @if ($pagado)
-            <p>Este pedido ya est&aacute; pagado. No hace falta cobrarlo otra vez.</p>
-            <p style="margin-top:16px;"><a class="boton" href="{{ route('catalogo') }}">Volver al cat&aacute;logo</a></p>
+            <div class="pago-listo">
+              <div class="pago-listo-check" aria-hidden="true">
+                <svg viewBox="0 0 48 48" width="38" height="38" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M13 25l7.5 7.5L35 16"/>
+                </svg>
+              </div>
+              <h2>&iexcl;Pedido pagado!</h2>
+              <p>Gracias por cuidar a tu mascota con nosotros. Tu pedido avanza a ENVIADO cuando la tienda lo despache.</p>
+              <p style="margin-top:16px;"><a class="boton" href="{{ route('catalogo') }}">Volver al cat&aacute;logo</a></p>
+            </div>
 
           @elseif ($faltaLlavePublica)
             <p data-rn="RN-21" data-rn-nota="Pasarela mal configurada">
@@ -218,15 +241,24 @@
                 </div>
 
                 <p style="margin-top:18px;" data-rn="RN-21" data-rn-nota="Sin aprobacion no hay PAGADO">
-                  <button type="submit" class="boton" id="btn-pagar">
+                  <button type="submit" class="boton boton-pagar" id="btn-pagar">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+                      <rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>
+                    </svg>
                     Pagar S/ {{ number_format((float) $pedido->monto_total, 2) }}
                   </button>
                 </p>
               </form>
 
-              <h2 style="margin-top:22px;">Tarjetas de prueba</h2>
-              <p>Un clic las carga. Cualquier otro n&uacute;mero inventado no pasa la
-                 validaci&oacute;n, igual que en una pasarela real.</p>
+              <p class="marcas-aceptadas">
+                <svg viewBox="0 0 64 22" width="42" height="15" aria-hidden="true"><text x="0" y="17" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="700" font-style="italic" fill="#1c2321">VISA</text></svg>
+                <svg viewBox="0 0 48 30" width="34" height="22" aria-hidden="true"><circle cx="18" cy="15" r="10" fill="#EB001B"/><circle cx="30" cy="15" r="10" fill="#F79E1B"/></svg>
+                Aceptamos Visa, Mastercard, Amex y Diners &middot; tu tarjeta se tokeniza en el navegador
+              </p>
+
+              <h3 style="margin-top:24px;">Tarjetas de prueba (demo)</h3>
+              <p class="nota-regla">Un clic las carga. Cualquier otro n&uacute;mero inventado no pasa la
+                 validaci&oacute;n (algoritmo de Luhn), igual que en una pasarela real.</p>
               <div class="atajos-tarjeta">
                 <button type="button" class="atajo-tarjeta" data-resultado="aprueba"
                         data-numero="4111 1111 1111 1111">Visa aprobada</button>
@@ -241,7 +273,10 @@
                 @csrf
                 <input type="hidden" name="token" id="token-pago">
                 <p style="margin-top:16px;" data-rn="RN-21" data-rn-nota="Sin aprobacion no hay PAGADO">
-                  <button type="button" class="boton" id="btn-pagar">
+                  <button type="button" class="boton boton-pagar" id="btn-pagar">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+                      <rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>
+                    </svg>
                     Pagar S/ {{ number_format((float) $pedido->monto_total, 2) }}
                   </button>
                 </p>

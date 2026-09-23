@@ -67,7 +67,17 @@
       <div class="rejilla rejilla-2">
         <div class="bloque">
           <h2>Total del pedido</h2>
-          <p class="indicador-valor" id="total-carrito">S/ {{ number_format((float) $total, 2) }}</p>
+          @php
+              /* Desglose fiscal peruano: los precios al publico incluyen IGV 18%. */
+              $igvTotal = round((float) $total - ((float) $total / 1.18), 2);
+              $baseTotal = round((float) $total - $igvTotal, 2);
+          @endphp
+          <div class="total-desglose" id="total-carrito" style="margin-top:10px;">
+            <p class="total-fila"><span>Subtotal (sin IGV)</span><span>S/ {{ number_format($baseTotal, 2) }}</span></p>
+            <p class="total-fila"><span>IGV 18%</span><span>S/ {{ number_format($igvTotal, 2) }}</span></p>
+            <p class="total-fila total-fila--final"><span>Total a pagar</span><span>S/ {{ number_format((float) $total, 2) }}</span></p>
+          </div>
+          <p class="fiscal-nota">Precios con IGV incluido (D.S. 055-99-EF). Al pagar recibir&aacute;s tu comprobante por correo.</p>
           <form method="POST" action="{{ route('carrito.confirmar') }}">
             @csrf
             <p class="nota-regla" style="margin-top:16px;" data-rn="RN-14" data-rn-nota="Origen del pedido">

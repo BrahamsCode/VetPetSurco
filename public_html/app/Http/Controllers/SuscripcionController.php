@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Enums\EstadoSuscripcion;
 use App\Exceptions\ReglaDeNegocioException;
+use App\Mail\CambioSuscripcionMail;
 use App\Models\Mascota;
 use App\Models\Producto;
 use App\Models\Suscripcion;
+use App\Services\CorreoService;
 use App\Services\SuscripcionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -102,6 +104,12 @@ class SuscripcionController extends Controller
         $nuevo = EstadoSuscripcion::from($datos['estado']);
         $suscripcion->estado = $nuevo;
         $suscripcion->save();
+
+        // Aviso por correo del cambio de plan (RN-15).
+        app(CorreoService::class)->enviar(
+            (string) $request->user()->correo,
+            new CambioSuscripcionMail($suscripcion, $nuevo->value),
+        );
 
         return back()->with('resultado', [
             'regla' => null,

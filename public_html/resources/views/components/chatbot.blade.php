@@ -1,15 +1,19 @@
 {{--
-  Pelusa, el asistente de ayuda de VetPet Connect.
-  Bot de preguntas frecuentes con respuestas guiadas (botones), sin servidor:
-  JavaScript vanilla y contenido fijo del negocio. Solo se muestra a los
-  clientes, que son quienes compran y reservan. Es el unico componente con
-  JavaScript de la plataforma junto con los avisos y el pago.
+  Pelusa, el asistente de ayuda de VetPet Connect (Nivel 2).
+  Menu guiado + campo de texto libre: las preguntas van al backend, que
+  entiende la intencion y responde con datos reales de la cuenta (solo los
+  del propio usuario). Sin JavaScript se muestra una ayuda estatica.
+  Solo se muestra a los clientes, que son quienes compran y reservan.
 --}}
 @php $rolAyuda = auth()->check() ? (auth()->user()->rol instanceof \App\Enums\Rol ? auth()->user()->rol->value : (string) auth()->user()->rol) : null; @endphp
 
 @if ($rolAyuda === 'CLIENTE')
-  <div class="chat-ayudante">
-    <section class="chat-panel" id="chat-panel" role="dialog" aria-modal="false" aria-labelledby="chat-titulo" hidden>
+  <div class="chat-ayudante"
+       data-guias="{{ route('ayuda.guias') }}"
+       data-consultar="{{ route('ayuda.consultar') }}"
+       data-csrf="{{ csrf_token() }}">
+
+    <section class="chat-panel" id="chat-panel" role="dialog" aria-modal="true" aria-labelledby="chat-titulo" hidden>
       <header class="chat-cabecera">
         <span class="chat-avatar" aria-hidden="true">
           <svg viewBox="0 0 64 64" width="24" height="24">
@@ -33,6 +37,17 @@
 
       <div class="chat-mensajes" id="chat-mensajes" role="log" aria-live="polite"></div>
       <div class="chat-opciones" id="chat-opciones"></div>
+
+      <form class="chat-form" id="chat-form">
+        <label class="oculto-visual" for="chat-texto">Escribe tu pregunta a Pelusa</label>
+        <input type="text" id="chat-texto" name="mensaje" maxlength="300" autocomplete="off"
+               placeholder="Escribe tu pregunta&hellip;">
+        <button type="submit" class="chat-enviar" aria-label="Enviar la pregunta">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </form>
     </section>
 
     <button type="button" class="chat-fab" id="chat-fab"
@@ -45,140 +60,23 @@
         <ellipse cx="41" cy="18" rx="6.4" ry="8.8"/>
         <ellipse cx="53" cy="31" rx="6.4" ry="8.4"/>
       </svg>
-      <span class="chat-globo" id="chat-globo" aria-hidden="true">¿Necesitas ayuda?</span>
+      <span class="chat-globo" id="chat-globo" aria-hidden="true">&iquest;Necesitas ayuda?</span>
     </button>
+
+    {{-- Sin JavaScript el chat no puede abrirse: se ofrece ayuda directa. --}}
+    <noscript>
+      <style>
+        .chat-ayudante .chat-fab, .chat-ayudante .chat-globo { display: none !important; }
+      </style>
+      <aside class="chat-sin-js" aria-label="Ayuda de VetPet Surco">
+        <strong>&iquest;Necesitas ayuda?</strong>
+        <p>Ll&aacute;manos al <a href="tel:+51987654321">987 654 321</a> o escr&iacute;benos a
+           <a href="mailto:contacto@vetpetsurco.pe">contacto@vetpetsurco.pe</a>.</p>
+        <p><a href="{{ route('contacto') }}">Formulario de contacto</a> &middot;
+           Lun a vie 9:00-20:00, s&aacute;b 9:00-14:00.</p>
+      </aside>
+    </noscript>
   </div>
 
-  <script>
-    // Conversacion guiada de preguntas frecuentes del negocio.
-    (function () {
-      const glosario = {
-        inicio: {
-          texto: '¡Hola! Soy Pelusa 🐾 El asistente de VetPet Surco. Elige un tema y te ayudo al toque.',
-          opciones: [
-            { texto: '🛒 ¿Cómo compro?', ir: 'comprar' },
-            { texto: '🚚 Envíos y entregas', ir: 'envios' },
-            { texto: '📦 Suscripción de alimento', ir: 'suscripcion' },
-            { texto: '💉 Vacunas y recordatorios', ir: 'salud' },
-            { texto: '🕒 Horarios y contacto', ir: 'contacto' },
-            { texto: '👤 Hablar con una persona', ir: 'persona' },
-          ],
-        },
-        comprar: {
-          texto: 'Comprar es rapidisimo: 1) agrega productos desde el Catálogo, 2) revisa tu Carrito, 3) confirma el pedido y paga con tarjeta. El stock que ves es el real, sin sorpresas.',
-          opciones: [
-            { texto: '👍 Entendido', ir: 'inicio' },
-            { texto: 'Ir al catálogo', ir: 'salto:catalogo' },
-          ],
-        },
-        envios: {
-          texto: 'Hacemos despacho el mismo día en Santiago de Surco. Los pedidos confirmados antes de las 6 p.m. salen ese día; después, a la mañana siguiente.',
-          opciones: [{ texto: '👌 Gracias', ir: 'inicio' }],
-        },
-        suscripcion: {
-          texto: 'Con la suscripción mensual eliges el alimento y la frecuencia, y te llega solo cada mes. Puedes pausarla o cancelarla cuando quieras desde "Mis mascotas", sin llamadas ni trámites.',
-          opciones: [
-            { texto: 'Quiero ver mis suscripciones', ir: 'salto:mascotas' },
-            { texto: '🔙 Volver', ir: 'inicio' },
-          ],
-        },
-        salud: {
-          texto: 'Cada mascota tiene su historia clínica digital: vacunas, desparasitaciones y controles. El sistema te avisa 15 días antes de cada próxima fecha, así nunca se te pasa una vacuna.',
-          opciones: [
-            { texto: '📅 Reservar una cita', ir: 'salto:citas' },
-            { texto: '🔙 Volver', ir: 'inicio' },
-          ],
-        },
-        contacto: {
-          texto: 'Estamos en Av. Velasco Astete 1245, Surco. Horario: lunes a viernes de 9:00 a 20:00 y sábados de 9:00 a 14:00. Teléfonos: (01) 445-8820 / 987 654 321.',
-          opciones: [
-            { texto: '✉️ Escribir al equipo', ir: 'salto:contacto' },
-            { texto: '🔙 Volver', ir: 'inicio' },
-          ],
-        },
-        persona: {
-          texto: 'Claro, con gusto. Llámanos al 987 654 321 o escríbenos a contacto@vetpetsurco.pe y te atiende el equipo del local en horario de atención.',
-          opciones: [
-            { texto: '✉️ Formulario de contacto', ir: 'salto:contacto' },
-            { texto: '🔙 Volver', ir: 'inicio' },
-          ],
-        },
-      };
-
-      const saltos = {
-        catalogo: '/app/catalogo',
-        mascotas: '/app/mascotas',
-        citas: '/app/citas',
-        contacto: '/contacto',
-      };
-
-      const panel = document.getElementById('chat-panel');
-      const fab = document.getElementById('chat-fab');
-      const globo = document.getElementById('chat-globo');
-      const mensajes = document.getElementById('chat-mensajes');
-      const opciones = document.getElementById('chat-opciones');
-      if (! panel || ! fab) return;
-
-      function burbuja(texto, quien) {
-        const parrafo = document.createElement('p');
-        parrafo.className = 'chat-burbuja chat-burbuja--' + quien;
-        parrafo.textContent = texto;
-        mensajes.appendChild(parrafo);
-        mensajes.scrollTop = mensajes.scrollHeight;
-      }
-
-      function pintarOpciones(opcionesTema) {
-        opciones.innerHTML = '';
-        (opcionesTema || []).forEach(function (opcion) {
-          const boton = document.createElement('button');
-          boton.type = 'button';
-          boton.className = 'chat-opcion';
-          boton.textContent = opcion.texto;
-          boton.addEventListener('click', function () {
-            if (opcion.ir.indexOf('salto:') === 0) {
-              window.location.href = saltos[opcion.ir.slice(6)] || '/';
-              return;
-            }
-            burbuja(opcion.texto, 'yo');
-            mostrarTema(opcion.ir);
-          });
-          opciones.appendChild(boton);
-        });
-      }
-
-      function mostrarTema(clave) {
-        const tema = glosario[clave] || glosario.inicio;
-        window.setTimeout(function () {
-          burbuja(tema.texto, 'pelusa');
-          pintarOpciones(tema.opciones);
-        }, 220);
-      }
-
-      function abrir() {
-        panel.hidden = false;
-        fab.setAttribute('aria-expanded', 'true');
-        if (globo) globo.hidden = true;
-        if (! mensajes.hasChildNodes()) mostrarTema('inicio');
-        const primero = opciones.querySelector('button');
-        if (primero) primero.focus();
-      }
-
-      function cerrar() {
-        panel.hidden = true;
-        fab.setAttribute('aria-expanded', 'false');
-        fab.focus();
-      }
-
-      fab.addEventListener('click', function () {
-        panel.hidden ? abrir() : cerrar();
-      });
-      document.getElementById('chat-cerrar').addEventListener('click', cerrar);
-      document.addEventListener('keydown', function (evento) {
-        if (evento.key === 'Escape' && ! panel.hidden) cerrar();
-      });
-
-      // El globo de invitacion asoma a los pocos segundos de llegar.
-      window.setTimeout(function () { if (globo && panel.hidden) globo.hidden = false; }, 1200);
-    })();
-  </script>
+  <script src="{{ asset('js/pelusa.js') }}?v={{ filemtime(public_path('js/pelusa.js')) }}" defer></script>
 @endif

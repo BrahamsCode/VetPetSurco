@@ -22,43 +22,53 @@
       {{-- FORMULARIO --}}
       <div class="columna">
         <h2>Escr&iacute;benos</h2>
-        <form class="formulario" action="#" method="post">
+
+        @if (session('contacto_ok'))
+          <p class="contacto-aviso contacto-aviso--ok">
+            &iexcl;Mensaje enviado! Lleg&oacute; a nuestro buz&oacute;n y te respondemos
+            el mismo d&iacute;a en horario de atenci&oacute;n.
+          </p>
+        @elseif ($errors->any())
+          <p class="contacto-aviso contacto-aviso--error">{{ $errors->first() }}</p>
+        @endif
+
+        <form class="formulario" action="{{ route('contacto.enviar') }}" method="post">
           @csrf
           <div class="campo">
             <label for="nombre">Nombre y apellido</label>
-            <input type="text" id="nombre" name="nombre" placeholder="Ana Quispe" autocomplete="name" required>
+            <input type="text" id="nombre" name="nombre" placeholder="Ana Quispe" autocomplete="name" value="{{ old('nombre') }}" required>
           </div>
           <div class="campo">
             <label for="correo">Correo electr&oacute;nico</label>
-            <input type="email" id="correo" name="correo" placeholder="ana@correo.com" autocomplete="email" required>
+            <input type="email" id="correo" name="correo" placeholder="ana@correo.com" autocomplete="email" value="{{ old('correo') }}" required>
           </div>
           <div class="campo">
             <label for="telefono">Tel&eacute;fono</label>
-            <input type="tel" id="telefono" name="telefono" placeholder="987 654 321" autocomplete="tel">
+            <input type="tel" id="telefono" name="telefono" placeholder="987 654 321" autocomplete="tel" value="{{ old('telefono') }}">
           </div>
           <div class="campo">
             <label for="mascota">Nombre de tu mascota</label>
-            <input type="text" id="mascota" name="mascota" placeholder="Rocky">
+            <input type="text" id="mascota" name="mascota" placeholder="Rocky" value="{{ old('mascota') }}">
           </div>
           <div class="campo">
             <label for="motivo">Motivo</label>
             <select id="motivo" name="motivo">
-              <option value="consulta">Reservar consulta veterinaria</option>
-              <option value="vacuna">Vacunaci&oacute;n o desparasitaci&oacute;n</option>
-              <option value="grooming">Ba&ntilde;o y grooming</option>
-              <option value="suscripcion">Suscripci&oacute;n mensual de alimento</option>
-              <option value="pedido">Consulta sobre un pedido</option>
+              <option value="consulta" @selected(old('motivo') === 'consulta')>Reservar consulta veterinaria</option>
+              <option value="vacuna" @selected(old('motivo') === 'vacuna')>Vacunaci&oacute;n o desparasitaci&oacute;n</option>
+              <option value="grooming" @selected(old('motivo') === 'grooming')>Ba&ntilde;o y grooming</option>
+              <option value="suscripcion" @selected(old('motivo') === 'suscripcion')>Suscripci&oacute;n mensual de alimento</option>
+              <option value="pedido" @selected(old('motivo') === 'pedido' || old('motivo') === null)>Consulta sobre un pedido</option>
             </select>
           </div>
           <div class="campo">
             <label for="mensaje">Mensaje</label>
-            <textarea id="mensaje" name="mensaje" placeholder="Cu&eacute;ntanos qu&eacute; necesita tu mascota"></textarea>
+            <textarea id="mensaje" name="mensaje" placeholder="Cu&eacute;ntanos qu&eacute; necesita tu mascota" required>{{ old('mensaje') }}</textarea>
           </div>
           <button type="submit" class="boton">Enviar mensaje</button>
           <p class="nota">
-            Formulario de vitrina del sitio institucional: la reserva real se hace desde la
-            plataforma, en <a href="{{ route('ingresar') }}">VetPet Connect</a>, que corresponde
-            al RF-04 (m&oacute;dulo de agenda de citas).
+            Este mensaje llega directo a nuestro buz&oacute;n de contacto y le
+            damos seguimiento el mismo d&iacute;a. Si quieres reservar hora ya,
+            hazlo desde <a href="{{ route('ingresar') }}">VetPet Connect</a> (RF-04).
           </p>
         </form>
       </div>
