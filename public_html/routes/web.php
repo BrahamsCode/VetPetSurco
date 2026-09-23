@@ -67,6 +67,8 @@ Route::middleware('auth')->prefix('app')->group(function (): void {
         Route::post('/citas', [CitaController::class, 'reservar'])->name('citas.reservar');
 
         Route::get('/mascotas', [MascotaController::class, 'index'])->name('mascotas');
+        // RF-03: el cliente registra sus mascotas para citas y planes.
+        Route::post('/mascotas', [MascotaController::class, 'guardar'])->name('mascotas.guardar');
         // RF-03: aqui el cliente contrata el plan mensual.
         Route::post('/suscripciones', [SuscripcionController::class, 'contratar'])
             ->name('suscripciones.contratar');

@@ -30,11 +30,12 @@
             negocio en la base de datos.
         -->
         <env name="DB_CONNECTION" value="mysql"/>
-        <env name="DB_HOST" value="127.0.0.1"/>
-        <env name="DB_PORT" value="3306"/>
-        <env name="DB_DATABASE" value="vetpet_connect_test"/>
-        <env name="DB_USERNAME" value="vetpet"/>
-        <env name="DB_PASSWORD" value="vetpet"/>
+        <!--
+            Host, puerto y credenciales heredados del .env del entorno: en
+            Docker el servicio de base es 'db'; con MySQL local es 127.0.0.1.
+            Solo la base se fija, y siempre a la de pruebas.
+        -->
+        <env name="DB_DATABASE" value="vetpet_connect_test" force="true"/>
         <env name="DB_URL" value=""/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>

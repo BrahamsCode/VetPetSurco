@@ -30,6 +30,48 @@
         @endforelse
       </div>
 
+      {{-- ALTA DE MASCOTA --}}
+      <div class="bloque" style="margin-top:24px;" id="bloque-alta-mascota">
+        <h2>Registrar una mascota</h2>
+        <p>As&iacute; puedes reservarle citas y contratar su plan de alimento.</p>
+        <form method="POST" action="{{ route('mascotas.guardar') }}" style="margin-top:14px;">
+          @csrf
+          <div class="rejilla rejilla-3">
+            <div class="campo">
+              <label for="mascota-nombre">Nombre</label>
+              <input type="text" id="mascota-nombre" name="nombre" value="{{ old('nombre') }}" maxlength="60" required>
+            </div>
+            <div class="campo">
+              <label for="mascota-especie">Especie</label>
+              <select id="mascota-especie" name="especie" required>
+                <option value="PERRO" @selected(old('especie') === 'PERRO')>Perro</option>
+                <option value="GATO" @selected(old('especie') === 'GATO')>Gato</option>
+                <option value="OTRO" @selected(old('especie') === 'OTRO')>Otro</option>
+              </select>
+            </div>
+            <div class="campo">
+              <label for="mascota-raza">Raza</label>
+              <input type="text" id="mascota-raza" name="raza" value="{{ old('raza') }}" maxlength="60" placeholder="Mestizo">
+            </div>
+            <div class="campo">
+              <label for="mascota-fecha">Fecha de nacimiento</label>
+              <input type="date" id="mascota-fecha" name="fecha_nacimiento" value="{{ old('fecha_nacimiento') }}" max="{{ now()->toDateString() }}">
+            </div>
+            <div class="campo">
+              <label for="mascota-peso">Peso (kg)</label>
+              <input type="number" id="mascota-peso" name="peso_kg" step="0.1" min="0.1" max="200" value="{{ old('peso_kg') }}">
+            </div>
+            <div class="campo">
+              <label for="mascota-alergias">Alergias</label>
+              <input type="text" id="mascota-alergias" name="alergias" value="{{ old('alergias') }}" maxlength="200" placeholder="Ninguna registrada">
+            </div>
+          </div>
+          <p style="margin-top:6px;" data-rn="RN-04" data-rn-nota="La mascota es del cliente">
+            <button type="submit" class="boton">Registrar mascota</button>
+          </p>
+        </form>
+      </div>
+
       <div class="bloque" style="margin-top:24px;">
         <h2>Suscripci&oacute;n mensual</h2>
         <p>Puedes pausarla o cancelarla en cualquier momento.</p>
