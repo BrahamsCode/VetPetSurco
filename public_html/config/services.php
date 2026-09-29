@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    // Pasarela de pagos del carrito. Las llaves "test" (pk_test_/sk_test_) se
+    // sacan del panel de Culqi; la secreta nunca sale del servidor.
+    'culqi' => [
+        'llave_publica' => env('CULQI_LLAVE_PUBLICA'),
+        'llave_secreta' => env('CULQI_LLAVE_SECRETA'),
+    ],
+
 ];

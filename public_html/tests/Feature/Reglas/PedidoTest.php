@@ -300,8 +300,11 @@ final class PedidoTest extends TestCase
         );
     }
 
-    /** El pedido nace PAGADO, que es el primer paso registrado de la secuencia. */
-    public function test_rn14_el_pedido_confirmado_nace_pagado_y_con_su_origen(): void
+    /**
+     * El pedido nace PENDIENTE: el stock ya quedo reservado, pero solo pasa a
+     * PAGADO cuando la pasarela aprueba el cobro (RN-21).
+     */
+    public function test_rn14_el_pedido_confirmado_nace_pendiente_y_con_su_origen(): void
     {
         $cliente  = Usuario::factory()->cliente()->create();
         $producto = Producto::factory()->create(['precio' => '50.00', 'stock_actual' => 20]);
@@ -312,7 +315,7 @@ final class PedidoTest extends TestCase
             TipoOrigen::SUSCRIPCION,
         );
 
-        $this->assertSame(EstadoPedido::PAGADO, $pedido->fresh()->estado);
+        $this->assertSame(EstadoPedido::PENDIENTE, $pedido->fresh()->estado);
         $this->assertSame(TipoOrigen::SUSCRIPCION, $pedido->fresh()->tipo_origen);
     }
 
