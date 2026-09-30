@@ -18,8 +18,9 @@ class RegistrarAtencionRequest extends SolicitudDeRegla
             'diagnostico' => ['required', 'string', 'max:2000'],
             'tratamiento' => ['required', 'string', 'max:2000'],
             'vacuna_aplicada' => ['nullable', 'string', 'max:100'],
-            // RN-20: si hay proximo control, no puede quedar en el pasado.
-            'proxima_fecha' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:today'],
+            // RN-20: si hay proximo control, es a partir de manana: un control
+            // "para hoy" es la misma atencion y su recordatorio nunca saldria.
+            'proxima_fecha' => ['nullable', 'date_format:Y-m-d', 'after:today'],
         ];
     }
 
@@ -31,7 +32,7 @@ class RegistrarAtencionRequest extends SolicitudDeRegla
         return [
             'diagnostico.required' => 'El diagnostico es obligatorio.',
             'tratamiento.required' => 'El tratamiento es obligatorio.',
-            'proxima_fecha.after_or_equal' => 'El proximo control no puede quedar en una fecha pasada.',
+            'proxima_fecha.after' => 'El proximo control tiene que ser a partir de manana.',
         ];
     }
 

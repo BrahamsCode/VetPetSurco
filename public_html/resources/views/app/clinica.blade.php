@@ -157,7 +157,7 @@
               </div>
               <div class="campo" data-rn="RN-20" data-rn-nota="Próximo control">
                 <label for="proxima">Pr&oacute;ximo control <span class="campo-opcional">(opcional)</span></label>
-                <input type="date" id="proxima" name="proxima_fecha" min="{{ today()->toDateString() }}"
+                <input type="date" id="proxima" name="proxima_fecha" min="{{ today()->addDay()->toDateString() }}"
                        value="{{ old('proxima_fecha', $proximaSugerida) }}">
                 <p class="campo-ayuda">El due&ntilde;o recibe un recordatorio 15 d&iacute;as antes. D&eacute;jalo vac&iacute;o si no necesita control.</p>
               </div>
@@ -175,30 +175,43 @@
 
       <div class="bloque" style="margin-top:24px;">
         <h2>Historia cl&iacute;nica registrada</h2>
-        <p>Atenciones que registraste, de la m&aacute;s reciente a la m&aacute;s antigua.</p>
-        <div class="tabla-scroll" style="margin-top:12px;">
-          <table class="tabla-app">
-            <caption class="oculto-visual">Atenciones registradas en la historia cl&iacute;nica</caption>
-            <thead>
-              <tr><th scope="col">Fecha</th><th scope="col">Mascota</th><th scope="col">Diagn&oacute;stico</th>
-                  <th scope="col">Tratamiento</th><th scope="col">Vacuna</th><th scope="col">Pr&oacute;ximo control</th></tr>
-            </thead>
-            <tbody id="cuerpo-historias">
-              @forelse ($historias as $historia)
-                <tr>
-                  <td data-label="Fecha">{{ $historia->fecha_atencion->format('d/m/Y') }}</td>
-                  <td data-label="Mascota">{{ $historia->mascota->nombre ?? '?' }}</td>
-                  <td data-label="Diagn&oacute;stico">{{ $historia->diagnostico }}</td>
-                  <td data-label="Tratamiento">{{ $historia->tratamiento }}</td>
-                  <td data-label="Vacuna">{{ $historia->vacuna_aplicada ?: '—' }}</td>
-                  <td data-label="Pr&oacute;ximo control">{{ $historia->proxima_fecha?->format('d/m/Y') ?? '—' }}</td>
-                </tr>
-              @empty
-                <tr><td colspan="6">Sin atenciones registradas.</td></tr>
-              @endforelse
-            </tbody>
-          </table>
-        </div>
+        <p>Atenciones que registraste, de la m&aacute;s reciente a la m&aacute;s antigua. Toca una para ver el detalle.</p>
+
+        {{-- Lista desplegable y no tabla: diagnostico y tratamiento son texto
+             libre y en una tabla cada fila crecia al alto del texto mas largo. --}}
+        @if ($historias->isEmpty())
+          <p class="agenda-vacia" style="margin-top:12px;">Sin atenciones registradas.</p>
+        @else
+          <ul class="historial" id="cuerpo-historias">
+            @foreach ($historias as $historia)
+              <li>
+                <details class="historial-item">
+                  <summary>
+                    <span class="historial-fecha">{{ $historia->fecha_atencion->format('d/m/Y') }}</span>
+                    <span class="historial-mascota">{{ $historia->mascota->nombre ?? '?' }}</span>
+                    <span class="historial-resumen">{{ $historia->diagnostico }}</span>
+                    <span class="historial-marcas">
+                      @if ($historia->vacuna_aplicada)
+                        <span class="estado">Vacuna</span>
+                      @endif
+                      @if ($historia->proxima_fecha)
+                        <span class="historial-control">Control {{ $historia->proxima_fecha->format('d/m/Y') }}</span>
+                      @endif
+                    </span>
+                  </summary>
+                  <dl class="historial-detalle">
+                    <div><dt>Diagn&oacute;stico</dt><dd>{{ $historia->diagnostico }}</dd></div>
+                    <div><dt>Tratamiento</dt><dd>{{ $historia->tratamiento }}</dd></div>
+                    @if ($historia->vacuna_aplicada)
+                      <div><dt>Vacuna aplicada</dt><dd>{{ $historia->vacuna_aplicada }}</dd></div>
+                    @endif
+                    <div><dt>Pr&oacute;ximo control</dt><dd>{{ $historia->proxima_fecha?->format('d/m/Y') ?? 'Sin control programado' }}</dd></div>
+                  </dl>
+                </details>
+              </li>
+            @endforeach
+          </ul>
+        @endif
       </div>
     </div>
 @endsection

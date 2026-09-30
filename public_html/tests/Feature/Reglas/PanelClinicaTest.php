@@ -60,6 +60,19 @@ final class PanelClinicaTest extends TestCase
         $this->assertSame(EstadoCita::ATENDIDA, $cita->fresh()->estado);
     }
 
+    /** RN-20: un "proximo control" para hoy no es un control futuro. */
+    public function test_el_proximo_control_no_puede_ser_hoy(): void
+    {
+        $vet = Usuario::factory()->veterinario()->create();
+        $cita = $this->citaDe($vet, now()->startOfDay()->addMinute());
+
+        $this->actingAs($vet)
+            ->post(route('clinica.atender', $cita->cita_id), ['proxima_fecha' => today()->toDateString()] + $this->atencion())
+            ->assertSessionHasErrors('proxima_fecha');
+
+        $this->assertDatabaseMissing('historias_clinicas', ['cita_id' => $cita->cita_id]);
+    }
+
     public function test_no_se_marca_inasistencia_antes_de_la_hora_de_la_cita(): void
     {
         $vet = Usuario::factory()->veterinario()->create();
