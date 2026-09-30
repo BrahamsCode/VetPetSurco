@@ -52,6 +52,44 @@ class Producto extends Model
     ];
 
     // ---------------------------------------------------------------
+    // Imagen
+    // ---------------------------------------------------------------
+
+    /** Ruta publica de la foto, si existe: public/img/productos/{SKU}.webp. */
+    private function rutaFoto(): string
+    {
+        // El SKU se limpia antes de armar la ruta: nunca sale de la carpeta.
+        return 'img/productos/'.preg_replace('/[^A-Za-z0-9_-]/', '', (string) $this->codigo_sku).'.webp';
+    }
+
+    public function tieneFoto(): bool
+    {
+        return is_file(public_path($this->rutaFoto()));
+    }
+
+    /**
+     * Foto del producto o, si todavia no tiene (un producto recien creado
+     * desde el panel), el icono de su categoria: la tarjeta nunca queda vacia.
+     */
+    public function urlImagen(): string
+    {
+        if ($this->tieneFoto()) {
+            return asset($this->rutaFoto());
+        }
+
+        $categoria = $this->categoria instanceof CategoriaProducto
+            ? $this->categoria
+            : CategoriaProducto::tryFrom((string) $this->categoria);
+
+        return asset(match ($categoria) {
+            CategoriaProducto::ALIMENTO => 'img/icono-alimento.svg',
+            CategoriaProducto::ACCESORIO => 'img/icono-accesorios.svg',
+            CategoriaProducto::MEDICAMENTO => 'img/icono-salud.svg',
+            default => 'img/icono-tienda.svg',
+        });
+    }
+
+    // ---------------------------------------------------------------
     // Relaciones
     // ---------------------------------------------------------------
 

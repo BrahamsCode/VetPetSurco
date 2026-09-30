@@ -35,8 +35,17 @@ class CarritoController extends Controller
 
     public function index(Request $request): View
     {
+        $lineas = $this->carrito->items();
+
+        // Miniatura de cada linea, indexada por producto.
+        $imagenes = Producto::query()
+            ->whereIn('producto_id', array_map(fn ($l) => (int) data_get($l, 'producto_id'), $lineas))
+            ->get()
+            ->mapWithKeys(fn (Producto $p) => [$p->producto_id => $p->urlImagen()]);
+
         return view('app.carrito', [
-            'lineas' => $this->carrito->items(),
+            'lineas' => $lineas,
+            'imagenes' => $imagenes,
             'total' => $this->carrito->total(),
             'unidades' => $this->carrito->unidades(),
             // Para precargar la direccion del delivery y calcular el envio en pantalla.

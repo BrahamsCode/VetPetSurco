@@ -33,7 +33,14 @@
                     $cantidad = (int) data_get($linea, 'cantidad');
                 @endphp
                 <tr>
-                  <td data-label="Producto">{{ data_get($linea, 'nombre') }}</td>
+                  <td data-label="Producto">
+                    <span class="linea-producto">
+                      @if (isset($imagenes[$productoId]))
+                        <img class="linea-miniatura" src="{{ $imagenes[$productoId] }}" alt="" width="56" height="42" loading="lazy">
+                      @endif
+                      <span>{{ data_get($linea, 'nombre') }}</span>
+                    </span>
+                  </td>
                   <td data-label="Precio unitario">S/ {{ number_format($precio, 2) }}</td>
                   <td data-label="Cantidad">
                     <form method="POST" action="{{ route('carrito.actualizar', $productoId) }}" style="display:flex;gap:8px;align-items:center;">
