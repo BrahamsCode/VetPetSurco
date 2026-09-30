@@ -241,6 +241,10 @@
 }
 .mascota-nombre { font-size: 14.5px; font-weight: 700; color: var(--tinta); }
 .mascota-especie { font-size: 12px; color: var(--gris); }
+/* RN-22: mascota que ya tiene plan vigente, no se puede elegir. */
+.mascota-plan { font-size: 12px; color: var(--gris); }
+.opcion-radio:disabled + .mascota-chip { opacity: .6; cursor: not-allowed; border-style: dashed; }
+.opcion-radio:disabled + .mascota-chip:hover { border-color: var(--borde); }
 .opcion-radio:checked + .mascota-chip {
   border-color: var(--verde-oscuro); background-color: var(--menta);
 }

@@ -161,7 +161,7 @@ const RN = [
   ['RN-19', 'Cada atención genera un único registro clínico.', 'RF-13'],
   ['RN-20', 'Se avisa al dueño quince días antes del próximo control.', 'RF-14'],
   ['RN-21', 'Un pedido pasa a pagado solo si la pasarela aprueba el cobro.', 'RF-06'],
-  ['RN-22', 'Una mascota no puede tener dos planes vigentes del mismo producto.', 'RF-08'],
+  ['RN-22', 'Cada mascota tiene un solo plan vigente (activo o pausado).', 'RF-08'],
 ];
 
 module.exports = { RF, RNF, RN };

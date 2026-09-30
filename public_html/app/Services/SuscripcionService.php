@@ -10,6 +10,7 @@ use App\Models\Mascota;
 use App\Models\Producto;
 use App\Models\Suscripcion;
 use App\Models\Usuario;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Alta de la suscripcion mensual: como el cliente contrata el ingreso
@@ -17,7 +18,7 @@ use App\Models\Usuario;
  *
  * Reglas que hace cumplir:
  *  - RN-16: toda suscripcion nace con su frecuencia y su primer despacho.
- *  - RN-22: no se duplica un plan vigente para la misma mascota y producto.
+ *  - RN-22: una mascota tiene un solo plan vigente (ACTIVO o PAUSADO).
  */
 final class SuscripcionService
 {
@@ -67,7 +68,7 @@ final class SuscripcionService
     /**
      * Contrata un plan para una mascota del cliente.
      *
-     * @throws SuscripcionDuplicadaException si ya hay un plan vigente igual (RN-22)
+     * @throws SuscripcionDuplicadaException si la mascota ya tiene un plan vigente (RN-22)
      */
     public function contratar(
         Usuario $cliente,
@@ -75,33 +76,40 @@ final class SuscripcionService
         Producto $producto,
         string $plan,
     ): Suscripcion {
-        // RN-22: vigente es tanto ACTIVA como PAUSADA; una pausada sigue siendo
-        // un contrato, solo esta detenida.
-        $vigente = Suscripcion::query()
-            ->where('mascota_id', $mascota->getKey())
-            ->where('producto_id', $producto->getKey())
-            ->whereIn('estado', [
-                EstadoSuscripcion::ACTIVA->value,
-                EstadoSuscripcion::PAUSADA->value,
-            ])
-            ->exists();
+        return DB::transaction(function () use ($cliente, $mascota, $producto, $plan): Suscripcion {
+            // RN-22 sin carreras: se bloquea la fila de la mascota hasta el
+            // commit. Dos envios simultaneos (doble clic, dos pestanas) quedan
+            // en fila y el segundo ya ve el plan que creo el primero.
+            Mascota::query()->whereKey($mascota->getKey())->lockForUpdate()->first();
 
-        if ($vigente) {
-            throw new SuscripcionDuplicadaException();
-        }
+            // RN-22: una mascota tiene un solo plan vigente, sea del producto que
+            // sea. Vigente es tanto ACTIVA como PAUSADA; una pausada sigue siendo
+            // un contrato, solo esta detenida.
+            $vigente = Suscripcion::query()
+                ->where('mascota_id', $mascota->getKey())
+                ->whereIn('estado', [
+                    EstadoSuscripcion::ACTIVA->value,
+                    EstadoSuscripcion::PAUSADA->value,
+                ])
+                ->exists();
 
-        $suscripcion = new Suscripcion();
-        $suscripcion->cliente_id = $cliente->getKey();
-        $suscripcion->mascota_id = $mascota->getKey();
-        $suscripcion->producto_id = $producto->getKey();
-        $suscripcion->plan = $plan;
-        $suscripcion->frecuencia_dias = self::FRECUENCIA_DIAS;
-        $suscripcion->monto_mensual = self::montoDe($plan);
-        // RN-16: el primer despacho sale a un ciclo completo desde hoy.
-        $suscripcion->proximo_despacho = self::primerDespacho();
-        $suscripcion->estado = EstadoSuscripcion::ACTIVA;
-        $suscripcion->save();
+            if ($vigente) {
+                throw new SuscripcionDuplicadaException();
+            }
 
-        return $suscripcion;
+            $suscripcion = new Suscripcion();
+            $suscripcion->cliente_id = $cliente->getKey();
+            $suscripcion->mascota_id = $mascota->getKey();
+            $suscripcion->producto_id = $producto->getKey();
+            $suscripcion->plan = $plan;
+            $suscripcion->frecuencia_dias = self::FRECUENCIA_DIAS;
+            $suscripcion->monto_mensual = self::montoDe($plan);
+            // RN-16: el primer despacho sale a un ciclo completo desde hoy.
+            $suscripcion->proximo_despacho = self::primerDespacho();
+            $suscripcion->estado = EstadoSuscripcion::ACTIVA;
+            $suscripcion->save();
+
+            return $suscripcion;
+        });
     }
 }

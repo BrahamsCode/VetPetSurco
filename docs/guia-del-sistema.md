@@ -70,7 +70,7 @@ Cliente contrata plan ──► cada N días (3:00 a. m.) ──► sistema emit
      (RN-22, sin duplicados)        (RN-16)                (RN-12/14) + correo al cliente
 ```
 
-- **RN-22**: no se puede contratar dos veces el mismo plan vigente para la misma mascota y producto.
+- **RN-22**: cada mascota tiene **un solo plan vigente** (ACTIVO o PAUSADO). Para cambiarlo se cancela el actual y se contrata otro; otra mascota del mismo cliente sí puede tener su propio plan.
 - **RN-15**: el cliente **pausa o cancela cuando quiera**; lo cancelado no se reactiva (se contrata de nuevo).
 - **RN-16**: tras despachar, el pr&oacute;ximo despacho salta un ciclo completo desde la fecha que tocaba, no desde hoy.
 - **RN-12**: si no hay stock, no se despacha y **la fecha no avanza** &mdash; se reintenta cuando repongan.
@@ -191,7 +191,7 @@ docker compose exec app php artisan migrate --seed
 | RN-18 | El desenlace de la cita lo cierra el veterinario. |
 | RN-20 | Aviso de control 15 d&iacute;as antes, por correo, una sola vez. |
 | RN-21 | Todo intento de cobro deja rastro; sin aprobaci&oacute;n no hay PAGADO. |
-| RN-22 | No se duplica un plan vigente para la misma mascota y producto. |
+| RN-22 | Cada mascota tiene un solo plan vigente (ACTIVO o PAUSADO). |
 
 ---
 

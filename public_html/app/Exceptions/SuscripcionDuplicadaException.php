@@ -7,16 +7,15 @@ namespace App\Exceptions;
 use Throwable;
 
 /**
- * RN-22: una mascota no puede tener dos suscripciones vigentes del mismo
- * producto, porque recibiria el mismo despacho dos veces y se le cobraria
- * dos veces al mes.
+ * RN-22: una mascota tiene un solo plan vigente (ACTIVO o PAUSADO). Un
+ * segundo plan le duplicaria el despacho y el cobro mensual.
  *
  * Para cambiar de plan hay que cancelar el vigente y contratar otro (RN-15).
  */
 final class SuscripcionDuplicadaException extends ReglaDeNegocioException
 {
     public function __construct(
-        string $mensaje = 'Esa mascota ya tiene una suscripcion vigente de ese producto.',
+        string $mensaje = 'Esa mascota ya tiene un plan vigente. Para cambiarlo, cancela el actual y contrata el nuevo.',
         ?Throwable $anterior = null,
     ) {
         parent::__construct($mensaje, 0, $anterior);

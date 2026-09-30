@@ -259,7 +259,7 @@ final class SuscripcionTest extends TestCase
         $this->assertDatabaseMissing('suscripciones', ['mascota_id' => $deMarco->getKey()]);
     }
 
-    /** RN-22: el mismo plan vigente no se contrata dos veces. */
+    /** RN-22: el mismo plan vigente no se contrata dos veces (doble clic). */
     public function test_rn22_no_se_duplica_un_plan_vigente_de_la_misma_mascota(): void
     {
         $cliente = Usuario::factory()->cliente()->create();
@@ -281,6 +281,111 @@ final class SuscripcionTest extends TestCase
 
         // Sigue habiendo una sola: la segunda no entro.
         $this->assertSame(1, Suscripcion::query()->where('mascota_id', $mascota->getKey())->count());
+    }
+
+    /**
+     * RN-22: una mascota tiene un solo plan vigente, aunque se intente con otro
+     * producto. Y el plan que ya tenia no se toca: ni plan ni fecha cambian.
+     */
+    public function test_rn22_una_mascota_con_plan_no_contrata_otro_de_otro_producto(): void
+    {
+        $cliente = Usuario::factory()->cliente()->create();
+        $mascota = Mascota::factory()->create(['cliente_id' => $cliente->getKey()]);
+        $fecha = now()->addDays(12)->toDateString();
+
+        $vigente = Suscripcion::factory()->create([
+            'cliente_id' => $cliente->getKey(),
+            'mascota_id' => $mascota->getKey(),
+            'producto_id' => Producto::factory()->create(['activo' => true])->getKey(),
+            'plan' => 'BASICO',
+            'proximo_despacho' => $fecha,
+            'estado' => EstadoSuscripcion::ACTIVA,
+        ]);
+
+        $this->actingAs($cliente)->post(route('suscripciones.contratar'), [
+            'mascota_id' => $mascota->getKey(),
+            'producto_id' => Producto::factory()->create(['activo' => true])->getKey(),
+            'plan' => 'INTEGRAL',
+        ])->assertSessionHas('resultado.regla', 'RN-22');
+
+        $this->assertSame(1, Suscripcion::query()->where('mascota_id', $mascota->getKey())->count());
+        $vigente->refresh();
+        $this->assertSame('BASICO', $vigente->plan);
+        $this->assertSame($fecha, $vigente->proximo_despacho->toDateString());
+    }
+
+    /** RN-22: un plan PAUSADO sigue siendo el plan de la mascota. */
+    public function test_rn22_un_plan_pausado_tambien_bloquea_otro(): void
+    {
+        $cliente = Usuario::factory()->cliente()->create();
+        $mascota = Mascota::factory()->create(['cliente_id' => $cliente->getKey()]);
+
+        Suscripcion::factory()->pausada()->create([
+            'cliente_id' => $cliente->getKey(),
+            'mascota_id' => $mascota->getKey(),
+        ]);
+
+        $this->actingAs($cliente)->post(route('suscripciones.contratar'), [
+            'mascota_id' => $mascota->getKey(),
+            'producto_id' => Producto::factory()->create(['activo' => true])->getKey(),
+            'plan' => 'BASICO',
+        ]);
+
+        $this->assertSame(1, Suscripcion::query()->where('mascota_id', $mascota->getKey())->count());
+    }
+
+    /** RN-22 es por mascota: otra mascota del mismo cliente si puede contratar. */
+    public function test_rn22_otra_mascota_del_mismo_cliente_si_contrata(): void
+    {
+        $cliente = Usuario::factory()->cliente()->create();
+        $conPlan = Mascota::factory()->create(['cliente_id' => $cliente->getKey()]);
+        $sinPlan = Mascota::factory()->create(['cliente_id' => $cliente->getKey()]);
+        $producto = Producto::factory()->create(['activo' => true]);
+
+        Suscripcion::factory()->create([
+            'cliente_id' => $cliente->getKey(),
+            'mascota_id' => $conPlan->getKey(),
+            'producto_id' => $producto->getKey(),
+            'estado' => EstadoSuscripcion::ACTIVA,
+        ]);
+
+        $this->actingAs($cliente)->post(route('suscripciones.contratar'), [
+            'mascota_id' => $sinPlan->getKey(),
+            'producto_id' => $producto->getKey(),
+            'plan' => 'CUIDADO',
+        ]);
+
+        $this->assertSame(1, Suscripcion::query()->where('mascota_id', $sinPlan->getKey())->count());
+    }
+
+    /**
+     * RN-22 en pantalla: la mascota con plan sale bloqueada y nada viene
+     * premarcado, para que un clic no contrate algo que no se eligio.
+     */
+    public function test_rn22_el_formulario_bloquea_la_mascota_con_plan_y_no_premarca(): void
+    {
+        $cliente = Usuario::factory()->cliente()->create();
+        $conPlan = Mascota::factory()->create(['cliente_id' => $cliente->getKey()]);
+        $sinPlan = Mascota::factory()->create(['cliente_id' => $cliente->getKey()]);
+
+        Suscripcion::factory()->create([
+            'cliente_id' => $cliente->getKey(),
+            'mascota_id' => $conPlan->getKey(),
+            'estado' => EstadoSuscripcion::ACTIVA,
+        ]);
+
+        $html = $this->actingAs($cliente)->get(route('mascotas'))->assertOk()->getContent();
+
+        $input = function (string $id) use ($html): string {
+            preg_match('#<input[^>]*id="'.$id.'"[^>]*>#s', $html, $m);
+
+            return $m[0] ?? '';
+        };
+
+        $this->assertStringContainsString('disabled', $input('mascota-'.$conPlan->getKey()));
+        $this->assertStringNotContainsString('disabled', $input('mascota-'.$sinPlan->getKey()));
+        $this->assertStringNotContainsString('checked', $input('mascota-'.$sinPlan->getKey()));
+        $this->assertStringNotContainsString('checked', $input('plan-BASICO'));
     }
 
     /**

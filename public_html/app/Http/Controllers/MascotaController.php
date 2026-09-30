@@ -38,21 +38,21 @@ class MascotaController extends Controller
                 ->get()
                 ->keyBy('producto_id');
 
-        // RN-22: lo que cada mascota ya tiene vigente no se vuelve a ofrecer.
-        // Una pausada tambien cuenta: sigue siendo un contrato, solo detenido.
-        $vigentes = $suscripciones
+        // RN-22: una mascota con plan vigente no puede contratar otro; el
+        // formulario la muestra bloqueada con el plan que ya tiene. Una pausada
+        // tambien cuenta: sigue siendo un contrato, solo detenido.
+        $planVigentePorMascota = $suscripciones
             ->whereIn('estado', [EstadoSuscripcion::ACTIVA, EstadoSuscripcion::PAUSADA])
-            ->groupBy('mascota_id');
-
-        $vigentesPorMascota = $vigentes
-            ->map(fn ($grupo) => $grupo->pluck('producto_id')->map(intval(...))->values()->all());
-
-        // Lo que ya recibe cada mascota, para avisar que el plan nuevo es adicional.
-        $recibePorMascota = $vigentes
+            ->groupBy('mascota_id')
             ->map(fn ($grupo) => $grupo
-                ->map(fn ($s) => ($productos[$s->producto_id]->nombre ?? '?').' ('.$s->plan.')')
-                ->values()
-                ->all());
+                ->map(function ($s) use ($productos) {
+                    $estado = $s->estado instanceof EstadoSuscripcion ? $s->estado : EstadoSuscripcion::from((string) $s->estado);
+
+                    return 'Plan '.$s->plan
+                        .($estado === EstadoSuscripcion::PAUSADA ? ' (pausado)' : '')
+                        .' · '.($productos[$s->producto_id]->nombre ?? '?');
+                })
+                ->implode(', '));
 
         return view('app.mascotas', [
             'mascotas' => $mascotas,
@@ -61,8 +61,7 @@ class MascotaController extends Controller
             // Para el formulario de contratacion.
             'catalogo' => Producto::query()->activos()->orderBy('nombre')->get(),
             'planes' => SuscripcionService::planes(),
-            'vigentesPorMascota' => $vigentesPorMascota,
-            'recibePorMascota' => $recibePorMascota,
+            'planVigentePorMascota' => $planVigentePorMascota,
             'primerDespacho' => \Illuminate\Support\Carbon::parse(SuscripcionService::primerDespacho()),
         ]);
     }

@@ -18,7 +18,7 @@ use Illuminate\Validation\Rule;
  * Alta y cambio de estado de la suscripcion mensual.
  * RN-15: el cliente pausa o cancela su plan cuando quiera; una suscripcion
  * cancelada no se reactiva, se contrata de nuevo.
- * RN-22: no se duplica un plan vigente para la misma mascota y producto.
+ * RN-22: una mascota tiene un solo plan vigente (ACTIVO o PAUSADO).
  */
 class SuscripcionController extends Controller
 {

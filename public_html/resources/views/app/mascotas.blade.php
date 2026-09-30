@@ -130,14 +130,24 @@
 
       <div class="bloque" style="margin-top:24px;">
         <h2>Contratar un plan mensual</h2>
-        <p data-rn="RN-22" data-rn-nota="Sin planes repetidos">
+        <p data-rn="RN-22" data-rn-nota="Un plan por mascota">
           Recibes el producto en casa cada 30 d&iacute;as, sin volver a pedirlo.
-          Puedes pausarlo o cancelarlo cuando quieras.
+          Cada mascota tiene un solo plan; puedes pausarlo o cancelarlo cuando quieras.
         </p>
+
+        @php
+            // RN-22: solo pueden contratar las mascotas que no tienen plan vigente.
+            $libres = $mascotas->reject(fn ($m) => isset($planVigentePorMascota[$m->mascota_id]));
+        @endphp
 
         @if ($mascotas->isEmpty())
           <p class="nota-regla" style="margin-top:14px;">
             Necesitas tener una mascota registrada para contratar un plan.
+          </p>
+        @elseif ($libres->isEmpty())
+          <p class="nota-regla" style="margin-top:14px;">
+            Todas tus mascotas ya tienen su plan. Para cambiar uno, canc&eacute;lalo en la tabla
+            de arriba y vuelve a contratarlo aqu&iacute;.
           </p>
         @else
           <form method="POST" action="{{ route('suscripciones.contratar') }}" id="form-plan"
@@ -147,18 +157,26 @@
             <div class="paso-plan">
               <p class="paso-titulo"><span class="paso-numero">1</span> Para qui&eacute;n es</p>
               <div class="mascotas-opciones">
-                @foreach ($mascotas as $indice => $mascota)
+                @foreach ($mascotas as $mascota)
+                  @php $planVigente = $planVigentePorMascota[$mascota->mascota_id] ?? null; @endphp
                   <input type="radio" class="opcion-radio" name="mascota_id" id="mascota-{{ $mascota->mascota_id }}"
-                         value="{{ $mascota->mascota_id }}" @checked($indice === 0)
-                         data-nombre="{{ $mascota->nombre }}"
-                         {{-- RN-22: lo que esta mascota ya recibe no se puede volver a contratar. --}}
-                         data-vigentes="{{ json_encode($vigentesPorMascota[$mascota->mascota_id] ?? []) }}"
-                         data-recibe="{{ json_encode($recibePorMascota[$mascota->mascota_id] ?? []) }}">
-                  <label class="mascota-chip" for="mascota-{{ $mascota->mascota_id }}">
+                         value="{{ $mascota->mascota_id }}" required
+                         {{-- Nada premarcado: el cliente elige a conciencia; solo se
+                              recupera lo que ya habia elegido si la validacion fallo. --}}
+                         @checked($planVigente === null && (string) old('mascota_id') === (string) $mascota->mascota_id)
+                         {{-- RN-22: con plan vigente no se puede elegir. --}}
+                         @disabled($planVigente !== null)
+                         data-nombre="{{ $mascota->nombre }}">
+                  <label class="mascota-chip" for="mascota-{{ $mascota->mascota_id }}"
+                         @if ($planVigente) title="{{ $mascota->nombre }} ya tiene su plan: {{ $planVigente }}" @endif>
                     <span class="mascota-avatar" aria-hidden="true">{{ mb_substr($mascota->nombre, 0, 1) }}</span>
                     <span>
                       <span class="mascota-nombre">{{ $mascota->nombre }}</span><br>
-                      <span class="mascota-especie">{{ $mascota->especie instanceof \App\Enums\Especie ? $mascota->especie->value : $mascota->especie }}</span>
+                      @if ($planVigente)
+                        <span class="mascota-plan">Ya tiene {{ $planVigente }}</span>
+                      @else
+                        <span class="mascota-especie">{{ $mascota->especie instanceof \App\Enums\Especie ? $mascota->especie->value : $mascota->especie }}</span>
+                      @endif
                     </span>
                   </label>
                 @endforeach
@@ -170,14 +188,15 @@
               <div class="campo" style="max-width:420px;">
                 <label class="oculto-visual" for="producto_id">Producto del despacho</label>
                 <select id="producto_id" name="producto_id" required>
+                  <option value="" disabled @selected(! old('producto_id'))>Elige el producto</option>
                   @foreach ($catalogo as $producto)
                     @php $etiqueta = $producto->nombre.' — S/ '.number_format((float) $producto->precio, 2); @endphp
                     <option value="{{ $producto->producto_id }}"
+                            @selected((string) old('producto_id') === (string) $producto->producto_id)
                             data-nombre="{{ $producto->nombre }}"
                             data-etiqueta="{{ $etiqueta }}">{{ $etiqueta }}</option>
                   @endforeach
                 </select>
-                <p class="error-campo" id="aviso-productos" role="status" hidden></p>
               </div>
             </div>
 
@@ -186,7 +205,7 @@
               <div class="planes-opciones">
                 @foreach ($planes as $nombrePlan => $datos)
                   <input type="radio" class="opcion-radio" name="plan" id="plan-{{ $nombrePlan }}"
-                         value="{{ $nombrePlan }}" @checked($loop->first)
+                         value="{{ $nombrePlan }}" required @checked(old('plan') === $nombrePlan)
                          data-monto="{{ number_format((float) $datos['monto'], 2) }}"
                          data-unidades="{{ $datos['unidades'] }}">
                   <label class="plan-tarjeta" for="plan-{{ $nombrePlan }}">
@@ -205,7 +224,7 @@
 
             <div class="resumen-plan">
               <p id="resumen-plan">Elige las opciones de arriba para ver el resumen.</p>
-              <button type="submit" class="boton">Contratar plan</button>
+              <button type="submit" class="boton" disabled>Contratar plan</button>
             </div>
           </form>
         @endif
@@ -222,46 +241,7 @@
 
       const resumen = document.getElementById('resumen-plan');
       const producto = document.getElementById('producto_id');
-      const aviso = document.getElementById('aviso-productos');
       const boton = form.querySelector('button[type="submit"]');
-
-      /*
-       * RN-22 en la propia pantalla: lo que la mascota elegida ya recibe se
-       * deshabilita en la lista. El servidor lo sigue validando igual; esto
-       * solo evita que la persona elija algo que iba a ser rechazado.
-       */
-      const ajustarProductos = function (mascota) {
-        const vigentes = JSON.parse(mascota.dataset.vigentes || '[]');
-        let disponibles = 0;
-
-        Array.from(producto.options).forEach(function (opcion) {
-          const yaLoRecibe = vigentes.indexOf(Number(opcion.value)) !== -1;
-
-          opcion.disabled = yaLoRecibe;
-          opcion.textContent = yaLoRecibe
-            ? opcion.dataset.nombre + ' — ya lo recibe'
-            : opcion.dataset.etiqueta;
-
-          if (! yaLoRecibe) disponibles++;
-        });
-
-        // Si lo que estaba elegido quedo deshabilitado, saltamos al primero libre.
-        const elegido = producto.options[producto.selectedIndex];
-
-        if (! elegido || elegido.disabled) {
-          const libre = Array.from(producto.options).find(function (o) { return ! o.disabled; });
-          producto.value = libre ? libre.value : '';
-        }
-
-        const sinOpciones = disponibles === 0;
-        aviso.textContent = sinOpciones
-          ? mascota.dataset.nombre + ' ya recibe todos los productos del catalogo.'
-          : '';
-        aviso.hidden = ! sinOpciones;
-        boton.disabled = sinOpciones;
-
-        return ! sinOpciones;
-      };
 
       // Se arma con nodos de texto en vez de innerHTML: los nombres vienen de
       // la base de datos y no deben poder inyectar marcado.
@@ -275,27 +255,28 @@
         const mascota = form.querySelector('input[name="mascota_id"]:checked');
         const plan = form.querySelector('input[name="plan"]:checked');
 
-        if (! mascota || ! plan) return;
+        // El boton solo se habilita cuando las tres elecciones estan hechas.
+        // Las mascotas con plan vigente vienen deshabilitadas (RN-22).
+        boton.disabled = true;
 
-        if (! ajustarProductos(mascota)) {
-          resumen.textContent = 'No queda ningun producto por contratar para ' + mascota.dataset.nombre + '.';
+        const opcion = producto.value !== '' ? producto.options[producto.selectedIndex] : null;
+        const faltan = [];
+        if (! mascota) faltan.push('para quien es');
+        if (! opcion) faltan.push('que producto recibe');
+        if (! plan) faltan.push('que plan');
+
+        if (faltan.length) {
+          resumen.textContent = 'Elige ' + faltan.join(', ') + ' para ver el resumen.';
           return;
         }
 
-        const opcion = producto.options[producto.selectedIndex];
-        if (! opcion) return;
+        boton.disabled = false;
 
         const unidades = Number(plan.dataset.unidades);
 
-        // Contratar crea un plan NUEVO: no cambia ni reprograma los que ya tiene.
-        const recibe = JSON.parse(mascota.dataset.recibe || '[]');
         const nota = document.createElement('small');
         nota.className = 'resumen-nota';
-        nota.textContent = 'Primer despacho el ' + form.dataset.primerDespacho + '. '
-          + (recibe.length
-            ? 'Es un plan adicional: ' + mascota.dataset.nombre + ' ya recibe ' + recibe.join(', ')
-              + ', que sigue igual.'
-            : 'Sera el primer plan de ' + mascota.dataset.nombre + '.');
+        nota.textContent = 'Primer despacho el ' + form.dataset.primerDespacho + '.';
 
         resumen.replaceChildren(
           fuerte(mascota.dataset.nombre),
