@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\ReglaDeNegocioException;
+use App\Mail\FacturaPedidoMail;
 use App\Models\Pedido;
+use App\Services\CorreoService;
 use App\Services\PagoService;
 use App\Services\Pasarela;
 use Illuminate\Http\RedirectResponse;
@@ -58,15 +60,22 @@ class PagoController extends Controller
                 'regla' => $e->regla(),
                 'mensaje' => $e->getMessage(),
                 'ok' => false,
-            ]);
+            ])->with('pago_estado', 'rechazado');
         }
+
+        // Comprobante por correo (demo): CorreoService absorve cualquier fallo
+        // para que un cobro aprobado jamas se pierda por un problema de correo.
+        app(CorreoService::class)->enviar(
+            (string) $request->user()->correo,
+            new FacturaPedidoMail($pedido->load('detalles.producto')),
+        );
 
         return redirect()->route('catalogo')->with('resultado', [
             'regla' => null,
             'mensaje' => 'Pago aprobado. El pedido '.$pedido->getKey().' quedo PAGADO.'
                 .($pago->ultimos_cuatro !== null ? ' Tarjeta terminada en '.$pago->ultimos_cuatro.'.' : ''),
             'ok' => true,
-        ]);
+        ])->with('pago_estado', 'aprobado');
     }
 
     /** Un cliente solo puede pagar sus propios pedidos. — RN-01 */

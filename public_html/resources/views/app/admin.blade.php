@@ -24,7 +24,7 @@
       <div class="bloque" id="bloque-inventario" style="margin-bottom:22px;">
         <h2>Inventario</h2>
         <p>El sem&aacute;foro compara el stock con el punto de reorden de cada producto.</p>
-        <div style="overflow-x:auto;margin-top:14px;">
+        <div class="tabla-scroll" style="margin-top:14px;">
           <table class="tabla-app">
             <caption class="oculto-visual">Inventario de productos activos</caption>
             <thead>
@@ -37,12 +37,12 @@
               @forelse ($productos as $producto)
                 @php $semaforo = $semaforos[$producto->producto_id] ?? 'VERDE'; @endphp
                 <tr>
-                  <td><code style="font-family:'Courier New',monospace;">{{ $producto->codigo_sku }}</code></td>
-                  <td>{{ $producto->nombre }}</td>
-                  <td>S/ {{ number_format((float) $producto->precio, 2) }}</td>
-                  <td>{{ $producto->stock_actual }}</td>
-                  <td>{{ $producto->punto_reorden }}</td>
-                  <td><span class="semaforo semaforo-{{ $semaforo }}">{{ $semaforo }}</span></td>
+                  <td data-label="SKU"><code style="font-family:'Courier New',monospace;">{{ $producto->codigo_sku }}</code></td>
+                  <td data-label="Producto">{{ $producto->nombre }}</td>
+                  <td data-label="Precio">S/ {{ number_format((float) $producto->precio, 2) }}</td>
+                  <td data-label="Stock">{{ $producto->stock_actual }}</td>
+                  <td data-label="Reorden">{{ $producto->punto_reorden }}</td>
+                  <td data-label="Sem&aacute;foro"><span class="semaforo semaforo-{{ $semaforo }}">{{ $semaforo }}</span></td>
                 </tr>
               @empty
                 <tr><td colspan="6">No hay productos activos en el cat&aacute;logo.</td></tr>
@@ -90,7 +90,7 @@
         <div class="bloque">
           <h2 data-rn="RN-20" data-rn-nota="Aviso 15 días antes">Recordatorios de salud</h2>
           <p>Controles programados dentro de los pr&oacute;ximos 15 d&iacute;as.</p>
-          <div style="overflow-x:auto;margin-top:12px;">
+          <div class="tabla-scroll" style="margin-top:12px;">
             <table class="tabla-app">
               <caption class="oculto-visual">Controles programados en los pr&oacute;ximos 15 d&iacute;as</caption>
               <thead>
@@ -100,10 +100,10 @@
               <tbody id="cuerpo-recordatorios">
                 @forelse ($recordatorios as $recordatorio)
                   <tr>
-                    <td>{{ data_get($recordatorio, 'mascota') }}</td>
-                    <td>{{ data_get($recordatorio, 'cliente') }}</td>
-                    <td>{{ data_get($recordatorio, 'proxima_fecha') }}</td>
-                    <td>{{ data_get($recordatorio, 'dias_restantes', data_get($recordatorio, 'dias')) }} d&iacute;as</td>
+                    <td data-label="Mascota">{{ data_get($recordatorio, 'mascota') }}</td>
+                    <td data-label="Cliente">{{ data_get($recordatorio, 'cliente') }}</td>
+                    <td data-label="Fecha">{{ data_get($recordatorio, 'proxima_fecha') }}</td>
+                    <td data-label="Faltan">{{ data_get($recordatorio, 'dias_restantes', data_get($recordatorio, 'dias')) }} d&iacute;as</td>
                   </tr>
                 @empty
                   <tr><td colspan="4">Sin controles en los pr&oacute;ximos 15 d&iacute;as.</td></tr>
@@ -117,7 +117,7 @@
       <div class="bloque" id="bloque-pedidos">
         <h2>Pedidos</h2>
         <p>Cada pedido avanza de PENDIENTE a ENTREGADO, sin saltarse pasos.</p>
-        <div style="overflow-x:auto;margin-top:14px;">
+        <div class="tabla-scroll" style="margin-top:14px;">
           <table class="tabla-app">
             <caption class="oculto-visual">Pedidos registrados y su estado</caption>
             <thead>
@@ -136,11 +136,11 @@
                     $siguiente = $estadoActual->siguiente();
                 @endphp
                 <tr>
-                  <td>{{ $pedido->pedido_id }}</td>
-                  <td>{{ $clientes[$pedido->cliente_id]->nombre ?? '?' }}</td>
-                  <td>S/ {{ number_format((float) $pedido->monto_total, 2) }}</td>
-                  <td class="origen-{{ $origen }}">{{ $origen === 'SUSCRIPCION' ? 'Suscripción' : 'Compra directa' }}</td>
-                  <td><span class="estado estado-{{ $estadoActual->value }}">{{ $estadoActual->value }}</span></td>
+                  <td data-label="N.&deg;">{{ $pedido->pedido_id }}</td>
+                  <td data-label="Cliente">{{ $clientes[$pedido->cliente_id]->nombre ?? '?' }}</td>
+                  <td data-label="Monto">S/ {{ number_format((float) $pedido->monto_total, 2) }}</td>
+                  <td data-label="Origen" class="origen-{{ $origen }}">{{ $origen === 'SUSCRIPCION' ? 'Suscripción' : 'Compra directa' }}</td>
+                  <td data-label="Estado"><span class="estado estado-{{ $estadoActual->value }}">{{ $estadoActual->value }}</span></td>
                   <td>
                     @if ($siguiente)
                       <form method="POST" action="{{ route('admin.pedidos.avanzar', $pedido->pedido_id) }}">

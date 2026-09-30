@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AutenticacionController;
+use App\Http\Controllers\AyudaController;
 use App\Http\Controllers\CarritoController;
 use App\Http\Controllers\CatalogoController;
 use App\Http\Controllers\CitaController;
@@ -21,6 +22,9 @@ Route::get('/', [PaginaPublicaController::class, 'inicio'])->name('inicio');
 Route::get('/nosotros', [PaginaPublicaController::class, 'nosotros'])->name('nosotros');
 Route::get('/productos', [PaginaPublicaController::class, 'productos'])->name('productos');
 Route::get('/contacto', [PaginaPublicaController::class, 'contacto'])->name('contacto');
+Route::post('/contacto', [PaginaPublicaController::class, 'recibirContacto'])
+    ->middleware('throttle:10,1')
+    ->name('contacto.enviar');
 
 /*
 |----------------------------------------------------------------------
@@ -63,11 +67,19 @@ Route::middleware('auth')->prefix('app')->group(function (): void {
         Route::post('/citas', [CitaController::class, 'reservar'])->name('citas.reservar');
 
         Route::get('/mascotas', [MascotaController::class, 'index'])->name('mascotas');
+        // RF-03: el cliente registra sus mascotas para citas y planes.
+        Route::post('/mascotas', [MascotaController::class, 'guardar'])->name('mascotas.guardar');
         // RF-03: aqui el cliente contrata el plan mensual.
         Route::post('/suscripciones', [SuscripcionController::class, 'contratar'])
             ->name('suscripciones.contratar');
         Route::patch('/suscripciones/{suscripcion}', [SuscripcionController::class, 'estado'])
             ->name('suscripciones.estado');
+
+        // Asistente Pelusa: guia del chat y respuestas con datos de la cuenta.
+        Route::get('/ayuda/guias', [AyudaController::class, 'guias'])->name('ayuda.guias');
+        Route::post('/ayuda/consultar', [AyudaController::class, 'consultar'])
+            ->middleware('throttle:30,1')
+            ->name('ayuda.consultar');
     });
 
     // ---- Modulo del VETERINARIO ----

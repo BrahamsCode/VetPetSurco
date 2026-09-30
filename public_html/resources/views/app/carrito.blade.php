@@ -13,7 +13,7 @@
       @include('components.aviso')
 
       <div class="bloque" style="margin-bottom:22px;">
-        <div style="overflow-x:auto;">
+        <div class="tabla-scroll">
           <table class="tabla-app" id="tabla-carrito">
             <caption class="oculto-visual">L&iacute;neas del carrito de compras</caption>
             <thead>
@@ -33,9 +33,9 @@
                     $cantidad = (int) data_get($linea, 'cantidad');
                 @endphp
                 <tr>
-                  <td>{{ data_get($linea, 'nombre') }}</td>
-                  <td>S/ {{ number_format($precio, 2) }}</td>
-                  <td>
+                  <td data-label="Producto">{{ data_get($linea, 'nombre') }}</td>
+                  <td data-label="Precio unitario">S/ {{ number_format($precio, 2) }}</td>
+                  <td data-label="Cantidad">
                     <form method="POST" action="{{ route('carrito.actualizar', $productoId) }}" style="display:flex;gap:8px;align-items:center;">
                       @csrf
                       @method('PATCH')
@@ -45,7 +45,7 @@
                       <button type="submit" class="boton-mini">Actualizar</button>
                     </form>
                   </td>
-                  <td>S/ {{ number_format((float) data_get($linea, 'subtotal', $precio * $cantidad), 2) }}</td>
+                  <td data-label="Subtotal">S/ {{ number_format((float) data_get($linea, 'subtotal', $precio * $cantidad), 2) }}</td>
                   <td>
                     <form method="POST" action="{{ route('carrito.quitar', $productoId) }}">
                       @csrf
@@ -67,7 +67,17 @@
       <div class="rejilla rejilla-2">
         <div class="bloque">
           <h2>Total del pedido</h2>
-          <p class="indicador-valor" id="total-carrito">S/ {{ number_format((float) $total, 2) }}</p>
+          @php
+              /* Desglose fiscal peruano: los precios al publico incluyen IGV 18%. */
+              $igvTotal = round((float) $total - ((float) $total / 1.18), 2);
+              $baseTotal = round((float) $total - $igvTotal, 2);
+          @endphp
+          <div class="total-desglose" id="total-carrito" style="margin-top:10px;">
+            <p class="total-fila"><span>Subtotal (sin IGV)</span><span>S/ {{ number_format($baseTotal, 2) }}</span></p>
+            <p class="total-fila"><span>IGV 18%</span><span>S/ {{ number_format($igvTotal, 2) }}</span></p>
+            <p class="total-fila total-fila--final"><span>Total a pagar</span><span>S/ {{ number_format((float) $total, 2) }}</span></p>
+          </div>
+          <p class="fiscal-nota">Precios con IGV incluido (D.S. 055-99-EF). Al pagar recibir&aacute;s tu comprobante por correo.</p>
           <form method="POST" action="{{ route('carrito.confirmar') }}">
             @csrf
             <p class="nota-regla" style="margin-top:16px;" data-rn="RN-14" data-rn-nota="Origen del pedido">

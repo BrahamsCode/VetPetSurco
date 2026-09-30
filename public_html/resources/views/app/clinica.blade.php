@@ -16,7 +16,7 @@
         <div class="bloque">
           <h2>Citas de hoy y pr&oacute;ximas</h2>
           <p>Selecciona una cita para registrar su atenci&oacute;n.</p>
-          <div style="overflow-x:auto;margin-top:12px;">
+          <div class="tabla-scroll" style="margin-top:12px;">
             <table class="tabla-app">
               <caption class="oculto-visual">Agenda de citas asignadas al veterinario</caption>
               <thead>
@@ -33,10 +33,10 @@
                       $elegida = $citaElegida !== null && (int) $citaElegida->cita_id === (int) $cita->cita_id;
                   @endphp
                   <tr @if ($elegida) style="background-color:var(--menta);" @endif>
-                    <td>{{ $mascotas[$cita->mascota_id]->nombre ?? '?' }}</td>
-                    <td>{{ $servicioCita }}</td>
-                    <td>{{ $momento->format('Y-m-d') }} &middot; {{ $momento->format('H:i') }}</td>
-                    <td><span class="estado estado-{{ $estado }}">{{ $estado }}</span></td>
+                    <td data-label="Mascota">{{ $mascotas[$cita->mascota_id]->nombre ?? '?' }}</td>
+                    <td data-label="Servicio">{{ $servicioCita }}</td>
+                    <td data-label="Fecha">{{ $momento->format('Y-m-d') }} &middot; {{ $momento->format('H:i') }}</td>
+                    <td data-label="Estado"><span class="estado estado-{{ $estado }}">{{ $estado }}</span></td>
                     <td>
                       @if ($estado === 'RESERVADA')
                         <a class="boton-mini" href="{{ route('clinica', ['cita' => $cita->cita_id]) }}">Atender</a>
@@ -98,7 +98,7 @@
 
       <div class="bloque" style="margin-top:24px;">
         <h2>Historia cl&iacute;nica registrada</h2>
-        <div style="overflow-x:auto;margin-top:12px;">
+        <div class="tabla-scroll" style="margin-top:12px;">
           <table class="tabla-app">
             <caption class="oculto-visual">Atenciones registradas en la historia cl&iacute;nica</caption>
             <thead>
@@ -108,11 +108,11 @@
             <tbody id="cuerpo-historias">
               @forelse ($historias as $historia)
                 <tr>
-                  <td>{{ $mascotas[$historia->mascota_id]->nombre ?? '?' }}</td>
-                  <td>{{ \Illuminate\Support\Carbon::parse($historia->fecha_atencion)->format('Y-m-d') }}</td>
-                  <td>{{ $historia->diagnostico }}</td>
-                  <td>{{ $historia->tratamiento }}</td>
-                  <td>{{ $historia->proxima_fecha ? \Illuminate\Support\Carbon::parse($historia->proxima_fecha)->format('Y-m-d') : '—' }}</td>
+                  <td data-label="Mascota">{{ $mascotas[$historia->mascota_id]->nombre ?? '?' }}</td>
+                  <td data-label="Fecha">{{ \Illuminate\Support\Carbon::parse($historia->fecha_atencion)->format('Y-m-d') }}</td>
+                  <td data-label="Diagn&oacute;stico">{{ $historia->diagnostico }}</td>
+                  <td data-label="Tratamiento">{{ $historia->tratamiento }}</td>
+                  <td data-label="Pr&oacute;ximo control">{{ $historia->proxima_fecha ? \Illuminate\Support\Carbon::parse($historia->proxima_fecha)->format('Y-m-d') : '—' }}</td>
                 </tr>
               @empty
                 <tr><td colspan="5">Sin atenciones registradas.</td></tr>

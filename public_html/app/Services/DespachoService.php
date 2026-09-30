@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Enums\TipoOrigen;
 use App\Exceptions\ReglaDeNegocioException;
+use App\Mail\DespachoSuscripcionMail;
 use App\Models\Suscripcion;
 use Illuminate\Support\Carbon;
 
@@ -87,6 +88,13 @@ final class DespachoService
                 ->copy()
                 ->addDays((int) $suscripcion->frecuencia_dias);
             $suscripcion->save();
+
+            // Aviso al cliente: su despacho mensual ya se emitio. Un fallo del
+            // correo nunca interrumpe la generacion de los demas despachos.
+            app(CorreoService::class)->enviar(
+                (string) $cliente->correo,
+                new DespachoSuscripcionMail($suscripcion, $pedido, $cliente),
+            );
 
             $despachados[] = [
                 'suscripcion' => (int) $suscripcion->getKey(),
