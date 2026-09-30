@@ -17,7 +17,9 @@ de avance.
 aceptación, no cuando el código existe. Por eso hay parciales: funcionan, pero no cumplen
 todo lo que el documento pide.
 
-> [!warning] El 85 % mide requerimientos, no producción
+> [!WARNING]
+> **El 85 % mide requerimientos, no producción.**
+>
 > El sistema no está desplegado. Dominio, alojamiento, respaldo y medición de rendimiento
 > están en cero. Un requerimiento cumplido en local no es un requerimiento en producción.
 
