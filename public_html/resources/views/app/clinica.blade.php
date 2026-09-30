@@ -174,8 +174,15 @@
       </div>
 
       <div class="bloque" style="margin-top:24px;">
-        <h2>Historia cl&iacute;nica registrada</h2>
-        <p>Atenciones que registraste, de la m&aacute;s reciente a la m&aacute;s antigua. Toca una para ver el detalle.</p>
+        <div class="bloque-cabecera">
+          <div>
+            <h2>&Uacute;ltimas atenciones</h2>
+            <p>Las {{ $historias->count() }} m&aacute;s recientes que registraste. Toca una para ver el detalle.</p>
+          </div>
+          @if ($totalHistorias > 0)
+            <a class="boton-mini" href="{{ route('clinica.historia') }}">Ver toda la historia ({{ $totalHistorias }})</a>
+          @endif
+        </div>
 
         {{-- Lista desplegable y no tabla: diagnostico y tratamiento son texto
              libre y en una tabla cada fila crecia al alto del texto mas largo. --}}
@@ -184,31 +191,7 @@
         @else
           <ul class="historial" id="cuerpo-historias">
             @foreach ($historias as $historia)
-              <li>
-                <details class="historial-item">
-                  <summary>
-                    <span class="historial-fecha">{{ $historia->fecha_atencion->format('d/m/Y') }}</span>
-                    <span class="historial-mascota">{{ $historia->mascota->nombre ?? '?' }}</span>
-                    <span class="historial-resumen">{{ $historia->diagnostico }}</span>
-                    <span class="historial-marcas">
-                      @if ($historia->vacuna_aplicada)
-                        <span class="estado">Vacuna</span>
-                      @endif
-                      @if ($historia->proxima_fecha)
-                        <span class="historial-control">Control {{ $historia->proxima_fecha->format('d/m/Y') }}</span>
-                      @endif
-                    </span>
-                  </summary>
-                  <dl class="historial-detalle">
-                    <div><dt>Diagn&oacute;stico</dt><dd>{{ $historia->diagnostico }}</dd></div>
-                    <div><dt>Tratamiento</dt><dd>{{ $historia->tratamiento }}</dd></div>
-                    @if ($historia->vacuna_aplicada)
-                      <div><dt>Vacuna aplicada</dt><dd>{{ $historia->vacuna_aplicada }}</dd></div>
-                    @endif
-                    <div><dt>Pr&oacute;ximo control</dt><dd>{{ $historia->proxima_fecha?->format('d/m/Y') ?? 'Sin control programado' }}</dd></div>
-                  </dl>
-                </details>
-              </li>
+              @include('app._historial-item')
             @endforeach
           </ul>
         @endif

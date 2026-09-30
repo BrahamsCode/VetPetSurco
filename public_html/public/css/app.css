@@ -286,6 +286,27 @@ a.boton-mini { display: inline-flex; align-items: center; justify-content: cente
   .historial-detalle div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
 }
 
+/* Encabezado de bloque con una accion a la derecha. */
+.bloque-cabecera { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.bloque-cabecera p { color: var(--gris); font-size: 14px; margin: 0; }
+.bloque-cabecera .boton-mini { text-decoration: none; }
+
+.migas { margin: 0 0 10px 0; font-size: 14px; }
+.migas a { text-decoration: none; font-weight: 700; }
+
+/* Buscador del historial. */
+.buscador { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.buscador input[type="search"] { flex: 1; min-width: 220px; padding: 12px 15px; font: inherit; font-size: 15px;
+  border: 1px solid var(--borde); border-radius: 30px; background-color: var(--blanco); }
+.buscador input[type="search"]:focus { outline: 2px solid var(--ambar); outline-offset: 1px; border-color: var(--verde-medio); }
+.buscador .boton { min-height: 46px; }
+.buscador-resultado { font-size: 13.5px; color: var(--gris); margin: 14px 0 0 0; }
+
+/* Paginacion. */
+.paginacion { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
+.paginacion-estado { font-size: 14px; color: var(--gris); }
+.paginacion-inactivo { opacity: .45; cursor: default; pointer-events: none; }
+
 .campo-opcional { font-weight: 400; color: var(--gris); }
 .campo-ayuda { font-size: 12.5px; color: var(--gris); margin: 5px 0 0 0; }
 .clinica-form-acciones { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 6px; }

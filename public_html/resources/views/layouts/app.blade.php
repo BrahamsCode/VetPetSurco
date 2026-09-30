@@ -66,7 +66,7 @@
 @if ($usuario)
         <nav aria-label="M&oacute;dulos de la plataforma"><ul class="menu">
 @foreach ($modulos as [$ruta, $etiqueta])
-          <li><a href="{{ route($ruta) }}" @if (request()->routeIs($ruta)) aria-current="page" @endif>{!! $etiqueta !!}</a></li>
+          <li><a href="{{ route($ruta) }}" @if (request()->routeIs($ruta, $ruta.'.*')) aria-current="page" @endif>{!! $etiqueta !!}</a></li>
 @endforeach
         </ul></nav>
         <div class="sesion" data-rn="RN-01" data-rn-nota="Rol excluyente">

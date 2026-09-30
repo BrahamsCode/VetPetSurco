@@ -123,6 +123,83 @@ final class PanelClinicaTest extends TestCase
             ->assertDontSee(route('clinica.atender', $futura->cita_id), false);
     }
 
+    /** Atencion ya registrada por este veterinario. */
+    private function atencionDe(Usuario $veterinario, string $diagnostico, int $haceDias = 1): HistoriaClinica
+    {
+        $cita = Cita::factory()->atendida()->create([
+            'veterinario_id' => $veterinario->getKey(),
+            'fecha_hora' => now()->subDays($haceDias)->setTime(10, 0),
+        ]);
+
+        return HistoriaClinica::query()->create([
+            'mascota_id' => $cita->mascota_id,
+            'cita_id' => $cita->cita_id,
+            'fecha_atencion' => now()->subDays($haceDias),
+            'diagnostico' => $diagnostico,
+            'tratamiento' => 'Reposo.',
+        ]);
+    }
+
+    public function test_el_panel_muestra_solo_las_ultimas_cinco_y_enlaza_al_historial(): void
+    {
+        $vet = Usuario::factory()->veterinario()->create();
+        foreach (range(1, 7) as $dia) {
+            $this->atencionDe($vet, 'Diagnostico numero '.$dia, $dia);
+        }
+
+        $this->actingAs($vet)->get(route('clinica'))
+            ->assertOk()
+            ->assertSee('Diagnostico numero 1')
+            ->assertSee('Diagnostico numero 5')
+            ->assertDontSee('Diagnostico numero 6')
+            ->assertSee('Ver toda la historia (7)');
+    }
+
+    public function test_el_historial_busca_por_diagnostico_y_por_mascota(): void
+    {
+        $vet = Usuario::factory()->veterinario()->create();
+        $otitis = $this->atencionDe($vet, 'Otitis externa', 1);
+        $this->atencionDe($vet, 'Control de peso', 2);
+
+        $this->actingAs($vet)->get(route('clinica.historia', ['q' => 'otitis']))
+            ->assertOk()
+            ->assertSee('Otitis externa')
+            ->assertDontSee('Control de peso')
+            ->assertSee('1 resultado');
+
+        $this->actingAs($vet)->get(route('clinica.historia', ['q' => $otitis->mascota->nombre]))
+            ->assertSee('Otitis externa');
+    }
+
+    public function test_el_historial_no_muestra_atenciones_de_otro_veterinario(): void
+    {
+        $lucia = Usuario::factory()->veterinario()->create();
+        $diego = Usuario::factory()->veterinario()->create();
+        $this->atencionDe($lucia, 'Atencion de Lucia');
+        $this->atencionDe($diego, 'Atencion de Diego');
+
+        $this->actingAs($lucia)->get(route('clinica.historia'))
+            ->assertSee('Atencion de Lucia')
+            ->assertDontSee('Atencion de Diego');
+    }
+
+    public function test_el_historial_se_pagina_de_quince_en_quince(): void
+    {
+        $vet = Usuario::factory()->veterinario()->create();
+        foreach (range(1, 17) as $dia) {
+            $this->atencionDe($vet, sprintf('Registro %02d', $dia), $dia);
+        }
+
+        $this->actingAs($vet)->get(route('clinica.historia'))
+            ->assertSee('Registro 15')
+            ->assertDontSee('Registro 16')
+            ->assertSee('Página 1 de 2');
+
+        $this->actingAs($vet)->get(route('clinica.historia', ['page' => 2]))
+            ->assertSee('Registro 17')
+            ->assertDontSee('Registro 01');
+    }
+
     public function test_la_ficha_muestra_alergias_y_atenciones_anteriores(): void
     {
         $vet = Usuario::factory()->veterinario()->create();

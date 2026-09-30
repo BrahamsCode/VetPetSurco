@@ -9,6 +9,7 @@ use App\Models\Cita;
 use App\Models\HistoriaClinica;
 use App\Services\AgendaService;
 use App\Services\HistoriaClinicaService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -21,6 +22,12 @@ use Illuminate\View\View;
  */
 class ClinicaController extends Controller
 {
+    /** Atenciones que se muestran en el panel del dia. */
+    private const ULTIMAS_ATENCIONES = 5;
+
+    /** Atenciones por pagina en el historial completo. */
+    private const POR_PAGINA = 15;
+
     public function __construct(
         private readonly AgendaService $agenda,
         private readonly HistoriaClinicaService $historias,
@@ -55,13 +62,12 @@ class ClinicaController extends Controller
             'no_asistio' => $this->agenda->sePuedeMarcarInasistencia($c),
         ]]);
 
-        $historias = $citas->isEmpty()
-            ? collect()
-            : HistoriaClinica::query()
-                ->with(['mascota', 'cita'])
-                ->whereIn('cita_id', $citas->pluck('cita_id'))
-                ->orderByDesc('fecha_atencion')
-                ->get();
+        // En el panel solo las ultimas; el historial completo tiene su vista.
+        $historias = $this->historiasDe($veterinarioId)
+            ->with('mascota')
+            ->limit(self::ULTIMAS_ATENCIONES)
+            ->get();
+        $totalHistorias = $this->historiasDe($veterinarioId)->count();
 
         // La cita seleccionada llega por la barra de direcciones al pulsar
         // "Atender". Solo se abre si de verdad se puede atender ahora.
@@ -95,11 +101,58 @@ class ClinicaController extends Controller
             'proximas' => $proximas,
             'acciones' => $acciones,
             'historias' => $historias,
+            'totalHistorias' => $totalHistorias,
             'citaElegida' => $citaElegida,
             'avisoEleccion' => $avisoEleccion,
             'antecedentes' => $antecedentes,
             'proximaSugerida' => now()->addDays(30)->toDateString(),
         ]);
+    }
+
+    /**
+     * Historia clinica completa del veterinario, con buscador y paginas.
+     * Busca por mascota, dueno, diagnostico, tratamiento o vacuna.
+     */
+    public function historia(Request $request): View
+    {
+        $datos = $request->validate(['q' => ['nullable', 'string', 'max:100']]);
+        $busqueda = trim((string) ($datos['q'] ?? ''));
+
+        $historias = $this->historiasDe($request->user()->usuario_id)
+            ->with('mascota.cliente')
+            ->when($busqueda !== '', function (Builder $consulta) use ($busqueda): void {
+                // Los comodines que escriba el usuario se buscan como texto.
+                $patron = '%'.addcslashes($busqueda, '%_\\').'%';
+
+                $consulta->where(fn (Builder $o) => $o
+                    ->where('diagnostico', 'like', $patron)
+                    ->orWhere('tratamiento', 'like', $patron)
+                    ->orWhere('vacuna_aplicada', 'like', $patron)
+                    ->orWhereHas('mascota', fn (Builder $m) => $m
+                        ->where('nombre', 'like', $patron)
+                        ->orWhereHas('cliente', fn (Builder $c) => $c->where('nombre', 'like', $patron))));
+            })
+            ->paginate(self::POR_PAGINA)
+            ->withQueryString();
+
+        return view('app.clinica-historia', [
+            'historias' => $historias,
+            'busqueda' => $busqueda,
+        ]);
+    }
+
+    /**
+     * Atenciones de las citas de este veterinario, de la mas reciente a la
+     * mas antigua. Es el mismo alcance en el panel y en el historial.
+     *
+     * @return Builder<HistoriaClinica>
+     */
+    private function historiasDe(int $veterinarioId): Builder
+    {
+        return HistoriaClinica::query()
+            ->whereHas('cita', fn (Builder $c) => $c->where('veterinario_id', $veterinarioId))
+            ->orderByDesc('fecha_atencion')
+            ->orderByDesc('historia_id');
     }
 
     public function atender(RegistrarAtencionRequest $solicitud, Cita $cita): RedirectResponse

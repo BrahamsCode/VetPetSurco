@@ -85,6 +85,7 @@ Route::middleware('auth')->prefix('app')->group(function (): void {
     // ---- Modulo del VETERINARIO ----
     Route::middleware('rol:VETERINARIO')->group(function (): void {
         Route::get('/clinica', [ClinicaController::class, 'index'])->name('clinica');
+        Route::get('/clinica/historia', [ClinicaController::class, 'historia'])->name('clinica.historia');
         Route::post('/clinica/{cita}/atender', [ClinicaController::class, 'atender'])->name('clinica.atender');
         Route::patch('/clinica/{cita}/desenlace', [ClinicaController::class, 'desenlace'])->name('clinica.desenlace');
     });
