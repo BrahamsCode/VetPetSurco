@@ -201,7 +201,7 @@ add(tabla(['Capítulo', 'Contenido'], [
   ['3', 'Objetivos que la empresa espera del sistema'],
   ['4', 'Alcance de lo solicitado y lo que queda fuera'],
   ['5', 'Interesados y perfiles de usuario'],
-  ['6', 'Requerimientos funcionales (RF-01 a RF-17)'],
+  ['6', 'Requerimientos funcionales (RF-01 a RF-19)'],
   ['7', 'Requerimientos no funcionales (RNF-01 a RNF-12)'],
   ['8', 'Reglas de negocio declaradas por la empresa (RN-01 a RN-22)'],
   ['9', 'Restricciones y supuestos'],
@@ -390,7 +390,7 @@ add(tabla(['Código', 'Supuesto'], [
 add(H('10. Criterios de aceptación del sistema', HeadingLevel.HEADING_1));
 add(P('La empresa dará por aceptado el sistema cuando se cumplan, en conjunto, las siguientes condiciones:'));
 add(...vinetas([
-  'Cada uno de los diecisiete requerimientos funcionales cumple su criterio de aceptación, demostrado sobre el sistema funcionando y no sobre una maqueta.',
+  'Cada uno de los diecinueve requerimientos funcionales cumple su criterio de aceptación, demostrado sobre el sistema funcionando y no sobre una maqueta.',
   'Las veintidós reglas de negocio del capítulo 8 se cumplen, y su cumplimiento puede volver a comprobarse las veces que la empresa lo pida (RNF-12).',
   'Se demuestra de principio a fin el recorrido del cliente: registro, catálogo, carrito, pedido, pago con tarjeta y seguimiento del estado.',
   'Se demuestra la prueba de simultaneidad: dos compras a la vez sobre la última unidad y dos reservas a la vez sobre el mismo horario (RNF-03).',
@@ -408,7 +408,7 @@ add(tabla(['Necesidad', 'Problema de origen', 'Objetivo', 'Requerimientos que lo
   ['N-02', 'Historial en fichas de cartón, imposible de consultar de forma remota.', 'OE-2', 'RF-10, RF-13'],
   ['N-03', 'Inventario en cuaderno, con quiebres de stock.', 'OE-3', 'RF-05, RF-15, RF-16'],
   ['N-04', 'Sin canal de venta en línea; ingresos dependientes del tráfico peatonal.', 'OE-1', 'RF-01, RF-02, RF-03, RF-04, RF-06, RF-07, RF-17'],
-  ['N-05', 'Sin recordatorios ni mecanismo de recompra; el dueño olvida sus controles.', 'OE-1, OE-2', 'RF-08, RF-09, RF-14'],
+  ['N-05', 'Sin recordatorios ni mecanismo de recompra; el dueño olvida sus controles.', 'OE-1, OE-2', 'RF-08, RF-09, RF-14, RF-18, RF-19'],
 ], [1400, 4238, 1400, 2600], { primeraNegrita: true }));
 
 // 12 -----------------------------------------------------------------------
@@ -417,8 +417,8 @@ add(P('La empresa no puede detener su operación para esperar un sistema complet
 add(aire(120));
 add(tabla(['Entrega', 'Qué debe incluir', 'Requerimientos', 'Por qué va primero'], [
   ['Primera', 'La tienda en línea funcionando y el inventario bajo control.', 'RF-01, RF-02, RF-03, RF-04, RF-05, RF-15, RF-16, RF-17', 'Es el ingreso nuevo más inmediato y resuelve el quiebre de stock, que es el problema más caro del día a día.'],
-  ['Segunda', 'La agenda y la historia clínica digital, con sus alertas.', 'RF-10, RF-11, RF-12, RF-13, RF-14', 'Elimina el cruce de citas y habilita la medición de la inasistencia del objetivo OE-2.'],
-  ['Tercera', 'El cobro en línea y el ingreso recurrente por suscripción.', 'RF-06, RF-07, RF-08, RF-09', 'Es lo que convierte la venta ocasional en ingreso estable, que es el objetivo OE-1.'],
+  ['Segunda', 'La agenda y la historia clínica digital, con sus alertas.', 'RF-10, RF-11, RF-12, RF-13, RF-14, RF-19', 'Elimina el cruce de citas y habilita la medición de la inasistencia del objetivo OE-2.'],
+  ['Tercera', 'El cobro en línea, el ingreso recurrente y el asistente del sitio.', 'RF-06, RF-07, RF-08, RF-09, RF-18', 'Es lo que convierte la venta ocasional en ingreso estable, que es el objetivo OE-1.'],
 ], [1300, 2900, 2700, 2738], { primeraNegrita: true }));
 
 // Anexo --------------------------------------------------------------------

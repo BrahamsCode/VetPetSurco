@@ -92,7 +92,7 @@ const pasos = [
   ["2", "Diagnóstico y objetivos", "Cinco problemas medidos y tres objetivos con métrica"],
   ["3", "La metodología", "Modelo iterativo e incremental, y la evidencia de cada incremento"],
   ["4", "Requerimientos y arquitectura", "17 funcionales, 22 reglas de negocio y cómo se hacen cumplir"],
-  ["5", "Evidencia y estado", "133 pruebas ejecutadas y lo que falta para producción"],
+  ["5", "Evidencia y estado", "137 pruebas ejecutadas y lo que falta para producción"],
 ];
 let y = 1.88;
 pasos.forEach(([n, t, d]) => {
@@ -272,7 +272,7 @@ const inc = [
    "Prototipo navegable de la plataforma, migrado luego a una aplicación completa con base de datos, cobro en línea y suscripción.",
    "Aquí aparecieron reglas que la entrevista no había revelado."],
   ["III", "29 y 30 de septiembre", "Requerimientos formales y presentación",
-   "Documento de requerimientos con 17 funcionales, 12 no funcionales y 22 reglas, más la trazabilidad a los problemas del diagnóstico.",
+   "Documento de requerimientos con 19 funcionales, 12 no funcionales y 22 reglas, más la trazabilidad a los problemas del diagnóstico.",
    "Consolidó por escrito lo que el prototipo ya había demostrado."],
 ];
 inc.forEach(([n, fecha, t, d, aporte], i) => {
@@ -299,7 +299,7 @@ s.addNotes("Punto honesto y a la vez fuerte: la especificación formal llegó en
 s = pres.addSlide();
 titulo(s, "Qué pide el negocio, por escrito", "Documento de requerimientos VPC-REQ-001, firmado por la empresa");
 
-[["17", "Requerimientos\nfuncionales", "Cada uno con quién lo pidió, su prioridad y su criterio de aceptación"],
+[["19", "Requerimientos\nfuncionales", "Cada uno con quién lo pidió, su prioridad y su criterio de aceptación"],
  ["12", "Requerimientos\nno funcionales", "Con la forma concreta en que se comprueba cada condición"],
  ["22", "Reglas\nde negocio", "Políticas de la empresa que el sistema hace cumplir sin excepción"]]
   .forEach(([cifra, que, det], i) => {
@@ -335,7 +335,7 @@ s.addNotes("El documento está redactado desde el pedido de la empresa, sin nomb
 s = pres.addSlide();
 titulo(s, "Cómo se hacen cumplir las reglas", "La decisión técnica que sostiene todo el modelo de negocio");
 
-[["9", "tablas"], ["12", "servicios de dominio"], ["28", "rutas propias"], ["3", "perfiles de acceso"]]
+[["9", "tablas"], ["14", "servicios de dominio"], ["32", "rutas propias"], ["3", "perfiles de acceso"]]
   .forEach(([cifra, que], i) => {
     const w = (ANCHO - 3 * 0.2) / 4, x = M + i * (w + 0.2);
     tarjeta(s, { x, y: 1.84, w, h: 1.16, fill: MENTA });
@@ -364,17 +364,39 @@ s.addText([
 s.addNotes("Esta es la lámina técnica que más pesa: las reglas de negocio no viven en la pantalla, donde cualquier cambio las rompe, sino en el servicio y en el motor de datos. Es lo que exige el RNF-08 del documento de requerimientos.");
 
 // =====================================================================
-// 11. Evidencia
+// 11. Lo que suma el ultimo incremento
+// =====================================================================
+s = pres.addSlide();
+titulo(s, "Atender al cliente sin sumar personal", "Tres piezas que incorporó el último incremento");
+
+bloque(s, { x: X3[0], y: 1.88, w: C3, h: 2.66, etiqueta: "ASISTENTE DEL SITIO", titulo: "Pelusa responde sola",
+  texto: "Entiende 14 tipos de pregunta en español y contesta con los datos de la propia cuenta: en qué va el pedido, cuándo llega el despacho, qué vacuna toca. Ocho temas de menú para quien prefiere no escribir.",
+  colorEtiqueta: VERDE_M });
+bloque(s, { x: X3[1], y: 1.88, w: C3, h: 2.66, etiqueta: "CORREOS", titulo: "Ocho avisos automáticos",
+  texto: "Bienvenida, pedido, factura, cita, despacho, cambio de plan, recordatorio de vacuna y mensaje de contacto. El recordatorio sale cada mañana a las 8:00 sin que nadie lo dispare (RN-20)." });
+bloque(s, { x: X3[2], y: 1.88, w: C3, h: 2.66, etiqueta: "ACCESIBILIDAD", titulo: "Usable en el celular",
+  texto: "Las tablas se reordenan en tarjetas en pantalla chica y cada dato conserva su etiqueta para el lector de pantalla. El chat anuncia su estado con atributos ARIA (RNF-01 y RNF-06)." });
+
+tarjeta(s, { x: M, y: 4.9, w: ANCHO, h: 1.3, fill: VERDE });
+s.addText([
+  { text: "El asistente no es una caja negra.  ", options: { bold: true, color: AMBAR } },
+  { text: "No usa inteligencia artificial externa ni servicios pagados: clasifica la pregunta con palabras clave y responde desde un único archivo de configuración. Y solo consulta los datos del cliente que está conectado, nunca los de otro (RN-01 y RN-04)." },
+], { x: M + 0.34, y: 4.9, w: ANCHO - 0.68, h: 1.3, isTextBox: true, margin: 0,
+     fontFace: SANS, fontSize: 12, color: BLANCO, valign: "middle", lineSpacing: 17 });
+s.addNotes("Si preguntan si el chatbot usa IA: no, y es una decisión, no una carencia. Un motor de palabras clave con una configuración revisable es auditable, no inventa respuestas y no tiene costo por consulta. Para las preguntas frecuentes de una veterinaria es suficiente.");
+
+// =====================================================================
+// 12. Evidencia
 // =====================================================================
 s = pres.addSlide();
 titulo(s, "Lo que se puede comprobar hoy", "No es una maqueta: es una aplicación que se ejecuta y se prueba");
 
 tarjeta(s, { x: M, y: 1.84, w: C2, h: 2.0, fill: VERDE });
-s.addText("133", { x: M + 0.3, y: 1.96, w: 2.0, h: 0.96, isTextBox: true, margin: 0,
+s.addText("137", { x: M + 0.3, y: 1.96, w: 2.0, h: 0.96, isTextBox: true, margin: 0,
   fontFace: SERIF, fontSize: 52, bold: true, color: AMBAR, valign: "middle" });
 s.addText("pruebas automatizadas", { x: M + 2.3, y: 1.96, w: C2 - 2.6, h: 0.96, isTextBox: true,
   margin: 0, fontFace: SERIF, fontSize: 15, bold: true, color: BLANCO, valign: "middle" });
-s.addText("336 aserciones, ejecutadas contra base de datos real y no contra una simulación. Al menos una prueba por cada una de las 22 reglas de negocio.",
+s.addText("346 aserciones, ejecutadas contra base de datos real y no contra una simulación. Al menos una prueba por cada una de las 22 reglas de negocio.",
   { x: M + 0.3, y: 2.96, w: C2 - 0.6, h: 0.74, isTextBox: true, margin: 0,
     fontFace: SANS, fontSize: 11.5, color: CLARO, valign: "top", lineSpacing: 16 });
 
@@ -388,13 +410,13 @@ pie(s, "Capturas del sistema con la regla señalada sobre el control que la apli
 s.addNotes("Si el jurado pide demostración en vivo: la suite corre en siete segundos y el recorrido completo de compra se puede mostrar en el navegador.");
 
 // =====================================================================
-// 12. Estado y cierre
+// 13. Estado y cierre
 // =====================================================================
 s = pres.addSlide();
 titulo(s, "Estado del proyecto y lo que sigue", "Dónde estamos parados al cerrar este avance");
 
 bloque(s, { x: X3[0], y: 1.88, w: C3, h: 2.66, etiqueta: "TERMINADO", titulo: "El núcleo funciona",
-  texto: "Los tres perfiles, la venta con descuento de inventario, el cobro en línea, la suscripción con despacho automático, la agenda sin cruce y la historia clínica con alertas.",
+  texto: "Los tres perfiles, la venta con descuento de inventario, el cobro en línea, la suscripción con despacho automático, la agenda sin cruce, la historia clínica con alertas, el asistente del sitio y los correos automáticos.",
   colorEtiqueta: VERDE_M });
 bloque(s, { x: X3[1], y: 1.88, w: C3, h: 2.66, etiqueta: "EN CURSO", titulo: "Documentación final",
   texto: "El documento de requerimientos ya está firmado. Queda cerrar el manual de instalación y el procedimiento de respaldo que exige el RNF-10." });

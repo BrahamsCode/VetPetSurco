@@ -69,7 +69,7 @@ La aplicación vive en `public_html/` y toda la configuración de Docker queda f
 
 | Documento | Contenido |
 | --- | --- |
-| [Requerimientos del sistema](docs/requerimientos/Requerimientos_VetPetConnect.docx) | Lo que VetPet Surco E.I.R.L. le pide a la plataforma: 17 requerimientos funcionales, 12 no funcionales, las 22 reglas de negocio como políticas del negocio, lo que queda fuera del alcance y el acta de conformidad. Escrito desde el pedido de la empresa, no desde la solución construida. |
+| [Requerimientos del sistema](docs/requerimientos/Requerimientos_VetPetConnect.docx) | Lo que VetPet Surco E.I.R.L. le pide a la plataforma: 19 requerimientos funcionales, 12 no funcionales, las 22 reglas de negocio como políticas del negocio, lo que queda fuera del alcance y el acta de conformidad. Escrito desde el pedido de la empresa, no desde la solución construida. |
 
 ---
 

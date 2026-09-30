@@ -122,6 +122,20 @@ const RF = [
     crit: 'Las páginas institucionales se ven sin iniciar sesión, desde una computadora y desde un celular.',
     reglas: '—',
   },
+  {
+    id: 'RF-18', nombre: 'Asistente de atención en el sitio',
+    origen: 'Atención al cliente', prioridad: 'Debería tener',
+    desc: 'La empresa recibe todos los días las mismas preguntas: cómo comprar, cuánto demora el envío, cuándo toca la vacuna, en qué va mi pedido. Se pide un asistente dentro del sitio que responda esas preguntas solo, a cualquier hora, y que cuando la pregunta sea sobre la cuenta del cliente conteste con sus propios datos. Debe poder usarse eligiendo temas de un menú, sin necesidad de escribir. VetPet Surco no quiere pagar un servicio externo por consulta ni que el asistente invente respuestas que la empresa no ha autorizado.',
+    crit: 'El asistente responde las preguntas frecuentes y consulta los pedidos, citas, mascotas y suscripciones del cliente conectado. Nunca muestra datos de otro cliente. Cuando no entiende la pregunta lo dice y ofrece el menú de temas.',
+    reglas: 'RN-01, RN-04',
+  },
+  {
+    id: 'RF-19', nombre: 'Avisos automáticos por correo',
+    origen: 'Gerencia General, atención al cliente', prioridad: 'Debe tener',
+    desc: 'Cada hecho importante debe llegar al correo del cliente sin que nadie lo escriba a mano: la bienvenida al registrarse, la confirmación del pedido y su factura, la cita reservada, el despacho de la suscripción, el cambio de plan y el recordatorio del próximo control. Además, los mensajes que el cliente envía desde la página de contacto deben llegar al buzón de la empresa clasificados por tipo, para que el equipo distinga de un vistazo una consulta veterinaria de un reclamo por un pedido.',
+    crit: 'Los siete avisos salen solos al ocurrir el hecho que los motiva, y el recordatorio de control sale cada mañana sin intervención. El buzón de la empresa recibe cada mensaje de contacto con su etiqueta de tipo en el asunto.',
+    reglas: 'RN-20',
+  },
 ];
 
 const RNF = [
@@ -140,10 +154,10 @@ const RNF = [
 ];
 
 const RN = [
-  ['RN-01', 'Cada persona entra con un solo perfil. Nadie es cliente y veterinario a la vez.', 'RF-01'],
+  ['RN-01', 'Cada persona entra con un solo perfil. Nadie es cliente y veterinario a la vez.', 'RF-01, RF-18'],
   ['RN-02', 'Un correo electrónico pertenece a una sola cuenta.', 'RF-02'],
   ['RN-03', 'Nadie de la empresa, ni el Administrador, puede leer la contraseña de un cliente.', 'RF-02'],
-  ['RN-04', 'Toda mascota tiene un dueño registrado. No hay mascotas sin cliente.', 'RF-10, RF-11'],
+  ['RN-04', 'Toda mascota tiene un dueño registrado. No hay mascotas sin cliente.', 'RF-10, RF-11, RF-18'],
   ['RN-05', 'Cada producto tiene un código interno propio que no se repite.', 'RF-16'],
   ['RN-06', 'Ningún producto se vende en cero ni en precio negativo.', 'RF-16'],
   ['RN-07', 'El inventario nunca queda en negativo.', 'RF-05, RF-15'],
@@ -159,7 +173,7 @@ const RN = [
   ['RN-17', 'Un veterinario no atiende dos citas a la misma hora.', 'RF-11'],
   ['RN-18', 'Toda cita se cierra con un desenlace: atendida, cancelada o no asistió.', 'RF-12'],
   ['RN-19', 'Cada atención genera un único registro clínico.', 'RF-13'],
-  ['RN-20', 'Se avisa al dueño quince días antes del próximo control.', 'RF-14'],
+  ['RN-20', 'Se avisa al dueño quince días antes del próximo control.', 'RF-14, RF-19'],
   ['RN-21', 'Un pedido pasa a pagado solo si la pasarela aprueba el cobro.', 'RF-06'],
   ['RN-22', 'Una mascota no puede tener dos planes vigentes del mismo producto.', 'RF-08'],
 ];
