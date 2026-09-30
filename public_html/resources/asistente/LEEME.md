@@ -11,6 +11,7 @@ nueva de preguntar.
 | `sinonimos.php` | Cómo llama la gente a lo mismo: «michi» es gato, «croquetas» es alimento. |
 | `vacias.php` | Palabras sin significado propio, que se descartan. |
 | `senales.php` | Lo que separa una pregunta de precio de una de disponibilidad. |
+| `cortesia.php` | Saludos, agradecimientos y despedidas. |
 | `corpus.php` | Preguntas reales con la intención que deberían reconocer. Es la nota del asistente. |
 
 El motor está en [`app/Services/Asistente/`](../../app/Services/Asistente/).
@@ -22,6 +23,10 @@ No hay inteligencia artificial externa ni servicios pagados. El motor compara
 español (`wamania/php-stemmer`). Por eso «queda», «quedan» y «quedar» son la
 misma palabra para el asistente.
 
+0. **Cortesía** — «hola», «gracias» y «chau» se revisan primero, porque son
+   palabras vacías: si se filtran, un saludo se queda sin nada que clasificar.
+   Solo responden cuando el mensaje no trae otra intención: «hola, queda arena»
+   contesta por la arena.
 1. **Normalizar** — minúsculas, sin tildes, sin puntuación.
 2. **Corregir el tecleo** — «alimeto» se acerca a «alimento» y se corrige, pero
    solo si la distancia es corta: preferimos no entender antes que inventar.

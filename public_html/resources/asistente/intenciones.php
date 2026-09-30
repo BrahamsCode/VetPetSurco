@@ -365,4 +365,26 @@ return [
             4 => 'mensualidad',
         ],
     ],
+    'agradecimiento' => [
+        'respuesta' => '¡De nada! 🐾 Si te queda otra duda, pregúntame nomás o elige un tema del menú.',
+        'sugerencias' => [
+            0 => [
+                'texto' => '🔙 Ver el menú',
+                'destino' => 'tema:inicio',
+            ],
+            1 => [
+                'texto' => '🛒 Ir al catálogo',
+                'destino' => 'salto:catalogo',
+            ],
+        ],
+    ],
+    'despedida' => [
+        'respuesta' => '¡Hasta luego! Acá estaré cuando necesites algo para tu mascota. 🐾',
+        'sugerencias' => [
+            0 => [
+                'texto' => '🔙 Ver el menú',
+                'destino' => 'tema:inicio',
+            ],
+        ],
+    ],
 ];

@@ -32,6 +32,9 @@ return [
     /* Desempate entre preguntar por precio y preguntar por disponibilidad. */
     'senales' => require resource_path('asistente/senales.php'),
 
+    /* Saludos, agradecimientos y despedidas. */
+    'cortesia' => require resource_path('asistente/cortesia.php'),
+
     /*
     | Puntaje minimo para dar una respuesta. Por debajo, el asistente dice
     | que no entendio en lugar de adivinar: prefiere quedarse corto antes

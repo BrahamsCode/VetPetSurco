@@ -79,6 +79,23 @@ return [
     ['como funciona la suscripcion', 'suscripcion_info'],
     ['quiero contratar el plan', 'suscripcion_info'],
 
+    /* Cortesia: saludar no es preguntar, pero tampoco es no entender */
+    ['hola', 'inicio'],
+    ['buenas', 'inicio'],
+    ['buenos dias', 'inicio'],
+    ['hola pelusa', 'inicio'],
+    ['que tal', 'inicio'],
+    ['hey', 'inicio'],
+    ['gracias', 'agradecimiento'],
+    ['ok gracias', 'agradecimiento'],
+    ['chau', 'despedida'],
+    ['adios', 'despedida'],
+
+    /* Con saludo delante manda la pregunta, no el saludo */
+    ['hola, queda arena sanitaria', 'stock_producto'],
+    ['buenas, cuanto cuesta la cama', 'precio_producto'],
+    ['hola, donde esta mi pedido', 'mis_pedidos'],
+
     /* Lo que debe reconocer como "no entendi" */
     ['asdfghjk', null],
     ['cual es la capital de francia', null],
