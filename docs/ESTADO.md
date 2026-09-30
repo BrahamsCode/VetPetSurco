@@ -1,7 +1,7 @@
 ---
 proyecto: VetPet Connect
 actualizado: 2026-09-30
-avance_requerimientos: 85%
+avance_requerimientos: 86%
 avance_despliegue: 0%
 tags: [vetpet, estado, backlog]
 ---
@@ -18,7 +18,7 @@ aceptación, no cuando el código existe. Por eso hay parciales: funcionan, pero
 todo lo que el documento pide.
 
 > [!WARNING]
-> **El 85 % mide requerimientos, no producción.**
+> **El 86 % mide requerimientos, no producción.**
 >
 > El sistema no está desplegado. Dominio, alojamiento, respaldo y medición de rendimiento
 > están en cero. Un requerimiento cumplido en local no es un requerimiento en producción.
@@ -27,12 +27,12 @@ todo lo que el documento pide.
 
 | Bloque | Terminados | Parciales | Sin empezar | Avance |
 | --- | --- | --- | --- | --- |
-| Requerimientos funcionales (RF) | 15 | 4 | 0 | **89 %** |
+| Requerimientos funcionales (RF) | 16 | 3 | 0 | **92 %** |
 | Requerimientos no funcionales (RNF) | 4 | 4 | 4 | **50 %** |
 | Reglas de negocio (RN) | 22 | 0 | 0 | **100 %** |
-| **Total ponderado por ítem** | 41 | 8 | 4 | **85 %** |
+| **Total ponderado por ítem** | 42 | 7 | 4 | **86 %** |
 
-El parcial cuenta como medio punto. Total = (41 + 8/2) / 53 ítems.
+El parcial cuenta como medio punto. Total = (42 + 7/2) / 53 ítems.
 
 ---
 
@@ -45,6 +45,8 @@ El parcial cuenta como medio punto. Total = (41 + 8/2) / 53 ítems.
 - [x] **RF-04** Carrito de compras — acumula, actualiza, quita y persiste
 - [x] **RF-05** Confirmación del pedido con descuento de inventario — bloqueo por producto, todo o nada
 - [x] **RF-06** Pago en línea con tarjeta — Culqi y pasarela simulada detrás de una interfaz
+- [x] **RF-07** Seguimiento del estado del pedido — pantalla «Mis pedidos» con barra de avance
+      (En camino / Listo para recoger según la modalidad) y correo cuando el pedido sale
 - [x] **RF-08** Suscripción mensual por mascota — tres planes, pausar y cancelar
 - [x] **RF-09** Despacho recurrente automático — `suscripciones:despachar`, cada día a las 03:00
 - [x] **RF-10** Registro de las mascotas del cliente — alta y listado propio
@@ -62,11 +64,6 @@ El parcial cuenta como medio punto. Total = (41 + 8/2) / 53 ítems.
       - [x] Filtro por categoría, precio vigente y semáforo de stock
       - [ ] Buscar por nombre: el criterio de aceptación lo pide y hoy solo filtra por categoría
       - Dónde: `app/Http/Controllers/CatalogoController.php`
-- [ ] **RF-07** Seguimiento del estado del pedido — *falta la pantalla del cliente*
-      - [x] El Administrador avanza el estado y la secuencia no se puede saltar
-      - [x] Pelusa informa el estado si el cliente pregunta
-      - [ ] No existe una página «Mis pedidos»: el criterio dice que el cliente lo ve en su historial
-      - Dónde: falta una ruta `GET app/pedidos` y su vista
 - [ ] **RF-13** Historia clínica digital — *el dueño todavía no la ve*
       - [x] El Veterinario registra diagnóstico, tratamiento, vacuna y próxima fecha
       - [x] Un único registro clínico por atención
@@ -74,7 +71,7 @@ El parcial cuenta como medio punto. Total = (41 + 8/2) / 53 ítems.
       - Dónde: `resources/views/app/mascotas.blade.php` no muestra historial
 - [ ] **RF-16** Mantenimiento del catálogo y de los pedidos — *solo se puede crear*
       - [x] Alta de producto con SKU único y precio positivo
-      - [x] Gestión de pedidos: avanzar estado
+      - [x] Gestión de pedidos: tablero por etapas, avanzar estado y anular lo no pagado con devolución de stock
       - [ ] Editar producto (precio, stock, punto de reorden)
       - [ ] Dar de baja un producto: hay columna `activo`, falta el control en pantalla
       - Dónde: `app/Http/Controllers/AdminController.php` solo tiene `crearProducto`
@@ -88,7 +85,7 @@ El parcial cuenta como medio punto. Total = (41 + 8/2) / 53 ítems.
 - [x] **RNF-03** Operación simultánea sin sobreventa — bloqueo por fila y pruebas de concurrencia
 - [x] **RNF-08** Reglas garantizadas por el almacén de datos — CHECK y UNIQUE en las tablas
 - [x] **RNF-09** Precio histórico del pedido — el detalle guarda su propio precio
-- [x] **RNF-12** Evidencia comprobable — 137 pruebas, 346 aserciones, contra MySQL real
+- [x] **RNF-12** Evidencia comprobable — 170 pruebas, 441 aserciones
 
 ### Parciales
 
@@ -99,11 +96,13 @@ El parcial cuenta como medio punto. Total = (41 + 8/2) / 53 ítems.
       - [x] Contraseñas cifradas, imposibles de leer
       - [ ] Falta el aviso de privacidad y el consentimiento en el registro (Ley N.º 29733)
 - [ ] **RNF-07** Moneda, idioma y horario locales
-      - [x] Importes en soles, zona horaria America/Lima en el contenedor
+      - [x] Importes en soles; zona horaria America/Lima en la aplicación (`config/app.php`
+            estaba en UTC: «hoy» y las horas de los correos salían 5 horas adelantadas)
       - [ ] Falta revisar que toda fecha en pantalla salga en dd/mm/aaaa
 - [ ] **RNF-11** Independencia del proveedor
       - [x] Dockerfile y compose escritos, con los tres servicios
-      - [ ] Nunca se levantó el entorno completo: hay que construirlo y dejarlo documentado
+      - [x] El entorno se levanta en local (app en :8080, MySQL en :13306, Mailhog en :8026)
+      - [ ] Falta documentar cómo levantarlo y correr el programador de tareas
 
 ### Sin empezar
 
@@ -127,7 +126,7 @@ esa es la condición del RNF-12.
 
 ### Primero: completar lo que el documento ya pide
 
-- [ ] Pantalla «Mis pedidos» del cliente — **RF-07**
+- [x] Pantalla «Mis pedidos» del cliente — **RF-07**
 - [ ] Historial clínico visible para el dueño — **RF-13**
 - [ ] Editar y dar de baja productos — **RF-16**
 - [ ] Búsqueda por nombre en el catálogo — **RF-03**
@@ -135,7 +134,7 @@ esa es la condición del RNF-12.
 
 ### Después: salir a producción
 
-- [ ] Levantar el entorno completo con Docker y documentarlo — **RNF-11**
+- [ ] Documentar el entorno Docker y agregarle el programador de tareas — **RNF-11**
 - [ ] Script de respaldo diario y una restauración probada — **RNF-10**
 - [ ] Registrar dominio y contratar alojamiento — **RNF-05**
 - [ ] Medir la carga del catálogo en conexión móvil — **RNF-04**
@@ -154,8 +153,10 @@ esa es la condición del RNF-12.
 - [ ] **Las capturas de `docs/capturas-reglas/` son del prototipo.** La del carrito muestra
       un selector de «origen del pedido» que la aplicación ya no tiene, porque el origen lo
       decide el sistema. Hay que rehacerlas antes de presentar.
-- [ ] **El entorno Docker nunca se construyó.** Está escrito y es coherente, pero decir que
-      funciona sin haberlo levantado es afirmar lo que no se comprobó.
+- [ ] **El programador de tareas no corre en Docker.** El contenedor no ejecuta
+      `schedule:work` ni cron, así que `suscripciones:despachar` (RF-09),
+      `vetpet:recordatorios` (RF-14) y `pedidos:anular-vencidos` solo corren a mano.
+      Falta un servicio `scheduler` en el compose.
 - [ ] **Las pruebas necesitan MySQL por TCP.** `phpunit.xml` hereda host y credenciales del
       `.env`; si la base local solo escucha por socket, fallan todas. Conviene dejarlo escrito
       en el README para que no vuelva a costar una tarde.
