@@ -37,8 +37,18 @@ final class Clasificador
         $palabras = $this->lexico->corregir($palabras, $this->vocabulario());
         $raices = $this->lexico->canonizar($this->normalizador->raicesDe($palabras));
 
+        // Saludar, agradecer y despedirse se revisa aparte, porque esas
+        // palabras son justamente las vacias: si se filtran primero, el
+        // mensaje se queda sin nada y un "hola" acaba en "no entendi".
+        $cortesia = $this->cortesia($mensaje);
+
         if ($raices === []) {
-            return ['intencion' => null, 'puntaje' => 0.0, 'raices' => [], 'productos' => 0];
+            return [
+                'intencion' => $cortesia,
+                'puntaje' => $cortesia !== null ? 1.0 : 0.0,
+                'raices' => [],
+                'productos' => 0,
+            ];
         }
 
         $productos = $this->catalogo->coincidencias($raices);
@@ -82,6 +92,12 @@ final class Clasificador
         $puntaje = (float) $puntajes[$intencion];
         $umbral = (float) config('asistente.umbral', 1.0);
 
+        // "hola, queda arena" es una pregunta con saludo delante: manda la
+        // pregunta. El saludo solo responde cuando viene solo.
+        if ($puntaje < $umbral && $cortesia !== null) {
+            return ['intencion' => $cortesia, 'puntaje' => 1.0, 'raices' => $raices, 'productos' => $productos];
+        }
+
         return [
             'intencion' => $puntaje >= $umbral ? $intencion : null,
             'puntaje' => $puntaje,
@@ -123,6 +139,38 @@ final class Clasificador
         }
 
         return $puntaje;
+    }
+
+    /**
+     * Saludo, agradecimiento o despedida, si el mensaje trae alguno.
+     *
+     * Se busca sobre el texto normalizado completo, sin quitar las palabras
+     * vacias, que es donde viven "hola" y "gracias".
+     */
+    private function cortesia(string $mensaje): ?string
+    {
+        $texto = $this->normalizador->texto($mensaje);
+
+        if ($texto === '') {
+            return null;
+        }
+
+        $palabras = array_filter(explode(' ', $texto), static fn (string $p): bool => $p !== '');
+
+        foreach ((array) config('asistente.cortesia', []) as $intencion => $formas) {
+            foreach ((array) $formas as $forma) {
+                $forma = (string) $forma;
+                $encontrada = str_contains($forma, ' ')
+                    ? str_contains($texto, $forma)
+                    : in_array($forma, $palabras, true);
+
+                if ($encontrada) {
+                    return (string) $intencion;
+                }
+            }
+        }
+
+        return null;
     }
 
     /** Si el cliente dijo "mi" o "mis", pregunta por lo suyo. */

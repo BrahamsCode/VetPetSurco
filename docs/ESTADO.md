@@ -63,7 +63,7 @@ El parcial cuenta como medio punto. Total = (38 + 11/2) / 53 ítems.
 - [x] **RF-14** Alertas de vacunación y desparasitación — `vetpet:recordatorios`, programado a las 08:00;
       lista de los próximos 15 días en el panel ⚠️ mismo aviso que RF-09
 - [x] **RF-17** Sitio institucional público — inicio, nosotros, productos y contacto
-- [x] **RF-18** Asistente de atención en el sitio — 14 intenciones, 8 temas y un corpus de 56 preguntas que mide su exactitud
+- [x] **RF-18** Asistente de atención en el sitio — 16 intenciones, 8 temas y un corpus de 69 preguntas que mide su exactitud
 - [x] **RF-19** Avisos automáticos por correo — 8 salientes (se sumó «pedido en camino /
       listo para recoger») más el buzón de contacto ⚠️ el recordatorio diario depende del
       programador de tareas
