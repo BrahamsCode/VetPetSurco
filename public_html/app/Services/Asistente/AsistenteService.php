@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Asistente;
 
 use App\Models\Cita;
 use App\Models\Mascota;
@@ -8,19 +8,27 @@ use App\Models\Pedido;
 use App\Models\Producto;
 use App\Models\Suscripcion;
 use App\Models\Usuario;
+use App\Services\CarritoService;
+use App\Services\InventarioService;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
 /**
- * Motor de respuestas del asistente Pelusa.
+ * Asistente Pelusa: arma la respuesta una vez que se sabe que se pregunto.
  *
- * No usa IA externa ni servicios pagados: entiende el mensaje del cliente
- * con un clasificador de intenciones en espanol (frases y palabras clave con
- * puntaje) y, cuando la intencion es de cuenta, consulta la base de datos
- * con los datos del propio usuario autenticado (RN-01 y RN-04).
+ * No usa IA externa ni servicios pagados. Quien entiende el mensaje es el
+ * Clasificador; este servicio solo decide que contestar y, cuando la
+ * intencion es de cuenta, consulta la base de datos con los datos del propio
+ * usuario autenticado (RN-01 y RN-04): nunca los de otro cliente.
  */
 final class AsistenteService
 {
+    public function __construct(
+        private readonly Clasificador $clasificador,
+        private readonly CatalogoIndice $catalogo,
+        private readonly InventarioService $inventario,
+    ) {}
+
     /**
      * Resuelve una pregunta del cliente y arma la respuesta con sugerencias.
      *
@@ -28,14 +36,13 @@ final class AsistenteService
      */
     public function responder(string $mensaje, Usuario $usuario): array
     {
-        $normal = $this->normalizar($mensaje);
-        $tokens = $this->tokens($normal);
-        $intencion = $this->mejorIntencion($normal, $tokens);
+        $analisis = $this->clasificador->analizar($mensaje);
+        $intencion = $analisis['intencion'];
 
         if ($intencion === null) {
             return [
                 'intencion' => null,
-                'respuesta' => 'Todavía no entiendo esa pregunta. Prueba con palabras como "pedido", "stock", "vacunas" o elige un tema del menú.',
+                'respuesta' => 'Todavía no entiendo esa pregunta. Puedes preguntarme por el stock o el precio de un producto, por tus pedidos, tus citas o las vacunas de tu mascota. O elige un tema del menú.',
                 'sugerencias' => $this->opcionesDe(config('asistente.guia.inicio.opciones', [])),
             ];
         }
@@ -48,8 +55,8 @@ final class AsistenteService
             'citas' => $this->informarCitas($usuario),
             'mascotas' => $this->informarMascotas($usuario),
             'carrito' => $this->informarCarrito(),
-            'stock' => $this->informarProductos($tokens, 'stock'),
-            'precio' => $this->informarProductos($tokens, 'precio'),
+            'stock' => $this->informarProductos($analisis['raices'], 'stock'),
+            'precio' => $this->informarProductos($analisis['raices'], 'precio'),
             default => $this->respuestaEstatica($intencion),
         };
     }
@@ -58,69 +65,6 @@ final class AsistenteService
     public function guia(): array
     {
         return config('asistente.guia', []);
-    }
-
-    /* -------------------------------------------------------------------
-     | Clasificador de intenciones
-     * ------------------------------------------------------------------- */
-
-    /** Minusculas, sin acentos ni puntuacion, para comparar sin errores. */
-    private function normalizar(string $texto): string
-    {
-        $texto = mb_strtolower($texto);
-        $texto = strtr($texto, [
-            'á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u', 'ü' => 'u', 'ñ' => 'n',
-        ]);
-        $texto = preg_replace('/[^a-z0-9\s]/u', ' ', $texto) ?? '';
-
-        return trim(preg_replace('/\s+/', ' ', $texto) ?? '');
-    }
-
-    /** @return list<string> */
-    private function tokens(string $normal): array
-    {
-        $palabras = array_filter(explode(' ', $normal), static fn (string $p): bool => $p !== '');
-        $vacias = config('asistente.vacias', []);
-
-        return array_values(array_filter($palabras, static fn (string $p): bool => ! in_array($p, $vacias, true)));
-    }
-
-    /** La intencion con mayor puntaje; null cuando ninguna alcanza el umbral. */
-    private function mejorIntencion(string $normal, array $tokens): ?string
-    {
-        $mejor = null;
-        $mejorPuntaje = 0;
-
-        foreach (config('asistente.intenciones', []) as $clave => $definicion) {
-            $puntaje = 0;
-
-            foreach ($definicion['frases'] ?? [] as $frase) {
-                if (str_contains($normal, $this->normalizar($frase))) {
-                    $puntaje += 2;
-                }
-            }
-
-            foreach ($definicion['palabras'] ?? [] as $palabra) {
-                if (in_array($this->normalizar($palabra), $tokens, true)) {
-                    $puntaje += 1;
-                }
-            }
-
-            if ($puntaje > $mejorPuntaje) {
-                $mejorPuntaje = $puntaje;
-                $mejor = $clave;
-            }
-        }
-
-        return $mejorPuntaje >= 1 ? $mejor : null;
-    }
-
-    /** Nombre de producto mencionado en el mensaje (para stock y precios). */
-    private function terminoDeBusqueda(array $tokens): array
-    {
-        $ruido = array_merge(config('asistente.ruido_producto', []), ['tienen', 'hay']);
-
-        return array_values(array_filter($tokens, static fn (string $p): bool => ! in_array($p, $ruido, true) && mb_strlen($p) >= 3));
     }
 
     /* -------------------------------------------------------------------
@@ -216,7 +160,7 @@ final class AsistenteService
             ]);
         }
 
-        $lineas = $citas->map(function (Cita $cita) use ($deMisMascotas): string {
+        $lineas = $citas->map(function (Cita $cita): string {
             $mascota = Mascota::query()->find($cita->mascota_id);
 
             return sprintf(
@@ -245,7 +189,7 @@ final class AsistenteService
             ]);
         }
 
-        $lineas = $mascotas->map(static function (Mascota $mascota): string {
+        $lineas = $mascotas->map(function (Mascota $mascota): string {
             $extra = $mascota->raza !== null && $mascota->raza !== '' ? ' de raza '.$mascota->raza : '';
 
             return sprintf('• %s (%s%s)', $mascota->nombre, $this->etiquetaDe($mascota->especie), $extra);
@@ -279,46 +223,59 @@ final class AsistenteService
         ]);
     }
 
-    /** Stock o precio de los productos que menciona el cliente. */
-    private function informarProductos(array $tokens, string $modo): array
+    /**
+     * Stock o precio de los productos que menciona el cliente.
+     *
+     * @param  list<string>  $raices  raices de la pregunta, ya normalizadas
+     */
+    private function informarProductos(array $raices, string $modo): array
     {
-        $terminos = $this->terminoDeBusqueda($tokens);
-
-        if ($terminos === []) {
-            $que = $modo === 'stock' ? 'si queda stock de un producto' : 'el precio de un producto';
-
-            return $this->armar($modo === 'stock' ? 'stock_producto' : 'precio_producto', 'Con gusto consulto. Dime el nombre del producto y te digo '.$que.'.', [
-                ['texto' => '🛒 Ver el catálogo', 'destino' => 'salto:catalogo'],
-                ['texto' => '🔙 Menú', 'destino' => 'tema:inicio'],
-            ]);
-        }
-
-        $productos = Producto::query()
-            ->where(function ($consulta) use ($terminos) {
-                foreach ($terminos as $termino) {
-                    $consulta->orWhere('nombre', 'like', '%'.$termino.'%')
-                        ->orWhere('codigo_sku', 'like', '%'.$termino.'%');
-                }
-            })
-            ->limit(3)
-            ->get();
+        $intencion = $modo === 'stock' ? 'stock_producto' : 'precio_producto';
+        $productos = $this->catalogo->buscar($raices);
 
         if ($productos->isEmpty()) {
-            return $this->armar($modo === 'stock' ? 'stock_producto' : 'precio_producto', 'No encontré productos con ese nombre. Prueba con otra palabra o revísalos todos en el catálogo.', [
+            $que = $modo === 'stock' ? 'si queda stock de un producto' : 'el precio de un producto';
+
+            return $this->armar($intencion, 'No encontré ese producto en el catálogo. Dime el nombre y te digo '.$que.'. Por ejemplo: «alimento para gato» o «arena sanitaria».', [
                 ['texto' => '🛒 Ver el catálogo', 'destino' => 'salto:catalogo'],
                 ['texto' => '🔙 Menú', 'destino' => 'tema:inicio'],
             ]);
         }
 
-        $lineas = $productos->map(static function (Producto $producto) use ($modo): string {
-            if ($modo === 'stock') {
-                return sprintf('• %s: %d unidades en stock.', $producto->nombre, (int) $producto->stock_actual);
+        if ($modo === 'precio') {
+            $lineas = $productos->map(static fn (Producto $p): string => sprintf(
+                '• %s: S/ %s.',
+                $p->nombre,
+                number_format((float) $p->precio, 2),
+            ))->implode("\n");
+
+            return $this->armar($intencion, "Esto encontré (precios con IGV 18% incluido):\n".$lineas, [
+                ['texto' => '🛒 Ir al catálogo', 'destino' => 'salto:catalogo'],
+                ['texto' => '🔙 Menú', 'destino' => 'tema:inicio'],
+            ]);
+        }
+
+        // RN-07 y RN-08: el stock que se informa es el real, y cuando el
+        // producto ya toco su punto de reorden se avisa que quedan pocas.
+        $lineas = $productos->map(function (Producto $producto): string {
+            $unidades = (int) $producto->stock_actual;
+
+            if ($unidades === 0) {
+                return sprintf('• %s: agotado por ahora.', $producto->nombre);
             }
 
-            return sprintf('• %s: S/ %s.', $producto->nombre, number_format((float) $producto->precio, 2));
+            $aviso = $this->inventario->semaforo($producto)->value === 'ROJO' ? ' (quedan pocas)' : '';
+
+            return sprintf(
+                '• %s: %d %s en stock%s.',
+                $producto->nombre,
+                $unidades,
+                $unidades === 1 ? 'unidad' : 'unidades',
+                $aviso,
+            );
         })->implode("\n");
 
-        return $this->armar($modo === 'stock' ? 'stock_producto' : 'precio_producto', "Esto encontré (precios con IGV 18% incluido):\n".$lineas, [
+        return $this->armar($intencion, "Esto tenemos:\n".$lineas, [
             ['texto' => '🛒 Ir al catálogo', 'destino' => 'salto:catalogo'],
             ['texto' => '🔙 Menú', 'destino' => 'tema:inicio'],
         ]);

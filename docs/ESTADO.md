@@ -53,7 +53,7 @@ El parcial cuenta como medio punto. Total = (41 + 8/2) / 53 ítems.
 - [x] **RF-14** Alertas de vacunación y desparasitación — `vetpet:recordatorios`, cada día a las 08:00
 - [x] **RF-15** Control de inventario con alerta de reposición — semáforo y lista de reposición
 - [x] **RF-17** Sitio institucional público — inicio, nosotros, productos y contacto
-- [x] **RF-18** Asistente de atención en el sitio — 14 intenciones y 8 temas de menú
+- [x] **RF-18** Asistente de atención en el sitio — 14 intenciones, 8 temas y un corpus de 56 preguntas que mide su exactitud
 - [x] **RF-19** Avisos automáticos por correo — 7 salientes más el buzón de contacto
 
 ### Parciales
@@ -88,7 +88,7 @@ El parcial cuenta como medio punto. Total = (41 + 8/2) / 53 ítems.
 - [x] **RNF-03** Operación simultánea sin sobreventa — bloqueo por fila y pruebas de concurrencia
 - [x] **RNF-08** Reglas garantizadas por el almacén de datos — CHECK y UNIQUE en las tablas
 - [x] **RNF-09** Precio histórico del pedido — el detalle guarda su propio precio
-- [x] **RNF-12** Evidencia comprobable — 137 pruebas, 346 aserciones, contra MySQL real
+- [x] **RNF-12** Evidencia comprobable — 198 pruebas, 411 aserciones, contra MySQL real
 
 ### Parciales
 
@@ -161,6 +161,9 @@ esa es la condición del RNF-12.
       en el README para que no vuelva a costar una tarde.
 - [ ] **Culqi está integrado pero no probado contra el ambiente de pruebas real.** Las pruebas
       usan la pasarela simulada.
+- [ ] **El corpus del asistente crece con el uso.** Cada pregunta que Pelusa no entienda en
+      producción debería terminar en `resources/asistente/corpus.php`; es la única forma de
+      que el arreglo quede comprobado y no se vuelva a romper.
 
 ---
 
