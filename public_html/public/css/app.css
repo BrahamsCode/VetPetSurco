@@ -887,6 +887,17 @@ a.boton-mini { display: inline-flex; align-items: center; justify-content: cente
   box-shadow: var(--sombra);
 }
 
+/* Celular: el globo de texto tapaba botones de las tarjetas; queda solo la
+   huellita (su aria-label ya dice que abre a Pelusa), un poco mas chica, y
+   el contenido deja aire abajo para que nada quede debajo del boton. */
+@media (max-width: 600px) {
+  .chat-globo { display: none; }
+  .chat-ayudante { right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+  .chat-fab { width: 50px; height: 50px; }
+  .chat-fab svg { width: 22px; height: 22px; }
+  body > main { padding-bottom: 72px; }
+}
+
 .chat-panel {
   position: absolute; right: 0; bottom: 74px;
   width: min(360px, calc(100vw - 28px));
