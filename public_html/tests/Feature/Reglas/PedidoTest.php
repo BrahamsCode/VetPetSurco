@@ -157,20 +157,48 @@ final class PedidoTest extends TestCase
     // RN-13: el pedido recorre una secuencia de estados
     // -----------------------------------------------------------------
 
-    /** Capa de aplicación: PENDIENTE → PAGADO → ENVIADO → ENTREGADO. */
+    /**
+     * Capa de aplicación: desde PAGADO el pedido avanza a ENVIADO y a
+     * ENTREGADO, y deja anotado cuándo pasó cada cosa.
+     */
     public function test_rn13_el_pedido_recorre_la_secuencia_completa_de_estados(): void
     {
         $servicio = app(PedidoService::class);
-        $pedido   = Pedido::factory()->enEstado(EstadoPedido::PENDIENTE)->create();
+        $pedido   = Pedido::factory()->enEstado(EstadoPedido::PAGADO)->create();
 
-        $this->assertSame(EstadoPedido::PAGADO, $servicio->avanzarEstado($pedido)->estado);
         $this->assertSame(EstadoPedido::ENVIADO, $servicio->avanzarEstado($pedido)->estado);
+        $this->assertNotNull($pedido->enviado_en);
         $this->assertSame(EstadoPedido::ENTREGADO, $servicio->avanzarEstado($pedido)->estado);
+        $this->assertNotNull($pedido->entregado_en);
 
         $this->assertDatabaseHas('pedidos', [
             'pedido_id' => $pedido->pedido_id,
             'estado'    => EstadoPedido::ENTREGADO->value,
         ]);
+    }
+
+    /**
+     * RN-21: PENDIENTE → PAGADO solo lo da la pasarela. Ni el servicio ni el
+     * botón del panel pueden marcar como pagado un pedido que nadie cobró.
+     */
+    public function test_rn13_un_pedido_pendiente_no_se_marca_pagado_a_mano(): void
+    {
+        $admin  = Usuario::factory()->admin()->create();
+        $pedido = Pedido::factory()->enEstado(EstadoPedido::PENDIENTE)->create();
+
+        try {
+            app(PedidoService::class)->avanzarEstado($pedido);
+            $this->fail('Un pedido pendiente no debe pasar a PAGADO sin la pasarela.');
+        } catch (DomainException $e) {
+            $this->assertStringContainsString('pasarela', $e->getMessage());
+        }
+
+        $this->actingAs($admin)
+            ->from(route('admin'))
+            ->patch(route('admin.pedidos.avanzar', $pedido))
+            ->assertSessionHas('resultado', fn (array $r): bool => $r['ok'] === false && $r['regla'] === 'RN-13');
+
+        $this->assertSame(EstadoPedido::PENDIENTE, $pedido->fresh()->estado);
     }
 
     /** El enum define la secuencia y dónde se acaba. */

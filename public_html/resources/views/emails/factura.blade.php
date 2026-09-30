@@ -1,7 +1,8 @@
 @extends('emails.plantilla', ['tipo' => 'factura'])
 
 @php
-    $total = (float) $pedido->monto_total;
+    $total = (float) $pedido->totalACobrar();
+    $envio = (float) $pedido->costo_envio;
     $igv = round($total - $total / 1.18, 2);
     $subtotal = round($total - $igv, 2);
     $numero = 'B001-'.str_pad((string) $pedido->pedido_id, 6, '0', STR_PAD_LEFT);
@@ -15,7 +16,9 @@
 
 @section('contenido')
   <p style="margin:0 0 14px 0;">
-    Tu pedido ya est&aacute; en camino. Aqu&iacute; tienes el detalle de tu compra.
+    Ya estamos preparando tu pedido. Te avisaremos cuando
+    {{ $pedido->modalidad() === \App\Enums\ModalidadEntrega::DELIVERY ? 'salga a tu dirección' : 'esté listo para recoger en la tienda' }}.
+    Aqu&iacute; tienes el detalle de tu compra.
   </p>
 
   @include('emails._datos', ['filas' => [
@@ -38,6 +41,13 @@
         <td align="right" style="padding:10px 14px;border-top:1px solid #d9e5df;">S/ {{ number_format((float) $detalle->subtotal, 2) }}</td>
       </tr>
     @endforeach
+    @if ($envio > 0)
+      <tr>
+        <td style="padding:10px 14px;border-top:1px solid #d9e5df;">Delivery en Surco</td>
+        <td align="center" style="padding:10px 8px;border-top:1px solid #d9e5df;">1</td>
+        <td align="right" style="padding:10px 14px;border-top:1px solid #d9e5df;">S/ {{ number_format($envio, 2) }}</td>
+      </tr>
+    @endif
   </table>
 
   {{-- Totales --}}

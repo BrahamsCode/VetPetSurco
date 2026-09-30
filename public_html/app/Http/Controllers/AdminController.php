@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\EstadoPedido;
 use App\Exceptions\ReglaDeNegocioException;
 use App\Http\Requests\CrearProductoRequest;
+use App\Mail\PedidoEnCaminoMail;
 use App\Models\Pedido;
 use App\Models\Producto;
 use App\Models\Suscripcion;
 use App\Models\Usuario;
+use App\Services\CorreoService;
 use App\Services\InventarioService;
 use App\Services\HistoriaClinicaService;
 use App\Services\PedidoService;
@@ -43,8 +46,22 @@ class AdminController extends Controller
             $semaforos[$producto->producto_id] = $this->inventario->semaforo($producto)->value;
         }
 
-        $pedidos = Pedido::query()->orderByDesc('pedido_id')->get();
-        $vivos = $pedidos->where('estado', '!=', 'ANULADO');
+        $pedidos = Pedido::query()->with(['detalles.producto', 'cliente'])->orderByDesc('pedido_id')->get();
+        $vivos = $pedidos->filter(fn (Pedido $p) => $p->estadoActual() !== EstadoPedido::ANULADO);
+
+        // El trabajo del dia por etapas: primero lo que hay que preparar.
+        $porEstado = fn (EstadoPedido $estado) => $pedidos
+            ->filter(fn (Pedido $p) => $p->estadoActual() === $estado)
+            ->sortBy('pedido_id')
+            ->values();
+        $etapas = [
+            'porPreparar' => $porEstado(EstadoPedido::PAGADO),
+            'enCurso' => $porEstado(EstadoPedido::ENVIADO),
+            'entregadosHoy' => $pedidos
+                ->filter(fn (Pedido $p) => $p->estadoActual() === EstadoPedido::ENTREGADO && $p->entregado_en?->isToday())
+                ->values(),
+            'porCobrar' => $porEstado(EstadoPedido::PENDIENTE),
+        ];
 
         // RN-14: la venta recurrente es la que viene de una suscripcion.
         $recurrente = $vivos->filter(function (Pedido $pedido): bool {
@@ -66,6 +83,7 @@ class AdminController extends Controller
             'clientes' => $clientes,
             'semaforos' => $semaforos,
             'pedidos' => $pedidos,
+            'etapas' => $etapas,
             'indicadores' => [
                 ['valor' => $vivos->sum('monto_total'), 'etiqueta' => 'Venta registrada', 'soles' => true],
                 ['valor' => $recurrente, 'etiqueta' => 'De ella, recurrente', 'soles' => true],
@@ -100,7 +118,8 @@ class AdminController extends Controller
     public function avanzarPedido(Pedido $pedido): RedirectResponse
     {
         try {
-            // RN-13: PENDIENTE, PAGADO, ENVIADO, ENTREGADO; sin saltos.
+            // RN-13: PAGADO, ENVIADO, ENTREGADO; sin saltos. PENDIENTE -> PAGADO
+            // solo lo da la pasarela, nunca este boton.
             $pedido = $this->pedidos->avanzarEstado($pedido);
         } catch (ReglaDeNegocioException $e) {
             return back()->with('resultado', [
@@ -110,11 +129,38 @@ class AdminController extends Controller
             ]);
         }
 
-        $estado = $pedido->estado instanceof \BackedEnum ? $pedido->estado->value : (string) $pedido->estado;
+        // Al salir (o quedar listo para recoger) se avisa al cliente.
+        if ($pedido->estadoActual() === EstadoPedido::ENVIADO) {
+            $correo = (string) $pedido->cliente?->correo;
+
+            if ($correo !== '') {
+                app(CorreoService::class)->enviar($correo, new PedidoEnCaminoMail($pedido));
+            }
+        }
 
         return back()->with('resultado', [
             'regla' => null,
-            'mensaje' => 'El pedido paso a '.$estado.'.',
+            'mensaje' => 'Pedido '.$pedido->pedido_id.': '.$pedido->etiquetaEstado().'.',
+            'ok' => true,
+        ]);
+    }
+
+    /** Anula un pedido que no se pago y devuelve su stock. */
+    public function anularPedido(Pedido $pedido): RedirectResponse
+    {
+        try {
+            $this->pedidos->anular($pedido, 'Anulado por la tienda.');
+        } catch (ReglaDeNegocioException $e) {
+            return back()->with('resultado', [
+                'regla' => $e->regla(),
+                'mensaje' => $e->getMessage(),
+                'ok' => false,
+            ]);
+        }
+
+        return back()->with('resultado', [
+            'regla' => null,
+            'mensaje' => 'Pedido '.$pedido->pedido_id.' anulado; el stock volvio al inventario.',
             'ok' => true,
         ]);
     }

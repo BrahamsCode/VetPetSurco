@@ -44,9 +44,17 @@ final class PagoService
             );
         }
 
+        // Pasado el plazo el stock deja de estar reservado para este pedido;
+        // la tarea programada lo anula y devuelve las unidades al inventario.
+        if (now()->greaterThan($pedido->vencePagoEl())) {
+            throw new EstadoPedidoInvalidoException(
+                'El plazo para pagar este pedido vencio. Vuelve a armar tu carrito.',
+            );
+        }
+
         // Culqi cobra en centimos enteros, la misma unidad con la que el
-        // carrito arma los totales.
-        $centimos = CarritoService::aCentimos($pedido->monto_total);
+        // carrito arma los totales. Se cobra productos mas envio.
+        $centimos = CarritoService::aCentimos($pedido->totalACobrar());
 
         $resultado = $this->pasarela->cobrar(
             $centimos,

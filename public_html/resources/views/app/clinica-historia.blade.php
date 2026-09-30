@@ -44,7 +44,7 @@
         @else
           <ul class="historial" id="cuerpo-historias">
             @foreach ($historias as $historia)
-              @include('app._historial-item', ['conDueno' => true])
+              @include('app._historial-item')
             @endforeach
           </ul>
 

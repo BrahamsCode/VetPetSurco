@@ -36,7 +36,7 @@ return [
         ],
 
         'envios' => [
-            'texto' => 'Hacemos despacho el mismo día en Santiago de Surco. Los pedidos confirmados antes de las 6 p.m. salen ese día; los posteriores, a la mañana siguiente.',
+            'texto' => 'Tienes dos opciones al confirmar: delivery en Santiago de Surco (S/ 8.00, gratis desde S/ 80.00) o recojo en tienda sin costo. Los pedidos pagados antes de las 6 p.m. salen ese día; los posteriores, a la mañana siguiente. Te escribimos cuando tu pedido sale o está listo para recoger, y lo sigues en Mis pedidos.',
             'opciones' => [
                 ['texto' => '📦 Ver mis pedidos', 'destino' => 'tema:mis_pedidos'],
                 ['texto' => '🔙 Volver al menú', 'destino' => 'tema:inicio'],
@@ -135,10 +135,10 @@ return [
             'palabras' => ['comprar', 'compro', 'comprar', 'adquirir', 'checkout'],
         ],
         'envios' => [
-            'respuesta' => 'Hacemos despacho el mismo día en Santiago de Surco. Los pedidos confirmados antes de las 6 p.m. salen ese día; los posteriores, a la mañana siguiente.',
+            'respuesta' => 'Tienes dos opciones al confirmar: delivery en Santiago de Surco (S/ 8.00, gratis desde S/ 80.00) o recojo en tienda sin costo. Los pedidos pagados antes de las 6 p.m. salen ese día; los posteriores, a la mañana siguiente. Te escribimos cuando tu pedido sale o está listo para recoger, y lo sigues en Mis pedidos.',
             'sugerencias' => [['texto' => '📦 Ver mis pedidos', 'destino' => 'tema:mis_pedidos'], ['texto' => '🔙 Menú', 'destino' => 'tema:inicio']],
             'frases' => ['cuanto tarda el envio', 'envio a domicilio', 'hacen envios', 'entrega a domicilio'],
-            'palabras' => ['envio', 'envios', 'entrega', 'entregan', 'domicilio', 'tarda', 'llevan'],
+            'palabras' => ['envio', 'envios', 'entrega', 'entregan', 'domicilio', 'tarda', 'llevan', 'delivery', 'recojo', 'recoger'],
         ],
         'pago_info' => [
             'respuesta' => 'Pagas con tarjeta de crédito o débito al confirmar el pedido. El número de tarjeta no pasa por nuestros servidores: lo tokeniza el checkout seguro y solo queda registrado el resultado del cobro.',

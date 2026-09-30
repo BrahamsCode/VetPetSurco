@@ -9,6 +9,7 @@
         'CLIENTE' => [
             ['catalogo', 'Cat&aacute;logo'],
             ['carrito', 'Carrito'],
+            ['pedidos', 'Mis pedidos'],
             ['citas', 'Reservar cita'],
             ['mascotas', 'Mis mascotas'],
         ],
@@ -95,6 +96,9 @@
       <p>Plataforma acad&eacute;mica de VetPet Connect &mdash; Curso de E-business, Equipo 4, 2026.</p>
     </div>
   </footer>
+
+  {{-- Dialogo de confirmacion para acciones que no se deshacen. --}}
+  @include('components.confirmar')
 
   {{-- Animacion de resultado del pago (aprobado / rechazado). --}}
   @include('components.pago-animacion')

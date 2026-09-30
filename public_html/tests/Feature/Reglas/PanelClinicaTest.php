@@ -171,6 +171,26 @@ final class PanelClinicaTest extends TestCase
             ->assertSee('Otitis externa');
     }
 
+    /** Dos mascotas pueden llamarse igual: el dueno las distingue y filtra. */
+    public function test_mascotas_con_el_mismo_nombre_se_distinguen_por_su_dueno(): void
+    {
+        $vet = Usuario::factory()->veterinario()->create();
+        $deAna = $this->atencionDe($vet, 'Otitis de Toby A', 1);
+        $deLuis = $this->atencionDe($vet, 'Dermatitis de Toby B', 2);
+        $deAna->mascota->update(['nombre' => 'Toby']);
+        $deLuis->mascota->update(['nombre' => 'Toby']);
+        $deAna->mascota->cliente->update(['nombre' => 'Ana Quispe']);
+        $deLuis->mascota->cliente->update(['nombre' => 'Luis Rojas']);
+
+        $this->actingAs($vet)->get(route('clinica.historia'))
+            ->assertSee('Ana Quispe')
+            ->assertSee('Luis Rojas');
+
+        $this->actingAs($vet)->get(route('clinica.historia', ['q' => 'Luis Rojas']))
+            ->assertSee('Dermatitis de Toby B')
+            ->assertDontSee('Otitis de Toby A');
+    }
+
     public function test_el_historial_no_muestra_atenciones_de_otro_veterinario(): void
     {
         $lucia = Usuario::factory()->veterinario()->create();

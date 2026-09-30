@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enums\EstadoPedido;
+use App\Enums\ModalidadEntrega;
 use App\Enums\TipoOrigen;
 use App\Exceptions\CantidadInvalidaException;
+use App\Exceptions\EntregaInvalidaException;
 use App\Exceptions\EstadoPedidoInvalidoException;
 use App\Exceptions\StockInsuficienteException;
 use App\Models\DetallePedido;
@@ -28,6 +30,27 @@ use Illuminate\Support\Facades\DB;
  */
 final class PedidoService
 {
+    /** Tarifa del delivery en Surco, en céntimos. */
+    public const ENVIO_CENTIMOS = 800;
+
+    /** Desde este monto de productos el delivery es gratis, en céntimos. */
+    public const ENVIO_GRATIS_DESDE_CENTIMOS = 8000;
+
+    /**
+     * Costo de entrega de un pedido, en céntimos.
+     *  - Recojo en tienda: gratis.
+     *  - Despacho de suscripción: gratis, el plan ya incluye el domicilio.
+     *  - Delivery de compra directa: S/ 8.00, gratis desde S/ 80.00.
+     */
+    public static function costoEnvio(ModalidadEntrega $modalidad, int $productosCentimos, TipoOrigen $origen): int
+    {
+        if ($modalidad === ModalidadEntrega::RECOJO || $origen === TipoOrigen::SUSCRIPCION) {
+            return 0;
+        }
+
+        return $productosCentimos >= self::ENVIO_GRATIS_DESDE_CENTIMOS ? 0 : self::ENVIO_CENTIMOS;
+    }
+
     /**
      * Confirma la compra completa dentro de una sola transacción.
      *
@@ -45,9 +68,21 @@ final class PedidoService
      *
      * @throws StockInsuficienteException si alguna línea no tiene stock (RN-12)
      * @throws CantidadInvalidaException  si alguna cantidad no es entera y positiva (RN-10)
+     * @throws EntregaInvalidaException   si es delivery y no hay dirección
      */
-    public function confirmar(Usuario $cliente, array $lineas, TipoOrigen $origen): Pedido
-    {
+    public function confirmar(
+        Usuario $cliente,
+        array $lineas,
+        TipoOrigen $origen,
+        ModalidadEntrega $modalidad = ModalidadEntrega::RECOJO,
+        ?string $direccion = null,
+    ): Pedido {
+        $direccion = trim((string) $direccion);
+
+        if ($modalidad === ModalidadEntrega::DELIVERY && $direccion === '') {
+            throw new EntregaInvalidaException('Para el delivery necesitamos la dirección de entrega.');
+        }
+
         // Paso 1: RN-09 — un producto aparece una sola vez por pedido, así que
         // dos líneas del mismo producto se suman antes de tocar la base de datos
         // (la tabla lo impone con UNIQUE KEY uk_linea_pedido).
@@ -64,7 +99,7 @@ final class PedidoService
         // Paso 2: toda la operación es atómica. Si algo falla —una excepción
         // nuestra o un rechazo del motor— Laravel revierte la transacción
         // completa, igual que el EXIT HANDLER del procedimiento almacenado.
-        return DB::transaction(function () use ($cliente, $pedidas, $origen): Pedido {
+        return DB::transaction(function () use ($cliente, $pedidas, $origen, $modalidad, $direccion): Pedido {
             $productos    = [];
             $faltantes    = [];
             $totalCentimos = 0;
@@ -117,6 +152,9 @@ final class PedidoService
             $pedido->fecha_pedido = now();
             $pedido->monto_total  = CarritoService::aDecimal($totalCentimos);
             $pedido->tipo_origen  = $origen;                    // RN-14
+            $pedido->modalidad_entrega = $modalidad;
+            $pedido->direccion_entrega = $modalidad === ModalidadEntrega::DELIVERY ? $direccion : null;
+            $pedido->costo_envio  = CarritoService::aDecimal(self::costoEnvio($modalidad, $totalCentimos, $origen));
             // RN-13: el pedido nace PENDIENTE y solo pasa a PAGADO cuando la
             // pasarela aprueba el cobro (ver PagoService). El stock ya se
             // descuento aqui mismo, asi que un pedido sin pagar mantiene la
@@ -164,10 +202,14 @@ final class PedidoService
     }
 
     /**
-     * RN-13: avanza el pedido al siguiente estado de la secuencia
-     * PENDIENTE → PAGADO → ENVIADO → ENTREGADO.
+     * RN-13: avanza el pedido en la parte logística de la secuencia,
+     * PAGADO → ENVIADO → ENTREGADO, y anota cuándo pasó.
      *
-     * @throws EstadoPedidoInvalidoException si el pedido está ANULADO o ya fue ENTREGADO
+     * El paso PENDIENTE → PAGADO no se hace aquí: solo lo da la pasarela al
+     * aprobar el cobro (RN-21, ver PagoService). Si el panel pudiera marcar un
+     * pedido como pagado, se despacharía mercadería que nadie cobró.
+     *
+     * @throws EstadoPedidoInvalidoException si está PENDIENTE, ANULADO o ya fue ENTREGADO
      */
     public function avanzarEstado(Pedido $pedido): Pedido
     {
@@ -177,6 +219,12 @@ final class PedidoService
             throw new EstadoPedidoInvalidoException('Un pedido anulado no puede cambiar de estado.');
         }
 
+        if ($actual === EstadoPedido::PENDIENTE) {
+            throw new EstadoPedidoInvalidoException(
+                'El pedido aún no está pagado: pasa a PAGADO solo cuando la pasarela aprueba el cobro.',
+            );
+        }
+
         $siguiente = $actual->siguiente();   // RN-13
 
         if ($siguiente === null) {
@@ -184,9 +232,91 @@ final class PedidoService
         }
 
         $pedido->estado = $siguiente;
+
+        match ($siguiente) {
+            EstadoPedido::ENVIADO => $pedido->enviado_en = now(),
+            EstadoPedido::ENTREGADO => $pedido->entregado_en = now(),
+            default => null,
+        };
+
         $pedido->save();
 
         return $pedido;
+    }
+
+    /**
+     * Anula un pedido que no se pagó y devuelve su stock al inventario.
+     *
+     * Solo un pedido PENDIENTE se anula: uno pagado ya tiene un cobro que
+     * habría que devolver, y eso es otro trámite.
+     *
+     * @throws EstadoPedidoInvalidoException si el pedido ya no está pendiente
+     */
+    public function anular(Pedido $pedido, string $motivo): Pedido
+    {
+        return DB::transaction(function () use ($pedido, $motivo): Pedido {
+            // Se relee con bloqueo: si en este instante entra el pago, uno de
+            // los dos espera al otro y no se anula un pedido recién cobrado.
+            /** @var Pedido $bloqueado */
+            $bloqueado = Pedido::query()->whereKey($pedido->getKey())->lockForUpdate()->firstOrFail();
+
+            if ($this->estadoDe($bloqueado) !== EstadoPedido::PENDIENTE) {
+                throw new EstadoPedidoInvalidoException(
+                    'Solo se anula un pedido pendiente de pago; este está '.$this->estadoDe($bloqueado)->etiqueta().'.',
+                );
+            }
+
+            // El stock reservado vuelve, en el mismo orden de bloqueo que la
+            // compra para no cruzarse con otra transacción.
+            $detalles = DetallePedido::query()
+                ->where('pedido_id', $bloqueado->getKey())
+                ->orderBy('producto_id')
+                ->get();
+
+            foreach ($detalles as $detalle) {
+                $producto = Producto::query()->whereKey($detalle->producto_id)->lockForUpdate()->first();
+
+                if ($producto !== null) {
+                    $producto->stock_actual = (int) $producto->stock_actual + (int) $detalle->cantidad;
+                    $producto->save();
+                }
+            }
+
+            $bloqueado->estado = EstadoPedido::ANULADO;
+            $bloqueado->anulado_en = now();
+            $bloqueado->motivo_anulacion = mb_substr($motivo, 0, 150);
+            $bloqueado->save();
+
+            return $bloqueado;
+        });
+    }
+
+    /**
+     * Anula los pedidos que pasaron el plazo de pago sin pagarse, para que
+     * su stock no quede reservado para siempre.
+     *
+     * @return list<Pedido> los pedidos anulados
+     */
+    public function anularVencidos(): array
+    {
+        $limite = now()->subHours(Pedido::HORAS_PARA_PAGAR);
+        $anulados = [];
+
+        $vencidos = Pedido::query()
+            ->where('estado', EstadoPedido::PENDIENTE->value)
+            ->where('fecha_pedido', '<=', $limite)
+            ->orderBy('pedido_id')
+            ->get();
+
+        foreach ($vencidos as $pedido) {
+            try {
+                $anulados[] = $this->anular($pedido, 'Sin pago en '.Pedido::HORAS_PARA_PAGAR.' horas.');
+            } catch (EstadoPedidoInvalidoException) {
+                // Se pagó justo mientras corría la tarea: queda como está.
+            }
+        }
+
+        return $anulados;
     }
 
     /**

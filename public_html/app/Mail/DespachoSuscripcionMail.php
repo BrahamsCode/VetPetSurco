@@ -35,7 +35,7 @@ final class DespachoSuscripcionMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Tu despacho mensual ya salió — Pedido '.$this->pedido->getKey().' | VetPet Surco',
+            subject: 'Tu pedido del mes está listo para pagar — Pedido '.$this->pedido->getKey().' | VetPet Surco',
         );
     }
 

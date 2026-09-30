@@ -198,14 +198,3 @@
       </div>
     </div>
 @endsection
-
-@section('scripts')
-  <script>
-    // Marcar una inasistencia no se puede deshacer (RN-18): se pide confirmacion.
-    document.querySelectorAll('form[data-confirmar]').forEach(function (form) {
-      form.addEventListener('submit', function (evento) {
-        if (! window.confirm(form.dataset.confirmar)) evento.preventDefault();
-      });
-    });
-  </script>
-@endsection

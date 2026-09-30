@@ -13,6 +13,11 @@ Schedule::command('suscripciones:despachar')
     ->dailyAt('03:00')
     ->timezone('America/Lima');
 
+// Cada hora se anulan los pedidos que llevan 48 h sin pagarse; su stock vuelve.
+Schedule::command('pedidos:anular-vencidos')
+    ->hourly()
+    ->timezone('America/Lima');
+
 // RN-20: cada manana se avisa de las vacunas y controles proximos.
 Schedule::command('vetpet:recordatorios')
     ->dailyAt('08:00')

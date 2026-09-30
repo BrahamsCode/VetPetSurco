@@ -69,17 +69,57 @@
           <h2>Total del pedido</h2>
           @php
               /* Desglose fiscal peruano: los precios al publico incluyen IGV 18%. */
-              $igvTotal = round((float) $total - ((float) $total / 1.18), 2);
-              $baseTotal = round((float) $total - $igvTotal, 2);
+              $productosCentimos = \App\Services\CarritoService::aCentimos($total);
+              $modalidadElegida = old('modalidad_entrega', 'RECOJO');
+              $envioInicial = $modalidadElegida === 'DELIVERY' && $productosCentimos < $envioGratisDesdeCentimos ? $envioCentimos : 0;
+              $totalInicial = ($productosCentimos + $envioInicial) / 100;
+              $igvTotal = round($totalInicial - ($totalInicial / 1.18), 2);
+              $baseTotal = round($totalInicial - $igvTotal, 2);
           @endphp
-          <div class="total-desglose" id="total-carrito" style="margin-top:10px;">
-            <p class="total-fila"><span>Subtotal (sin IGV)</span><span>S/ {{ number_format($baseTotal, 2) }}</span></p>
-            <p class="total-fila"><span>IGV 18%</span><span>S/ {{ number_format($igvTotal, 2) }}</span></p>
-            <p class="total-fila total-fila--final"><span>Total a pagar</span><span>S/ {{ number_format((float) $total, 2) }}</span></p>
-          </div>
-          <p class="fiscal-nota">Precios con IGV incluido (D.S. 055-99-EF). Al pagar recibir&aacute;s tu comprobante por correo.</p>
-          <form method="POST" action="{{ route('carrito.confirmar') }}">
+
+          <form method="POST" action="{{ route('carrito.confirmar') }}" id="form-confirmar"
+                data-productos="{{ $productosCentimos }}" data-envio="{{ $envioCentimos }}"
+                data-gratis-desde="{{ $envioGratisDesdeCentimos }}">
             @csrf
+
+            {{-- Como recibe el pedido: delivery en Surco o recojo en tienda. --}}
+            <fieldset class="entrega">
+              <legend class="entrega-titulo">&iquest;C&oacute;mo lo recibes?</legend>
+              <div class="entrega-opciones">
+                <input type="radio" class="opcion-radio" name="modalidad_entrega" id="entrega-recojo" value="RECOJO"
+                       @checked($modalidadElegida === 'RECOJO')>
+                <label class="entrega-tarjeta" for="entrega-recojo">
+                  <span class="entrega-nombre">Recojo en tienda</span>
+                  <span class="entrega-detalle">Gratis &middot; Av. Velasco Astete 1245, Surco</span>
+                </label>
+
+                <input type="radio" class="opcion-radio" name="modalidad_entrega" id="entrega-delivery" value="DELIVERY"
+                       @checked($modalidadElegida === 'DELIVERY')>
+                <label class="entrega-tarjeta" for="entrega-delivery">
+                  <span class="entrega-nombre">Delivery en Surco</span>
+                  <span class="entrega-detalle">S/ {{ number_format($envioCentimos / 100, 2) }} &middot; gratis desde S/ {{ number_format($envioGratisDesdeCentimos / 100, 2) }}</span>
+                </label>
+              </div>
+
+              <div class="campo" id="campo-direccion" @if ($modalidadElegida !== 'DELIVERY') hidden @endif>
+                <label for="direccion_entrega">Direcci&oacute;n de entrega</label>
+                <textarea id="direccion_entrega" name="direccion_entrega" rows="2" maxlength="255"
+                          placeholder="Calle, número, dpto. y una referencia">{{ old('direccion_entrega', $direccionPerfil) }}</textarea>
+                @if ($direccionPerfil)
+                  <p class="campo-ayuda">Es la direcci&oacute;n de tu perfil; c&aacute;mbiala si esta vez va a otro lugar.</p>
+                @endif
+              </div>
+            </fieldset>
+
+            <div class="total-desglose" id="total-carrito" style="margin-top:14px;">
+              <p class="total-fila"><span>Productos</span><span>S/ {{ number_format($productosCentimos / 100, 2) }}</span></p>
+              <p class="total-fila"><span>Env&iacute;o</span><span id="total-envio">{{ $envioInicial ? 'S/ '.number_format($envioInicial / 100, 2) : 'Gratis' }}</span></p>
+              <p class="total-fila"><span>Subtotal (sin IGV)</span><span id="total-base">S/ {{ number_format($baseTotal, 2) }}</span></p>
+              <p class="total-fila"><span>IGV 18%</span><span id="total-igv">S/ {{ number_format($igvTotal, 2) }}</span></p>
+              <p class="total-fila total-fila--final"><span>Total a pagar</span><span id="total-final">S/ {{ number_format($totalInicial, 2) }}</span></p>
+            </div>
+            <p class="fiscal-nota">Precios con IGV incluido (D.S. 055-99-EF). Al pagar recibir&aacute;s tu comprobante por correo.</p>
+
             <p class="nota-regla" style="margin-top:16px;" data-rn="RN-14" data-rn-nota="Origen del pedido">
               Esto es una <strong>compra directa</strong>. Los despachos de
               suscripci&oacute;n los emite el sistema solo, al vencer el plan.
@@ -96,8 +136,47 @@
             <li>Que ninguna l&iacute;nea deje el stock en negativo.</li>
             <li>Si una sola l&iacute;nea falla, no se registra ninguna parte del pedido.</li>
             <li>Al descontar, avisa qu&eacute; productos quedaron bajo el punto de reorden.</li>
+            <li>El stock queda reservado {{ \App\Models\Pedido::HORAS_PARA_PAGAR }} horas: si no pagas en ese plazo, el pedido se anula y las unidades vuelven a la tienda.</li>
           </ul>
         </div>
       </div>
     </div>
+@endsection
+
+@section('scripts')
+  <script>
+    // Muestra la direccion solo para delivery y recalcula envio, IGV y total.
+    // El servidor vuelve a calcular todo al confirmar; esto es solo la vista previa.
+    (function () {
+      const form = document.getElementById('form-confirmar');
+      if (! form) return;
+
+      const productos = Number(form.dataset.productos);
+      const tarifa = Number(form.dataset.envio);
+      const gratisDesde = Number(form.dataset.gratisDesde);
+      const campoDireccion = document.getElementById('campo-direccion');
+      const direccion = document.getElementById('direccion_entrega');
+      const soles = function (centimos) { return 'S/ ' + (centimos / 100).toFixed(2); };
+
+      const pintar = function () {
+        const elegida = form.querySelector('input[name="modalidad_entrega"]:checked');
+        const esDelivery = elegida && elegida.value === 'DELIVERY';
+
+        campoDireccion.hidden = ! esDelivery;
+        direccion.required = esDelivery;
+
+        const envio = esDelivery && productos < gratisDesde ? tarifa : 0;
+        const total = productos + envio;
+        const igv = Math.round(total - total / 1.18);
+
+        document.getElementById('total-envio').textContent = envio ? soles(envio) : 'Gratis';
+        document.getElementById('total-base').textContent = soles(total - igv);
+        document.getElementById('total-igv').textContent = soles(igv);
+        document.getElementById('total-final').textContent = soles(total);
+      };
+
+      form.addEventListener('change', pintar);
+      pintar();
+    })();
+  </script>
 @endsection

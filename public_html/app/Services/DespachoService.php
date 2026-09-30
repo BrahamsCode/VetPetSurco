@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\ModalidadEntrega;
 use App\Enums\TipoOrigen;
 use App\Exceptions\ReglaDeNegocioException;
 use App\Mail\DespachoSuscripcionMail;
@@ -62,7 +63,10 @@ final class DespachoService
             try {
                 // El despacho es un pedido normal: el producto sale a su precio
                 // vigente (RN-11) y descuenta stock dentro de la transaccion.
-                // Las unidades las manda el plan contratado.
+                // Las unidades las manda el plan contratado. Va a domicilio,
+                // sin costo de envio (el plan lo incluye); si el cliente no
+                // tiene direccion en su perfil, queda para recojo en tienda.
+                $direccion = trim((string) $cliente->direccion);
                 $pedido = $this->pedidos->confirmar(
                     $cliente,
                     [[
@@ -70,6 +74,8 @@ final class DespachoService
                         'cantidad' => SuscripcionService::unidadesDe((string) $suscripcion->plan),
                     ]],
                     TipoOrigen::SUSCRIPCION,
+                    $direccion !== '' ? ModalidadEntrega::DELIVERY : ModalidadEntrega::RECOJO,
+                    $direccion,
                 );
             } catch (ReglaDeNegocioException $e) {
                 // RN-12: sin stock no se despacha. La fecha NO avanza, asi que

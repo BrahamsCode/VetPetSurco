@@ -64,7 +64,7 @@ class ClinicaController extends Controller
 
         // En el panel solo las ultimas; el historial completo tiene su vista.
         $historias = $this->historiasDe($veterinarioId)
-            ->with('mascota')
+            ->with('mascota.cliente')
             ->limit(self::ULTIMAS_ATENCIONES)
             ->get();
         $totalHistorias = $this->historiasDe($veterinarioId)->count();

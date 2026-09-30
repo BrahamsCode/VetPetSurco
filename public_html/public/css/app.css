@@ -4,6 +4,24 @@
    ===================================================================== */
 
 .sesion { display: flex; align-items: center; gap: 10px; }
+/* Escritorio: la sesion se separa del menu de modulos con una linea. */
+@media (min-width: 761px) {
+  .menu-panel .menu li { margin-left: 16px; }
+  .menu-panel .sesion { gap: 8px; margin-left: 8px; padding-left: 12px; border-left: 1px solid var(--borde); }
+}
+/* Pantallas medianas: el menu del cliente tiene 5 modulos; se compacta
+   y el nombre cede su lugar (el rol y "Salir" siguen a la vista). */
+@media (min-width: 761px) and (max-width: 1100px) {
+  .menu-panel .menu li { margin-left: 14px; }
+  .menu-panel .menu a { font-size: 14.5px; }
+  .menu-panel .sesion-nombre { display: none; }
+}
+/* Tablet horizontal, antes del menu hamburguesa: logo solo con el icono y
+   sin la pastilla del rol. Solo en la plataforma (la barra con sesion). */
+@media (min-width: 761px) and (max-width: 1000px) {
+  .barra-superior:has(.sesion) .logo-texto { display: none; }
+  .menu-panel .pastilla-rol { display: none; }
+}
 .sesion-nombre { font-weight: 700; font-size: 15px; color: var(--verde-oscuro); }
 
 .pastilla-rol {
@@ -257,7 +275,7 @@ a.boton-mini { display: inline-flex; align-items: center; justify-content: cente
 .historial-item { border: 1px solid var(--borde); border-radius: 12px; background-color: var(--blanco);
   transition: border-color var(--transicion); }
 .historial-item:hover, .historial-item[open] { border-color: var(--verde-medio); }
-.historial-item summary { display: grid; grid-template-columns: 92px 110px minmax(0, 1fr) auto 16px;
+.historial-item summary { display: grid; grid-template-columns: 92px 150px minmax(0, 1fr) auto 16px;
   align-items: center; gap: 12px; padding: 12px 14px; cursor: pointer; list-style: none; font-size: 14px; }
 .historial-item summary::-webkit-details-marker { display: none; }
 /* Flecha que gira al abrir. */
@@ -266,7 +284,8 @@ a.boton-mini { display: inline-flex; align-items: center; justify-content: cente
   transform: rotate(45deg); transition: transform var(--transicion); }
 .historial-item[open] summary::after { transform: rotate(-135deg); }
 .historial-fecha { font-weight: 700; color: var(--verde-oscuro); }
-.historial-mascota { font-weight: 700; color: var(--verde-oscuro); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.historial-mascota { font-weight: 700; color: var(--verde-oscuro); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.3; }
+.historial-dueno { display: block; font-weight: 400; font-size: 12.5px; color: var(--gris); overflow: hidden; text-overflow: ellipsis; }
 .historial-resumen { color: var(--gris); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .historial-item[open] .historial-resumen { visibility: hidden; }
 .historial-marcas { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
@@ -306,6 +325,97 @@ a.boton-mini { display: inline-flex; align-items: center; justify-content: cente
 .paginacion { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
 .paginacion-estado { font-size: 14px; color: var(--gris); }
 .paginacion-inactivo { opacity: .45; cursor: default; pointer-events: none; }
+
+/* ---------- Dialogo de confirmacion (components/confirmar) ---------- */
+/* margin:auto lo centra en la ventana (el reset global de estilos.css lo quita). */
+.dialogo { border: 0; padding: 0; margin: auto; inset: 0; background: transparent;
+  max-width: min(430px, calc(100vw - 32px)); width: 100%; }
+.dialogo::backdrop { background-color: rgba(15, 45, 40, .45); backdrop-filter: blur(3px); }
+.dialogo[open] { animation: dialogo-entra .18s ease-out; }
+.dialogo-caja { background-color: var(--blanco); border-radius: 16px; padding: 24px 24px 20px 24px;
+  box-shadow: 0 24px 60px rgba(15, 45, 40, .28); text-align: center; }
+.dialogo-icono { width: 48px; height: 48px; margin: 0 auto 12px auto; border-radius: 50%;
+  display: grid; place-items: center; background-color: #fdeceb; color: #b3261e; }
+.dialogo-titulo { font-size: 20px; margin: 0 0 6px 0; color: var(--verde-oscuro); }
+.dialogo-mensaje { margin: 0; color: var(--gris); font-size: 14.5px; line-height: 1.55; }
+.dialogo-acciones { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+.dialogo-acciones .boton-mini { min-height: 46px; padding: 10px 22px; }
+.dialogo-aceptar { background-color: #b3261e; border-color: #b3261e; }
+.dialogo-aceptar:hover, .dialogo-aceptar:focus-visible { background-color: #8c1d18; border-color: #8c1d18; }
+@keyframes dialogo-entra { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .dialogo[open] { animation: none; } }
+@media (max-width: 420px) { .dialogo-acciones { flex-direction: column-reverse; } .dialogo-acciones > * { width: 100%; } }
+
+/* ---------- Entrega en el carrito ---------- */
+.entrega { border: 0; padding: 0; margin: 12px 0 0 0; }
+.entrega-titulo { font-weight: 700; color: var(--verde-oscuro); font-size: 15px; margin-bottom: 8px; }
+.entrega-opciones { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+.entrega-tarjeta { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; cursor: pointer;
+  border: 1px solid var(--borde); border-radius: 12px; background-color: var(--blanco);
+  transition: border-color var(--transicion), background-color var(--transicion); }
+.entrega-tarjeta:hover { border-color: var(--verde-medio); }
+.opcion-radio:checked + .entrega-tarjeta { border-color: var(--verde-oscuro); background-color: var(--menta);
+  box-shadow: inset 0 0 0 1px var(--verde-oscuro); }
+.opcion-radio:focus-visible + .entrega-tarjeta { outline: 2px solid var(--ambar); outline-offset: 2px; }
+.entrega-nombre { font-weight: 700; color: var(--verde-oscuro); }
+.entrega-detalle { font-size: 13px; color: var(--gris); }
+.entrega .campo { margin-top: 12px; }
+
+/* ---------- Mis pedidos (cliente) ---------- */
+.pedidos-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+.pedido-cabecera { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.pedido-cabecera p { margin: 0; }
+.pedido-numero { font-family: "Fraunces", Georgia, serif; font-size: 20px; font-weight: 600; color: var(--verde-oscuro); }
+.pedido-meta { font-size: 13.5px; color: var(--gris); }
+.pedido-total { text-align: right; }
+.pedido-total p { font-weight: 700; color: var(--verde-oscuro); margin-top: 6px !important; }
+.pedido-aviso { margin: 14px 0 0 0; padding: 12px 14px; border-radius: 12px; background-color: #fff4e0; color: #6b4700; font-size: 14px; }
+.pedido-aviso p { margin: 0; }
+.pedido-aviso-gris { background-color: var(--menta); color: var(--gris); }
+.pedido-acciones { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.pedido-datos { margin: 14px 0 0 0; display: grid; gap: 6px; font-size: 14px; }
+.pedido-datos div { display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 10px; }
+.pedido-datos dt { color: var(--gris); }
+.pedido-datos dd { margin: 0; color: var(--tinta); overflow-wrap: anywhere; }
+
+/* Barra de avance: Pagado -> En camino / Listo -> Entregado. */
+.avance { list-style: none; margin: 16px 0 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); }
+.avance-paso { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 3px; }
+/* Linea que une cada punto con el anterior. */
+.avance-paso + .avance-paso::before { content: ""; position: absolute; top: 8px; right: 50%; width: 100%; height: 3px;
+  background-color: var(--borde); z-index: 0; }
+.avance-paso.avance-hecho + .avance-paso.avance-hecho::before { background-color: var(--verde-medio); }
+.avance-punto { position: relative; z-index: 1; width: 19px; height: 19px; border-radius: 50%;
+  background-color: var(--blanco); border: 3px solid var(--borde); }
+.avance-hecho .avance-punto { background-color: var(--verde-medio); border-color: var(--verde-medio); }
+.avance-actual .avance-punto { box-shadow: 0 0 0 4px var(--menta); }
+.avance-nombre { font-size: 13.5px; font-weight: 700; color: var(--gris); }
+.avance-hecho .avance-nombre { color: var(--verde-oscuro); }
+.avance-fecha { font-size: 12px; color: var(--gris); }
+
+/* ---------- Tablero de pedidos (admin) ---------- */
+.tablero { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 8px; }
+@media (max-width: 960px) { .tablero { grid-template-columns: minmax(0, 1fr); } }
+.tablero-columna { background-color: #f7faf8; border: 1px solid var(--borde); border-radius: 12px; padding: 4px 12px 12px 12px; }
+.tablero-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+/* Una columna con muchos pedidos se desplaza por dentro: el tablero no crece sin fin. */
+.tablero-columna .tablero-lista { max-height: 620px; overflow-y: auto; padding-right: 4px; overscroll-behavior: contain; }
+.tablero-lista-fila { max-height: 420px; overflow-y: auto; }
+.tablero-lista-fila { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.tarjeta-pedido { background-color: var(--blanco); border: 1px solid var(--borde); border-radius: 10px; padding: 10px 12px; font-size: 13.5px; }
+.tarjeta-pedido p { margin: 4px 0 0 0; }
+.tarjeta-pedido-cabecera { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.tarjeta-pedido-numero { font-weight: 700; color: var(--verde-oscuro); }
+.tarjeta-pedido-total { margin-left: auto; font-weight: 700; color: var(--verde-oscuro); }
+.tarjeta-pedido-cliente { font-weight: 600; }
+.tarjeta-pedido-direccion, .tarjeta-pedido-productos { color: var(--gris); font-size: 12.5px; overflow-wrap: anywhere; }
+.tarjeta-pedido-pie { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.tarjeta-pedido-pie form { margin-left: auto; }
+.tarjeta-pedido-pie .boton-mini { min-height: 32px; padding: 5px 13px; }
+.tarjeta-pedido-hora { font-size: 12px; color: var(--gris); }
+.entrega-chip { border-radius: 30px; padding: 1px 9px; font-size: 11.5px; font-weight: 700; }
+.entrega-chip-delivery { background-color: #e7eefc; color: #2a4c8f; }
+.entrega-chip-recojo { background-color: var(--menta); color: var(--verde-oscuro); }
 
 .campo-opcional { font-weight: 400; color: var(--gris); }
 .campo-ayuda { font-size: 12.5px; color: var(--gris); margin: 5px 0 0 0; }

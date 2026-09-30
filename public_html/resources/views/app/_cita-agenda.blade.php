@@ -31,7 +31,9 @@
 
     @if ($puede['no_asistio'] && ! $elegida)
       <form method="POST" action="{{ route('clinica.desenlace', $cita->cita_id) }}"
-            data-confirmar="¿Marcar que {{ $mascota->nombre ?? 'la mascota' }} no asistió? No se puede deshacer.">
+            data-confirmar-titulo="¿{{ $mascota->nombre ?? 'La mascota' }} no asistió?"
+            data-confirmar="La cita de las {{ $cita->fecha_hora->format('H:i') }} quedará cerrada como inasistencia. Esto no se puede deshacer."
+            data-confirmar-boton="Sí, no asistió">
         @csrf
         @method('PATCH')
         <input type="hidden" name="desenlace" value="NO_ASISTIO">

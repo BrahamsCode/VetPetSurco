@@ -150,8 +150,8 @@ final class AsistenteService
                 '• Pedido %d del %s: S/ %s — %s',
                 $pedido->pedido_id,
                 $fecha,
-                number_format((float) $pedido->monto_total, 2),
-                $this->etiquetaDe($pedido->estado),
+                number_format((float) $pedido->totalACobrar(), 2),
+                $pedido->etiquetaEstado(),
             );
         })->implode("\n");
 
