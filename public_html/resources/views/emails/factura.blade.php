@@ -9,7 +9,9 @@
     $cliente = $pedido->cliente;
 @endphp
 
-@section('titulo')&iexcl;Pago aprobado, {{ $cliente->nombre ?? 'gracias' }}!@endsection
+@section('titulo')
+&iexcl;Pago aprobado, {{ $cliente->nombre ?? 'gracias' }}!
+@endsection
 
 @section('contenido')
   <p style="margin:0 0 14px 0;">

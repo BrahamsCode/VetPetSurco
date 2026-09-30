@@ -4,7 +4,9 @@
     $total = (float) $pedido->monto_total;
 @endphp
 
-@section('titulo')Tu pedido {{ $pedido->pedido_id }} qued&oacute; registrado@endsection
+@section('titulo')
+Tu pedido {{ $pedido->pedido_id }} qued&oacute; registrado
+@endsection
 
 @section('contenido')
   <p style="margin:0 0 14px 0;">

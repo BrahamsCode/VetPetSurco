@@ -32,6 +32,9 @@ class RegistroRequest extends SolicitudDeRegla
     {
         return [
             'nombre.required' => 'El nombre y apellido son obligatorios.',
+            'nombre.max' => 'El nombre y apellido admiten hasta 100 caracteres.',
+            'correo.max' => 'El correo electronico admite hasta 100 caracteres.',
+            'telefono.max' => 'El telefono admite hasta 15 caracteres. Escribelo sin espacios ni parentesis, por ejemplo 987654321.',
             'correo.required' => 'El correo electronico es obligatorio.',
             'correo.email' => 'Escribe un correo electronico valido.',
             'correo.unique' => 'Ese correo ya esta registrado en otra cuenta.',

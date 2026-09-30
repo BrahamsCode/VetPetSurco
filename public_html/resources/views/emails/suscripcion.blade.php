@@ -4,7 +4,9 @@
     $despacho = \Illuminate\Support\Carbon::parse($suscripcion->proximo_despacho);
 @endphp
 
-@section('titulo')Tu suscripci&oacute;n qued&oacute; {{ $nuevoEstado }}@endsection
+@section('titulo')
+Tu suscripci&oacute;n qued&oacute; {{ $nuevoEstado }}
+@endsection
 
 @section('contenido')
   <p style="margin:0 0 14px 0;">

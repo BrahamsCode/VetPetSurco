@@ -4,7 +4,9 @@
     $despacho = \Illuminate\Support\Carbon::parse($suscripcion->proximo_despacho);
 @endphp
 
-@section('titulo')&iexcl;Tu despacho mensual ya sali&oacute;!@endsection
+@section('titulo')
+&iexcl;Tu despacho mensual ya sali&oacute;!
+@endsection
 
 @section('contenido')
   <p style="margin:0 0 14px 0;">
