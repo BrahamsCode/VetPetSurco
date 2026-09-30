@@ -91,7 +91,7 @@ const pasos = [
   ["1", "La visión de negocio", "Qué gasto queremos capturar y por qué hoy se escapa"],
   ["2", "Diagnóstico y objetivos", "Cinco problemas medidos y tres objetivos con métrica"],
   ["3", "La metodología", "Modelo iterativo e incremental, y la evidencia de cada incremento"],
-  ["4", "Requerimientos y arquitectura", "17 funcionales, 22 reglas de negocio y cómo se hacen cumplir"],
+  ["4", "Requerimientos y tecnología", "Qué pide el negocio, con qué está construido y cómo se hacen cumplir las reglas"],
   ["5", "Evidencia y estado", "137 pruebas ejecutadas y lo que falta para producción"],
 ];
 let y = 1.88;
@@ -328,6 +328,75 @@ s.addText("Tres entregas priorizadas por valor de negocio", { x: M, y: 4.16, w: 
       fontFace: SANS, fontSize: 11, color: GRIS, valign: "middle" });
   });
 s.addNotes("El documento está redactado desde el pedido de la empresa, sin nombrar tecnología, y cierra con un acta de conformidad. Lo que no está ahí se trata como solicitud de cambio.");
+
+// =====================================================================
+// 10. Con que esta construido
+// =====================================================================
+s = pres.addSlide();
+titulo(s, "Con qué está construido", "Todo estándar, gratuito y sostenible por cualquier programador");
+
+const C4 = (ANCHO - 3 * 0.22) / 4, X4 = [0.7, 3.738, 6.776, 9.814];
+const pila = [
+  ["APLICACIÓN", "PHP 8.2", ["Laravel 12.69", "Plantillas Blade", "Composer", "Servicios de dominio"]],
+  ["DATOS", "MySQL 8.0", ["Migraciones versionadas", "Restricciones en el motor", "Procedimiento de compra", "Vistas de reporte"]],
+  ["ENTORNO", "Docker", ["php:8.2-apache", "mysql:8.0", "MailHog", "Node 20 y Apache"]],
+  ["CALIDAD Y COBRO", "PHPUnit 11", ["Laravel Pint", "137 pruebas automatizadas", "Culqi como pasarela", "Git con ramas"]],
+];
+pila.forEach(([et, pieza, items], i) => {
+  const oscura = i === 2;
+  tarjeta(s, { x: X4[i], y: 1.88, w: C4, h: 2.62, fill: oscura ? VERDE : MENTA });
+  s.addText(et, { x: X4[i] + 0.24, y: 2.08, w: C4 - 0.48, h: 0.28, isTextBox: true, margin: 0,
+    fontFace: SANS, fontSize: 9.5, bold: true, color: oscura ? AMBAR : VERDE_M, valign: "middle" });
+  s.addText(pieza, { x: X4[i] + 0.24, y: 2.38, w: C4 - 0.48, h: 0.44, isTextBox: true, margin: 0,
+    fontFace: SERIF, fontSize: 17, bold: true, color: oscura ? BLANCO : VERDE, valign: "middle" });
+  s.addText(items.map((t, n) => ({ text: t, options: { breakLine: n < items.length - 1 } })),
+    { x: X4[i] + 0.24, y: 2.94, w: C4 - 0.48, h: 2.1, isTextBox: true, margin: 0,
+      fontFace: SANS, fontSize: 11, color: oscura ? CLARO : TINTA, valign: "top", lineSpacing: 19 });
+});
+
+tarjeta(s, { x: M, y: 4.88, w: ANCHO, h: 1.2, fill: MENTA });
+s.addText([
+  { text: "Por qué esta pila y no otra.  ", options: { bold: true, color: VERDE } },
+  { text: "Ninguna pieza es exótica ni de pago: VetPet Surco es una MYPE y tiene que poder contratar a cualquier programador para mantener el sistema, y poder mudarlo de proveedor si el costo sube. Es el requerimiento RNF-11." },
+], { x: M + 0.3, y: 4.88, w: ANCHO - 0.6, h: 1.2, isTextBox: true, margin: 0,
+     fontFace: SANS, fontSize: 12, color: TINTA, valign: "middle", lineSpacing: 17 });
+s.addNotes("PHP 8.2 y no 8.3 o superior porque Laravel 12 es la última versión que lo admite, y 8.2 es lo que ofrecen los hostings peruanos económicos. Culqi entra detrás de una interfaz, así que cambiar de pasarela no toca el resto del sistema.");
+
+// =====================================================================
+// 11. El entorno en contenedores
+// =====================================================================
+s = pres.addSlide();
+titulo(s, "El entorno se levanta con un comando", "Tres contenedores, idénticos en la máquina de cada integrante y en el servidor");
+
+const cajas = [
+  ["app", "La aplicación", "php:8.2-apache con las extensiones que Laravel necesita. Publica los puertos 80 y 443, con certificado propio para probar en HTTPS."],
+  ["db", "La base de datos", "mysql:8.0 con volumen propio y verificación de salud: la aplicación no arranca hasta que el motor responde."],
+  ["mailhog", "El buzón de pruebas", "Atrapa todos los correos que el sistema envía y los muestra en el navegador. Se demuestra el aviso real sin escribirle a un cliente."],
+];
+cajas.forEach(([nombre, t, d], i) => {
+  const oscura = i === 2;
+  tarjeta(s, { x: X3[i], y: 1.92, w: C3, h: 2.52, fill: oscura ? VERDE : MENTA });
+  pastilla(s, X3[i] + 0.26, 2.14, 1.5, 0.36, nombre, { fill: oscura ? AMBAR : VERDE, size: 11,
+    color: oscura ? VERDE : BLANCO, mono: true });
+  s.addText(t, { x: X3[i] + 0.26, y: 2.62, w: C3 - 0.52, h: 0.42, isTextBox: true, margin: 0,
+    fontFace: SERIF, fontSize: 16, bold: true, color: oscura ? BLANCO : VERDE, valign: "middle" });
+  s.addText(d, { x: X3[i] + 0.26, y: 3.12, w: C3 - 0.52, h: 1.72, isTextBox: true, margin: 0,
+    fontFace: SANS, fontSize: 11.5, color: oscura ? CLARO : TINTA, valign: "top", lineSpacing: 16 });
+});
+
+tarjeta(s, { x: M, y: 4.72, w: ANCHO, h: 0.68, fill: VERDE });
+s.addText("docker compose up -d", { x: M + 0.3, y: 4.72, w: 4.0, h: 0.68, isTextBox: true, margin: 0,
+  fontFace: MONO, fontSize: 14, bold: true, color: AMBAR, valign: "middle" });
+s.addText("Un solo comando deja el sistema corriendo, con la base creada y el buzón escuchando.",
+  { x: M + 4.4, y: 4.72, w: ANCHO - 4.7, h: 0.68, isTextBox: true, margin: 0,
+    fontFace: SANS, fontSize: 12, color: CLARO, valign: "middle" });
+
+s.addText([
+  { text: "La aplicación vive en public_html/ y la infraestructura fuera, en docker/. ", options: { bold: true } },
+  { text: "Es la convención de carpetas que ya se usa en la empresa, así que el proyecto se despliega igual que los demás." },
+], { x: M, y: 5.56, w: ANCHO, h: 0.56, isTextBox: true, margin: 0,
+     fontFace: SANS, fontSize: 11.5, color: GRIS, valign: "middle" });
+s.addNotes("MailHog es la pieza que permite demostrar el correo en vivo: se dispara un pedido o un recordatorio y el mensaje aparece en el buzón del navegador, con su diseño y sus datos, sin enviar nada a una casilla real.");
 
 // =====================================================================
 // 10. Arquitectura y reglas en dos capas
