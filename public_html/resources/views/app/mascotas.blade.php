@@ -140,7 +140,8 @@
             Necesitas tener una mascota registrada para contratar un plan.
           </p>
         @else
-          <form method="POST" action="{{ route('suscripciones.contratar') }}" id="form-plan">
+          <form method="POST" action="{{ route('suscripciones.contratar') }}" id="form-plan"
+                data-primer-despacho="{{ $primerDespacho->format('d/m/Y') }}">
             @csrf
 
             <div class="paso-plan">
@@ -151,7 +152,8 @@
                          value="{{ $mascota->mascota_id }}" @checked($indice === 0)
                          data-nombre="{{ $mascota->nombre }}"
                          {{-- RN-22: lo que esta mascota ya recibe no se puede volver a contratar. --}}
-                         data-vigentes="{{ json_encode($vigentesPorMascota[$mascota->mascota_id] ?? []) }}">
+                         data-vigentes="{{ json_encode($vigentesPorMascota[$mascota->mascota_id] ?? []) }}"
+                         data-recibe="{{ json_encode($recibePorMascota[$mascota->mascota_id] ?? []) }}">
                   <label class="mascota-chip" for="mascota-{{ $mascota->mascota_id }}">
                     <span class="mascota-avatar" aria-hidden="true">{{ mb_substr($mascota->nombre, 0, 1) }}</span>
                     <span>
@@ -285,6 +287,16 @@
 
         const unidades = Number(plan.dataset.unidades);
 
+        // Contratar crea un plan NUEVO: no cambia ni reprograma los que ya tiene.
+        const recibe = JSON.parse(mascota.dataset.recibe || '[]');
+        const nota = document.createElement('small');
+        nota.className = 'resumen-nota';
+        nota.textContent = 'Primer despacho el ' + form.dataset.primerDespacho + '. '
+          + (recibe.length
+            ? 'Es un plan adicional: ' + mascota.dataset.nombre + ' ya recibe ' + recibe.join(', ')
+              + ', que sigue igual.'
+            : 'Sera el primer plan de ' + mascota.dataset.nombre + '.');
+
         resumen.replaceChildren(
           fuerte(mascota.dataset.nombre),
           document.createTextNode(' recibe '),
@@ -294,10 +306,18 @@
           document.createTextNode(' cada 30 dias, por '),
           fuerte('S/ ' + plan.dataset.monto),
           document.createTextNode(' al mes.'),
+          nota,
         );
       };
 
       form.addEventListener('change', pintar);
+
+      // Un doble clic mandaria dos contrataciones a la vez; se envia una sola.
+      form.addEventListener('submit', function () {
+        boton.disabled = true;
+        boton.textContent = 'Contratando...';
+      });
+
       pintar();
     })();
   </script>

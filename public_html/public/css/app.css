@@ -283,6 +283,7 @@
 }
 .resumen-plan p { margin: 0; font-size: 14px; color: var(--verde-oscuro); flex: 1; min-width: 210px; }
 .resumen-plan strong { font-weight: 700; }
+.resumen-plan .resumen-nota { display: block; margin-top: 6px; font-size: 13px; color: var(--gris); }
 
 /* ---------- Pago con tarjeta ---------- */
 .aviso-simulado {

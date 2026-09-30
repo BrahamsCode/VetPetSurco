@@ -40,10 +40,19 @@ class MascotaController extends Controller
 
         // RN-22: lo que cada mascota ya tiene vigente no se vuelve a ofrecer.
         // Una pausada tambien cuenta: sigue siendo un contrato, solo detenido.
-        $vigentesPorMascota = $suscripciones
+        $vigentes = $suscripciones
             ->whereIn('estado', [EstadoSuscripcion::ACTIVA, EstadoSuscripcion::PAUSADA])
-            ->groupBy('mascota_id')
+            ->groupBy('mascota_id');
+
+        $vigentesPorMascota = $vigentes
             ->map(fn ($grupo) => $grupo->pluck('producto_id')->map(intval(...))->values()->all());
+
+        // Lo que ya recibe cada mascota, para avisar que el plan nuevo es adicional.
+        $recibePorMascota = $vigentes
+            ->map(fn ($grupo) => $grupo
+                ->map(fn ($s) => ($productos[$s->producto_id]->nombre ?? '?').' ('.$s->plan.')')
+                ->values()
+                ->all());
 
         return view('app.mascotas', [
             'mascotas' => $mascotas,
@@ -53,6 +62,8 @@ class MascotaController extends Controller
             'catalogo' => Producto::query()->activos()->orderBy('nombre')->get(),
             'planes' => SuscripcionService::planes(),
             'vigentesPorMascota' => $vigentesPorMascota,
+            'recibePorMascota' => $recibePorMascota,
+            'primerDespacho' => \Illuminate\Support\Carbon::parse(SuscripcionService::primerDespacho()),
         ]);
     }
 

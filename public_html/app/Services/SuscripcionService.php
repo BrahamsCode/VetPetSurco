@@ -58,6 +58,12 @@ final class SuscripcionService
         return self::PLANES[$plan]['unidades'];
     }
 
+    /** RN-16: fecha del primer despacho de un plan contratado hoy (Y-m-d). */
+    public static function primerDespacho(): string
+    {
+        return now()->addDays(self::FRECUENCIA_DIAS)->toDateString();
+    }
+
     /**
      * Contrata un plan para una mascota del cliente.
      *
@@ -92,7 +98,7 @@ final class SuscripcionService
         $suscripcion->frecuencia_dias = self::FRECUENCIA_DIAS;
         $suscripcion->monto_mensual = self::montoDe($plan);
         // RN-16: el primer despacho sale a un ciclo completo desde hoy.
-        $suscripcion->proximo_despacho = now()->addDays(self::FRECUENCIA_DIAS)->toDateString();
+        $suscripcion->proximo_despacho = self::primerDespacho();
         $suscripcion->estado = EstadoSuscripcion::ACTIVA;
         $suscripcion->save();
 
