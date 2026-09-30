@@ -47,7 +47,7 @@ La aplicación vive en `public_html/` y toda la configuración de Docker queda f
 | [`public_html/database/`](public_html/database/) | Las ocho tablas con sus `UNIQUE`, `CHECK` y claves foráneas, más semillas y factories. |
 | [`public_html/tests/`](public_html/tests/) | 112 pruebas que comprueban las 20 reglas contra MySQL. |
 | [`docker/`](docker/) | Imagen de PHP 8.2 sobre Apache, compose con MySQL y MailHog. Ver [`docker/README.md`](docker/README.md). |
-| [`docs/`](docs/) | [Entrega 1](docs/entrega-1-modelo-de-negocio.md), [Entrega 2](docs/entrega-2-arquitectura-software.md), [reglas de negocio](docs/reglas-de-negocio.md), presentaciones y capturas. |
+| [`docs/`](docs/) | [Estado del proyecto](docs/ESTADO.md), [Entrega 1](docs/entrega-1-modelo-de-negocio.md), [Entrega 2](docs/entrega-2-arquitectura-software.md), [reglas de negocio](docs/reglas-de-negocio.md), presentaciones y capturas. |
 
 ## Entregas del curso
 
