@@ -63,7 +63,7 @@ El parcial cuenta como medio punto. Total = (38 + 11/2) / 53 ítems.
 - [x] **RF-14** Alertas de vacunación y desparasitación — `vetpet:recordatorios`, programado a las 08:00;
       lista de los próximos 15 días en el panel ⚠️ mismo aviso que RF-09
 - [x] **RF-17** Sitio institucional público — inicio, nosotros, productos y contacto
-- [x] **RF-18** Asistente de atención en el sitio — 14 intenciones y 8 temas de menú
+- [x] **RF-18** Asistente de atención en el sitio — 14 intenciones, 8 temas y un corpus de 56 preguntas que mide su exactitud
 - [x] **RF-19** Avisos automáticos por correo — 8 salientes (se sumó «pedido en camino /
       listo para recoger») más el buzón de contacto ⚠️ el recordatorio diario depende del
       programador de tareas
@@ -114,7 +114,7 @@ El parcial cuenta como medio punto. Total = (38 + 11/2) / 53 ítems.
 - [x] **RNF-08** Reglas garantizadas por el almacén de datos — CHECK y UNIQUE en las tablas;
       hay pruebas que escriben directo en la base y el motor las rechaza
 - [x] **RNF-09** Precio histórico del pedido — el detalle guarda su propio precio
-- [x] **RNF-12** Evidencia comprobable — 170 pruebas, 441 aserciones, contra MySQL
+- [x] **RNF-12** Evidencia comprobable — 231 pruebas, 506 aserciones, contra MySQL
       (`vetpet_connect_test`); las 22 reglas tienen al menos una prueba con su código
 
 ### Parciales
@@ -220,6 +220,9 @@ esa es la condición del RNF-12.
       escucha por socket, fallan todas. Conviene dejarlo escrito en el README.
 - [ ] **Culqi está integrado pero no probado contra el ambiente de pruebas real.** Las pruebas
       usan la pasarela simulada.
+- [ ] **El corpus del asistente crece con el uso.** Cada pregunta que Pelusa no entienda en
+      producción debería terminar en `resources/asistente/corpus.php`; es la única forma de
+      que el arreglo quede comprobado y no se vuelva a romper.
 
 ---
 
