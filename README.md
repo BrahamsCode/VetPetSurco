@@ -63,6 +63,7 @@ La aplicación vive en `public_html/` y toda la configuración de Docker queda f
 | [Entrega 2](docs/presentacion/Entrega2_VetPetConnect_Presentacion.pptx) | Arquitectura de software y core transaccional: requerimientos, modelo de datos, pantallas y flujo de compra |
 | [Paso 1: Identificar la necesidad](docs/presentacion/Paso1_IdentificarLaNecesidad.pptx) | Qué necesitaba el negocio, por qué no bastaba un gestor de contenidos y qué existe hoy en el código |
 | [Reglas de negocio](docs/presentacion/ReglasDeNegocio_VetPetConnect.pptx) | Las 20 reglas del sistema, enmarcadas sobre capturas del prototipo, más dos casos trazados de principio a fin |
+| [EA2](docs/presentacion/EA2_VetPetConnect.pptx) | Evaluación de Avance 2: visión de negocio, metodología de desarrollo, requerimientos y el estado verificable del sistema |
 
 ### Documentos del cliente
 
