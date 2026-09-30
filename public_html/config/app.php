@@ -65,7 +65,9 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    // La veterinaria atiende en Lima: "hoy", los horarios de cita y las fechas
+    // de los correos tienen que ser hora peruana, no UTC (5 horas adelante).
+    'timezone' => env('APP_TIMEZONE', 'America/Lima'),
 
     /*
     |--------------------------------------------------------------------------

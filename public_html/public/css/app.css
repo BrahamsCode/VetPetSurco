@@ -19,6 +19,13 @@
   transition: border-color var(--transicion), color var(--transicion);
 }
 .boton-mini:hover { border-color: var(--verde-medio); color: var(--verde-oscuro); }
+a.boton-mini { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+/* Variante principal: la accion esperada de la fila. */
+.boton-mini-primario { background-color: var(--verde-oscuro); border-color: var(--verde-oscuro); color: var(--blanco); }
+.boton-mini-primario:hover { background-color: var(--verde-medio); border-color: var(--verde-medio); color: var(--blanco); }
+/* Variante de peligro: acciones que no se deshacen. */
+.boton-mini-peligro { color: #8c1d18; }
+.boton-mini-peligro:hover { border-color: #8c1d18; color: #8c1d18; background-color: #fdeceb; }
 
 .panel { padding: 34px 0 48px 0; }
 
@@ -187,6 +194,72 @@
 .indicador-valor { font-family: "Fraunces", Georgia, serif; font-size: 34px;
   font-weight: 600; color: var(--verde-oscuro); line-height: 1.1; }
 .indicador-etiqueta { font-size: 13px; color: var(--gris); margin-top: 3px; }
+.indicador-alerta { background-color: #fff4e0; }
+.indicador-alerta .indicador-valor { color: #8a5a00; }
+
+/* ---------- Ficha clinica (veterinario) ---------- */
+.clinica-indicadores { margin-bottom: 20px; }
+.clinica-rejilla { display: grid; gap: 20px; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: start; }
+@media (max-width: 960px) { .clinica-rejilla { grid-template-columns: minmax(0, 1fr); } }
+
+.agenda-grupo { display: flex; align-items: center; gap: 8px; margin: 20px 0 8px 0;
+  font-size: 13px; letter-spacing: .6px; text-transform: uppercase; color: var(--verde-oscuro); }
+.agenda-grupo-alerta { color: #8a5a00; }
+.agenda-cuenta { background-color: var(--menta); border-radius: 30px; padding: 1px 9px; font-size: 12px; }
+.agenda-grupo-alerta .agenda-cuenta { background-color: #fff4e0; }
+.agenda-ayuda, .agenda-vacia { font-size: 13.5px; color: var(--gris); margin: 0 0 8px 0; }
+.agenda { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+
+.cita { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; align-items: center; gap: 14px;
+  padding: 11px 13px; border: 1px solid var(--borde); border-radius: 12px; background-color: var(--blanco);
+  transition: border-color var(--transicion); }
+.cita:hover { border-color: var(--verde-medio); }
+.cita-elegida { border-color: var(--verde-oscuro); background-color: var(--menta); }
+.cita-hora { display: flex; flex-direction: column; align-items: center; line-height: 1.15; }
+.cita-hora-valor { font-family: "Fraunces", Georgia, serif; font-size: 19px; font-weight: 600; color: var(--verde-oscuro); }
+.cita-hora-dia { font-size: 11.5px; color: var(--gris); white-space: nowrap; }
+.cita-datos p { margin: 0; }
+.cita-mascota { font-weight: 700; color: var(--verde-oscuro); }
+.cita-especie { font-weight: 400; font-size: 12.5px; color: var(--gris); margin-left: 4px; }
+.cita-detalle { font-size: 13.5px; color: var(--gris); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cita-acciones { display: flex; align-items: center; justify-content: flex-end; gap: 6px; flex-wrap: wrap; }
+.cita-acciones form { display: contents; }
+.cita-acciones .boton-mini { min-height: 34px; padding: 6px 14px; white-space: nowrap; }
+
+.clinica-vacio { border: 1px dashed var(--borde); border-radius: 12px; padding: 22px; margin-top: 12px;
+  text-align: center; color: var(--gris); font-size: 14px; }
+.clinica-vacio p { margin: 0; }
+.clinica-vacio-titulo { font-weight: 700; color: var(--verde-oscuro); margin-bottom: 6px !important; }
+
+.ficha { background-color: var(--menta); border-radius: 12px; padding: 15px 16px; margin: 12px 0 6px 0; }
+.ficha-cabecera { display: flex; align-items: center; gap: 12px; }
+.ficha-cabecera p { margin: 0; }
+.ficha .mascota-avatar { width: 44px; height: 44px; font-size: 18px;
+  background-color: var(--verde-oscuro); color: var(--blanco); }
+.ficha-nombre { font-family: "Fraunces", Georgia, serif; font-size: 20px; font-weight: 600; color: var(--verde-oscuro); }
+.ficha-sub { font-size: 13px; color: var(--gris); }
+.ficha-datos { display: grid; gap: 4px; margin: 12px 0 0 0; font-size: 13.5px; }
+.ficha-datos div { display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: 8px; }
+.ficha-datos dt { color: var(--gris); }
+.ficha-datos dd { margin: 0; color: var(--verde-oscuro); }
+.ficha-alergias { margin: 10px 0 0 0; padding: 8px 11px; border-radius: 9px; font-size: 13.5px;
+  background-color: #fdeceb; color: #8c1d18; }
+.ficha-sin-alergias { margin: 10px 0 0 0; font-size: 13px; color: var(--gris); }
+.ficha-antecedentes { margin-top: 10px; font-size: 13.5px; }
+.ficha-antecedentes summary { cursor: pointer; font-weight: 700; color: var(--verde-oscuro); }
+.ficha-antecedentes ul { margin: 8px 0 0 0; padding-left: 0; list-style: none; display: grid; gap: 6px; }
+.ficha-antecedentes li { background-color: var(--blanco); border-radius: 8px; padding: 7px 10px; }
+.antecedente-fecha { font-weight: 700; color: var(--verde-oscuro); margin-right: 6px; }
+.antecedente-vacuna { display: block; font-size: 12.5px; color: var(--gris); }
+
+.campo-opcional { font-weight: 400; color: var(--gris); }
+.campo-ayuda { font-size: 12.5px; color: var(--gris); margin: 5px 0 0 0; }
+.clinica-form-acciones { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+
+@media (max-width: 520px) {
+  .cita { grid-template-columns: 54px minmax(0, 1fr); }
+  .cita-acciones { grid-column: 1 / -1; justify-content: flex-start; }
+}
 
 /* ---------- Ingreso ---------- */
 .ingreso { max-width: 440px; margin: 0 auto; }
