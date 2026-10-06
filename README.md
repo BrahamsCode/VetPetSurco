@@ -63,7 +63,7 @@ La aplicación vive en `public_html/` y toda la configuración de Docker queda f
 | [Entrega 2](docs/presentacion/Entrega2_VetPetConnect_Presentacion.pptx) | Arquitectura de software y core transaccional: requerimientos, modelo de datos, pantallas y flujo de compra |
 | [Paso 1: Identificar la necesidad](docs/presentacion/Paso1_IdentificarLaNecesidad.pptx) | Qué necesitaba el negocio, por qué no bastaba un gestor de contenidos y qué existe hoy en el código |
 | [Reglas de negocio](docs/presentacion/ReglasDeNegocio_VetPetConnect.pptx) | Las 20 reglas del sistema, enmarcadas sobre capturas del prototipo, más dos casos trazados de principio a fin |
-| [Pilares CRM, ERP y SRM](docs/presentacion/Pilares_CRM_ERP_SRM.pptx) | Qué pilares de gestión tiene la plataforma, por qué falta integrar el SRM y por qué el ERP contable queda fuera de alcance |
+| [Pilares CRM, ERP y SRM](docs/presentacion/Pilares_CRM_ERP_SRM.pptx) | Análisis de los tres pilares de gestión: qué tablas y flujos forman cada uno, la propuesta para cerrar el SRM y en qué orden conviene hacerlo |
 | [EA2](docs/presentacion/EA2_VetPetConnect.pptx) | Evaluación de Avance 2: visión de negocio, metodología, requerimientos, la pila tecnológica y el entorno en contenedores, y el estado verificable del sistema |
 
 ### Documentos del cliente

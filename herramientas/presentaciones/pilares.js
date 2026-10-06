@@ -14,6 +14,7 @@ pres.title = "Integracion de la gestion empresarial - VetPet Connect";
 
 const W = 13.333, H = 7.5, M = 0.7, ANCHO = W - 2 * M;
 const C3 = 3.831, X3 = [0.7, 4.751, 8.802];
+const C2d = 5.8365, X2d = 6.7965;
 
 function titulo(s, t, sub) {
   s.addText(t, { x: M, y: 0.42, w: ANCHO, h: 0.72, isTextBox: true, margin: 0,
@@ -72,6 +73,97 @@ pilares.forEach(([sigla, que, estado, color, texto], i) => {
 pie(s, "«Proveedor» aparece en el proyecto solo como comentario en el SQL y como promesa en la Entrega 1: no hay tabla, ni modelo, ni pantalla.");
 s.addNotes("Importante: esto no sale del documento, sale de revisar el código. El CRM existe aunque no se llame asi en ninguna carpeta.");
 
+// 3. Inventario del sistema -------------------------------------------------
+s = pres.addSlide();
+titulo(s, "Qué hay construido", "El punto de partida del análisis: 9 tablas y lo que mueve cada una");
+
+const cifras = [["9", "tablas de dominio"], ["14", "servicios"], ["2", "procesos automáticos"], ["8", "correos"], ["32", "rutas"]];
+cifras.forEach(([n, q], i) => {
+  const w = (ANCHO - 4 * 0.2) / 5, x = M + i * (w + 0.2);
+  tarjeta(s, { x, y: 1.86, w, h: 1.1, fill: MENTA });
+  s.addText(n, { x, y: 1.94, w, h: 0.52, isTextBox: true, margin: 0, align: "center",
+    fontFace: SERIF, fontSize: 28, bold: true, color: VERDE, valign: "middle" });
+  s.addText(q, { x, y: 2.44, w, h: 0.38, isTextBox: true, margin: 0, align: "center",
+    fontFace: SANS, fontSize: 11, color: GRIS, valign: "middle" });
+});
+
+const grupos = [
+  ["CRM", VERDE, "usuarios · mascotas · citas · historias_clinicas"],
+  ["ERP", AMBAR, "productos · pedidos · detalle_pedidos · pagos"],
+  ["AMBOS", VERDE_M, "suscripciones — fideliza al cliente y mueve inventario"],
+];
+grupos.forEach(([t, c, tablas], i) => {
+  const y = 3.18 + i * 0.78;
+  tarjeta(s, { x: M, y, w: ANCHO, h: 0.64, fill: MENTA });
+  pastilla(s, M + 0.22, y + 0.14, 1.3, 0.36, t, { fill: c, size: 10.5, color: c === AMBAR ? VERDE : BLANCO });
+  s.addText(tablas, { x: M + 1.74, y, w: ANCHO - 2.0, h: 0.64, isTextBox: true, margin: 0,
+    fontFace: MONO, fontSize: 11.5, color: TINTA, valign: "middle" });
+});
+
+tarjeta(s, { x: M, y: 5.6, w: ANCHO, h: 0.86, fill: "F6EADA" });
+s.addText([
+  { text: "Cuidado con la palabra «pedido».  ", options: { bold: true, color: "8A5A12" } },
+  { text: "Lo que el sistema llama pedido es una orden de VENTA: del cliente hacia la empresa. Una orden de COMPRA va al revés, de la empresa hacia el proveedor, y esa no existe." },
+], { x: M + 0.3, y: 5.6, w: ANCHO - 0.6, h: 0.86, isTextBox: true, margin: 0,
+     fontFace: SANS, fontSize: 12, color: TINTA, valign: "middle", lineSpacing: 17 });
+s.addNotes("Esta confusion de vocabulario es la que hace creer que el SRM ya existe. El sistema tiene ordenes de venta, no de compra.");
+
+// 4. CRM en detalle ---------------------------------------------------------
+s = pres.addSlide();
+titulo(s, "CRM: qué tablas y qué flujos lo forman", "El pilar más completo, aunque no se llame así en ninguna carpeta");
+
+tarjeta(s, { x: M, y: 1.86, w: ANCHO, h: 0.76, fill: VERDE });
+s.addText("usuarios  →  mascotas  →  citas  →  historias_clinicas        +  pedidos y suscripciones como historial",
+  { x: M + 0.34, y: 1.86, w: ANCHO - 0.68, h: 0.76, isTextBox: true, margin: 0,
+    fontFace: MONO, fontSize: 12.5, bold: true, color: BLANCO, valign: "middle" });
+
+[["Registro → bienvenida", "Se crea la cuenta y el correo sale solo."],
+ ["Atención → próxima fecha → recordatorio", "El veterinario escribe la fecha del próximo control. Cada mañana a las 08:00 el sistema barre las que caen en 15 días y escribe al dueño. Nadie revisa nada a mano."],
+ ["Suscripción → despacho → aviso", "El plan llega a su fecha, se emite el pedido solo y se notifica."],
+ ["El asistente consulta las cinco tablas", "Pelusa responde con los datos del cliente conectado, nunca con los de otro."]]
+  .forEach(([t, d], i) => {
+    const y = 2.84 + i * 0.84;
+    tarjeta(s, { x: M, y, w: ANCHO, h: 0.7, fill: MENTA });
+    s.addText(t, { x: M + 0.3, y, w: 4.6, h: 0.7, isTextBox: true, margin: 0,
+      fontFace: SERIF, fontSize: 13, bold: true, color: VERDE, valign: "middle" });
+    s.addText(d, { x: M + 5.1, y, w: ANCHO - 5.4, h: 0.7, isTextBox: true, margin: 0,
+      fontFace: SANS, fontSize: 11.5, color: TINTA, valign: "middle", lineSpacing: 16 });
+  });
+pie(s, "Lo que le falta: segmentación y campañas. No hay tabla de interacciones, así que no se puede filtrar «dueños de gato que no compran hace 60 días».");
+s.addNotes("Lo que convierte una base de datos en un CRM no son las tablas: son los tres flujos automaticos que salen de ellas sin que nadie los dispare.");
+
+// 5. ERP en detalle ---------------------------------------------------------
+s = pres.addSlide();
+titulo(s, "ERP: una rebanada sólida, sin esqueleto", "Lo que existe funciona; lo que falta es la base para decidir");
+
+tarjeta(s, { x: M, y: 1.84, w: C2d, h: 4.5, fill: MENTA });
+s.addText("LO QUE SÍ", { x: M + 0.3, y: 2.02, w: C2d - 0.6, h: 0.3, isTextBox: true, margin: 0,
+  fontFace: SANS, fontSize: 10.5, bold: true, color: VERDE_M, valign: "middle" });
+s.addText("El ciclo de venta e inventario", { x: M + 0.3, y: 2.34, w: C2d - 0.6, h: 0.42,
+  isTextBox: true, margin: 0, fontFace: SERIF, fontSize: 16, bold: true, color: VERDE, valign: "middle" });
+s.addText([
+  { text: "Descuento de stock en el mismo momento de confirmar, con bloqueo por producto y todo o nada.", options: { breakLine: true } },
+  { text: "Punto de reorden y semáforo por producto.", options: { breakLine: true } },
+  { text: "Pedido con secuencia de estados que no se puede saltar.", options: { breakLine: true } },
+  { text: "Registro del cobro con su resultado." },
+], { x: M + 0.3, y: 2.88, w: C2d - 0.6, h: 3.3, isTextBox: true, margin: 0,
+     fontFace: SANS, fontSize: 12, color: TINTA, valign: "top", lineSpacing: 19, paraSpaceAfter: 8 });
+
+tarjeta(s, { x: X2d, y: 1.84, w: C2d, h: 4.5, fill: VERDE });
+s.addText("LO QUE FALTA, POR GRAVEDAD", { x: X2d + 0.3, y: 2.02, w: C2d - 0.6, h: 0.3, isTextBox: true,
+  margin: 0, fontFace: SANS, fontSize: 10.5, bold: true, color: AMBAR, valign: "middle" });
+[["1", "No hay kardex", "El stock es una columna, no una historia. Sabes que quedan 15, pero no por qué: qué salió, cuándo ni por cuál pedido."],
+ ["2", "No hay precio de compra", "Solo existe el precio de venta. No se puede calcular el margen de un producto."],
+ ["3", "No hay compras ni contabilidad", "Cuentas por pagar, caja y facturación quedan fuera."]]
+  .forEach(([n, t, d], i) => {
+    const y = 2.46 + i * 1.28;
+    s.addText(n + ".  " + t, { x: X2d + 0.3, y, w: C2d - 0.6, h: 0.36, isTextBox: true, margin: 0,
+      fontFace: SERIF, fontSize: 14, bold: true, color: BLANCO, valign: "middle" });
+    s.addText(d, { x: X2d + 0.3, y: y + 0.38, w: C2d - 0.6, h: 0.8, isTextBox: true, margin: 0,
+      fontFace: SANS, fontSize: 11.5, color: CLARO, valign: "top", lineSpacing: 16 });
+  });
+s.addNotes("El kardex es lo mas grave y casi nadie lo nota: sin movimientos no hay consumo diario, y sin consumo diario el punto de reorden es un numero inventado.");
+
 // 3. Por que integrar el SRM ------------------------------------------------
 s = pres.addSlide();
 titulo(s, "Por qué sí hay que integrar el SRM", "El proceso hoy se corta a la mitad");
@@ -98,6 +190,66 @@ flujo.forEach(([t, c], i) => {
   });
 s.addNotes("El dolor N-03 del diagnóstico era la reposición dependiendo de la memoria del personal. Sin SRM ese problema no se resolvió: se movió un paso más adelante.");
 
+// Propuesta: las tablas -----------------------------------------------------
+s = pres.addSlide();
+titulo(s, "La propuesta: cinco tablas", "Cuatro para el SRM y una que es el cimiento de todo");
+
+const tablasNuevas = [
+  ["movimientos_inventario", "EL CIMIENTO", "Cada entrada y salida con su motivo y su documento. Es lo que permite saber el consumo diario, y sin consumo diario el punto de reorden es un número inventado.", true],
+  ["proveedores", "SRM", "Razón social, RUC, contacto y plazo de entrega en días.", false],
+  ["producto_proveedor", "SRM", "Precio de compra y código del proveedor. Sin esto no hay margen.", false],
+  ["ordenes_compra", "SRM", "Proveedor, fecha y estado: borrador, enviada, recibida o anulada.", false],
+  ["detalle_ordenes_compra", "SRM", "Producto, cantidad y precio pactado.", false],
+];
+let yy = 1.88;
+tablasNuevas.forEach(([tabla, etiqueta, texto, destacada]) => {
+  const alto = destacada ? 1.12 : 0.76;
+  tarjeta(s, { x: M, y: yy, w: ANCHO, h: alto, fill: destacada ? VERDE : MENTA });
+  pastilla(s, M + 0.22, yy + (alto - 0.34) / 2, 1.2, 0.34, etiqueta,
+    { fill: destacada ? AMBAR : VERDE_M, size: 9.5, color: destacada ? VERDE : BLANCO });
+  s.addText(tabla, { x: M + 1.62, y: yy + 0.08, w: 3.4, h: 0.36, isTextBox: true, margin: 0,
+    fontFace: MONO, fontSize: 12.5, bold: true, color: destacada ? BLANCO : VERDE, valign: "middle" });
+  s.addText(texto, { x: M + 1.62, y: yy + 0.42, w: ANCHO - 1.92, h: alto - 0.5, isTextBox: true,
+    margin: 0, fontFace: SANS, fontSize: 11.5, color: destacada ? CLARO : TINTA, valign: "top", lineSpacing: 16 });
+  yy += alto + 0.16;
+});
+s.addNotes("El kardex va primero, y es la correccion mas importante del analisis: un SRM que dispara compras sobre un punto de reorden inventado, compra mal.");
+
+// Propuesta: el ciclo cerrado -----------------------------------------------
+s = pres.addSlide();
+titulo(s, "La propuesta: el ciclo se cierra", "Reutilizando lo que ya existe, no empezando de cero");
+
+const ciclo = [
+  ["Semáforo en rojo", "InventarioService::porReponer()", "ya existe"],
+  ["Orden en borrador", "AbastecimientoService agrupa por proveedor", "nuevo"],
+  ["Correo al proveedor", "CorreoService y una plantilla más", "ya existe"],
+  ["Recepción", "Suma stock y deja el movimiento", "nuevo"],
+];
+ciclo.forEach(([t, d, estado], i) => {
+  const w = (ANCHO - 3 * 0.26) / 4, x = M + i * (w + 0.26);
+  const existe = estado === "ya existe";
+  tarjeta(s, { x, y: 2.0, w, h: 2.5, fill: existe ? MENTA : VERDE });
+  s.addText(String(i + 1), { x: x + 0.26, y: 2.2, w: 0.5, h: 0.46, isTextBox: true, margin: 0,
+    fontFace: SERIF, fontSize: 24, bold: true, color: existe ? VERDE : AMBAR, valign: "middle" });
+  s.addText(t, { x: x + 0.26, y: 2.74, w: w - 0.52, h: 0.6, isTextBox: true, margin: 0,
+    fontFace: SERIF, fontSize: 14, bold: true, color: existe ? VERDE : BLANCO, valign: "middle" });
+  s.addText(d, { x: x + 0.26, y: 3.38, w: w - 0.52, h: 0.76, isTextBox: true, margin: 0,
+    fontFace: SANS, fontSize: 11, color: existe ? GRIS : CLARO, valign: "top", lineSpacing: 15 });
+  pastilla(s, x + 0.26, 4.1, 1.5, 0.3, estado, { fill: existe ? VERDE_M : AMBAR, size: 9,
+    color: existe ? BLANCO : VERDE });
+});
+s.addText("Un comando programado dispara el ciclo de madrugada, igual que el despacho de suscripciones.",
+  { x: M, y: 4.76, w: ANCHO, h: 0.4, isTextBox: true, margin: 0, align: "center",
+    fontFace: SANS, fontSize: 12.5, color: GRIS, valign: "middle" });
+
+tarjeta(s, { x: M, y: 5.4, w: ANCHO, h: 0.9, fill: MENTA });
+s.addText([
+  { text: "Tres reglas nuevas.  ", options: { bold: true, color: VERDE } },
+  { text: "No se emite una orden sin proveedor. Recibir mercadería suma stock y nunca lo resta. No se emite una segunda orden de un producto que ya tiene una pendiente." },
+], { x: M + 0.3, y: 5.4, w: ANCHO - 0.6, h: 0.9, isTextBox: true, margin: 0,
+     fontFace: SANS, fontSize: 12, color: TINTA, valign: "middle", lineSpacing: 17 });
+s.addNotes("La mitad del trabajo ya esta hecho: el semaforo y el envio de correo existen. Lo nuevo es el servicio que arma la orden y la pantalla de recepcion.");
+
 // 4. Por que NO el ERP completo ---------------------------------------------
 s = pres.addSlide();
 titulo(s, "Por qué no un ERP completo", "Contabilidad, cuentas por pagar, caja y nómina quedan fuera, a propósito");
@@ -122,6 +274,36 @@ s.addText([
 ], { x: M + 0.3, y: 5.46, w: ANCHO - 0.6, h: 0.92, isTextBox: true, margin: 0,
      fontFace: SANS, fontSize: 12, color: TINTA, valign: "middle", lineSpacing: 17 });
 s.addNotes("Decir «fuera de alcance, por esta razón» vale más que ponerlo en el diagrama y no tenerlo.");
+
+// La decision --------------------------------------------------------------
+s = pres.addSlide();
+titulo(s, "¿Lo necesitamos?", "La respuesta no es la misma para todo");
+
+const filas = [
+  ["Kardex y precio de compra", "SÍ, primero", VERDE, "Sin movimientos no hay consumo diario; sin costo no hay margen. Es la base del resto."],
+  ["SRM mínimo", "SÍ", VERDE, "Proveedor, orden de compra y recepción. Cierra el ciclo y cumple lo que promete la Entrega 1."],
+  ["SRM completo", "NO", ROJO, "Licitaciones, evaluación de proveedores y contratos marco. Con dos proveedores locales, es burocracia."],
+  ["ERP contable", "NO", ROJO, "La empresa ya lo lleva en su sistema. Duplicarlo crea dos verdades sobre el mismo dinero."],
+  ["Campañas de CRM", "AHORA NO", AMBAR, "Deseable, pero no es lo que hoy le hace perder dinero al negocio."],
+];
+filas.forEach(([que, veredicto, color, porque], i) => {
+  const y = 1.9 + i * 0.86;
+  tarjeta(s, { x: M, y, w: ANCHO, h: 0.74, fill: MENTA });
+  s.addText(que, { x: M + 0.28, y, w: 3.1, h: 0.74, isTextBox: true, margin: 0,
+    fontFace: SERIF, fontSize: 13.5, bold: true, color: VERDE, valign: "middle" });
+  pastilla(s, M + 3.5, y + 0.19, 1.5, 0.36, veredicto, { fill: color, size: 10.5,
+    color: color === AMBAR ? VERDE : BLANCO });
+  s.addText(porque, { x: M + 5.26, y, w: ANCHO - 5.56, h: 0.74, isTextBox: true, margin: 0,
+    fontFace: SANS, fontSize: 11.5, color: TINTA, valign: "middle", lineSpacing: 16 });
+});
+
+tarjeta(s, { x: M, y: 6.26, w: ANCHO, h: 0.6, fill: "F6EADA" });
+s.addText([
+  { text: "Para la entrega del curso, no.  ", options: { bold: true, color: "8A5A12" } },
+  { text: "El alcance está firmado y ningún requerimiento menciona proveedores. Para el negocio sí, en ese orden." },
+], { x: M + 0.3, y: 6.26, w: ANCHO - 0.6, h: 0.6, isTextBox: true, margin: 0,
+     fontFace: SANS, fontSize: 11.5, color: TINTA, valign: "middle" });
+s.addNotes("Esta es la lamina que decide. Lo defendible es reconocer la brecha, saber en que orden se cierra y por que, no construirla a las apuradas.");
 
 // 5. Cierre -----------------------------------------------------------------
 s = pres.addSlide();
