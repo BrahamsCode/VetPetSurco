@@ -69,7 +69,7 @@ pilares.forEach(([sigla, que, estado, color, texto], i) => {
   s.addText(texto, { x: X3[i] + 0.3, y: 3.96, w: C3 - 0.6, h: 2.1, isTextBox: true, margin: 0,
     fontFace: SANS, fontSize: 12, color: TINTA, valign: "top", lineSpacing: 17 });
 });
-pie(s, "Busqué «proveedor», «orden de compra» y «abastecimiento» en todo el proyecto: cero resultados.");
+pie(s, "«Proveedor» aparece en el proyecto solo como comentario en el SQL y como promesa en la Entrega 1: no hay tabla, ni modelo, ni pantalla.");
 s.addNotes("Importante: esto no sale del documento, sale de revisar el código. El CRM existe aunque no se llame asi en ninguna carpeta.");
 
 // 3. Por que integrar el SRM ------------------------------------------------
