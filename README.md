@@ -70,6 +70,7 @@ La aplicación vive en `public_html/` y toda la configuración de Docker queda f
 
 | Documento | Contenido |
 | --- | --- |
+| [Presentación del Trabajo Final](docs/trabajo-final/TrabajoFinal_Presentacion.pptx) | 16 diapositivas para la sustentación: el negocio, el modelo B2C, los pilares de gestión, la arquitectura, las 22 reglas, el carrito, la pasarela, la seguridad y las conclusiones. |
 | [Trabajo Final](docs/trabajo-final/TrabajoFinal_VetPetConnect.docx) | El informe completo siguiendo el temario del curso: carátula, introducción, los cinco capítulos, conclusiones, recomendaciones y bibliografía en APA. |
 | [Capturas del entregable](docs/trabajo-final/capturas/) | Blog corporativo, documentos legales, carrito y pasarela de pago. |
 | [Guía de despliegue](docs/DESPLIEGUE.md) | Cómo publicar la plataforma en Render con el blueprint `render.yaml`. |
