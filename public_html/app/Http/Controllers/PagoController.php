@@ -23,8 +23,7 @@ class PagoController extends Controller
     public function __construct(
         private readonly PagoService $pagos,
         private readonly Pasarela $pasarela,
-    ) {
-    }
+    ) {}
 
     public function mostrar(Request $request, Pedido $pedido): View
     {

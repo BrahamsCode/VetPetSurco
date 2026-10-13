@@ -19,8 +19,7 @@ final class CambioSuscripcionMail extends Mailable
     public function __construct(
         private readonly Suscripcion $suscripcion,
         private readonly string $nuevoEstado,
-    ) {
-    }
+    ) {}
 
     public function envelope(): Envelope
     {

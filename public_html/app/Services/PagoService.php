@@ -20,9 +20,7 @@ use App\Models\Pedido;
  */
 final class PagoService
 {
-    public function __construct(private readonly Pasarela $pasarela)
-    {
-    }
+    public function __construct(private readonly Pasarela $pasarela) {}
 
     /**
      * Cobra el pedido con el token que genero el checkout en el navegador.
@@ -32,7 +30,7 @@ final class PagoService
      * fallo la primera.
      *
      * @throws EstadoPedidoInvalidoException si el pedido ya no esta PENDIENTE (RN-13)
-     * @throws PagoRechazadoException        si la pasarela no aprueba el cobro (RN-21)
+     * @throws PagoRechazadoException si la pasarela no aprueba el cobro (RN-21)
      */
     public function cobrar(Pedido $pedido, string $token, string $correo): Pago
     {
@@ -57,7 +55,7 @@ final class PagoService
 
         // RN-21: el registro va antes de decidir, para que un rechazo tambien
         // deje huella.
-        $pago = new Pago();
+        $pago = new Pago;
         $pago->pedido_id = $pedido->getKey();
         $pago->cargo_culqi = $resultado->cargoId;
         $pago->monto = CarritoService::aDecimal($centimos);

@@ -1,0 +1,83 @@
+# ---------------------------------------------------------------------------
+# Blueprint de Render para VetPet Connect.
+#
+# Crea dos recursos: el servicio web con la aplicacion Laravel en un
+# contenedor, y una base de datos PostgreSQL. Las credenciales de la base se
+# inyectan solas desde el recurso, sin escribirlas en ningun archivo.
+#
+# Uso: en Render, New > Blueprint, apuntar al repositorio y elegir la rama.
+# ---------------------------------------------------------------------------
+services:
+  - type: web
+    name: vetpet-connect
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./docker/render/Dockerfile
+    dockerContext: .
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: APP_NAME
+        value: VetPet Connect
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        generateValue: true
+      - key: APP_TIMEZONE
+        value: America/Lima
+      - key: APP_LOCALE
+        value: es
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        fromDatabase:
+          name: vetpet-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: vetpet-db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: vetpet-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: vetpet-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: vetpet-db
+          property: password
+      # Correo: sin servidor configurado los avisos quedan en el log y no
+      # rompen ningun flujo (CorreoService atrapa el fallo).
+      - key: MAIL_MAILER
+        value: log
+      - key: MAIL_FROM_ADDRESS
+        value: contacto@vetpetsurco.pe
+      - key: MAIL_FROM_NAME
+        value: VetPet Surco
+      # Pasarela: sin llaves de Culqi se usa la implementacion simulada, que
+      # permite demostrar el flujo de cobro aprobado y rechazado.
+      - key: CULQI_LLAVE_PUBLICA
+        sync: false
+      - key: CULQI_LLAVE_SECRETA
+        sync: false
+
+databases:
+  - name: vetpet-db
+    plan: free
+    region: oregon
+    databaseName: vetpet_connect
+    user: vetpet

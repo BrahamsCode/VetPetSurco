@@ -92,7 +92,7 @@
 
   <footer class="pie">
     <div class="contenedor pie-final">
-      <p>Plataforma acad&eacute;mica de VetPet Connect &mdash; Curso de E-business, Equipo 4, 2026.</p>
+      <p>Plataforma acad&eacute;mica de VetPet Connect &mdash; Curso de E-business, 2026.</p>
     </div>
   </footer>
 

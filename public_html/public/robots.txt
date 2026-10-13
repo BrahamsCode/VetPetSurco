@@ -1,2 +1,11 @@
+# VetPet Surco — robots.txt
+# Lo publico se indexa; la plataforma del cliente, no.
+
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /app/
+Disallow: /ingresar
+Disallow: /registro
+Disallow: /boletin/baja/
+
+Sitemap: /sitemap.xml

@@ -24,7 +24,7 @@ final class StockInsuficienteException extends ReglaDeNegocioException
     private array $faltantes;
 
     /**
-     * @param array<int, array{producto_id: int|null, nombre: string, pedida: int, disponible: int}> $faltantes
+     * @param  array<int, array{producto_id: int|null, nombre: string, pedida: int, disponible: int}>  $faltantes
      */
     public function __construct(array $faltantes = [], string $mensaje = '', ?Throwable $anterior = null)
     {
@@ -33,8 +33,8 @@ final class StockInsuficienteException extends ReglaDeNegocioException
         if ($mensaje === '') {
             $mensaje = $faltantes === []
                 ? 'No hay líneas que confirmar.'
-                : 'Stock insuficiente → ' . self::describir($faltantes)
-                  . '. No se registró ninguna parte del pedido.';
+                : 'Stock insuficiente → '.self::describir($faltantes)
+                  .'. No se registró ninguna parte del pedido.';
         }
 
         parent::__construct($mensaje, 0, $anterior);
@@ -59,7 +59,7 @@ final class StockInsuficienteException extends ReglaDeNegocioException
      * Arma el mismo texto que produce el procedimiento almacenado:
      * «Nombre (pedido: 5, disponible: 2); Otro (pedido: 3, disponible: 0)».
      *
-     * @param array<int, array{producto_id: int|null, nombre: string, pedida: int, disponible: int}> $faltantes
+     * @param  array<int, array{producto_id: int|null, nombre: string, pedida: int, disponible: int}>  $faltantes
      */
     private static function describir(array $faltantes): string
     {

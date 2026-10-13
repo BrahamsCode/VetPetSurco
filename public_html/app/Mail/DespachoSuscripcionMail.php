@@ -29,8 +29,7 @@ final class DespachoSuscripcionMail extends Mailable
         private readonly Suscripcion $suscripcion,
         private readonly Pedido $pedido,
         private readonly Usuario $cliente,
-    ) {
-    }
+    ) {}
 
     public function envelope(): Envelope
     {

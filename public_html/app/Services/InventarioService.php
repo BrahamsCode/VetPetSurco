@@ -26,7 +26,7 @@ final class InventarioService
      */
     public function semaforo(Producto $p): Semaforo
     {
-        $stock  = (int) $p->stock_actual;
+        $stock = (int) $p->stock_actual;
         $reorden = (int) $p->punto_reorden;
 
         if ($stock <= $reorden) {

@@ -36,12 +36,12 @@ final class CarritoService
 
         foreach ($this->lineas() as $linea) {
             $items[] = [
-                'producto_id'     => $linea['producto_id'],
-                'nombre'          => $linea['nombre'],
+                'producto_id' => $linea['producto_id'],
+                'nombre' => $linea['nombre'],
                 'precio_unitario' => $linea['precio_unitario'],
-                'cantidad'        => $linea['cantidad'],
+                'cantidad' => $linea['cantidad'],
                 // RN-11: el subtotal es siempre un cálculo, jamás un dato guardado.
-                'subtotal'        => self::aDecimal(
+                'subtotal' => self::aDecimal(
                     self::aCentimos($linea['precio_unitario']) * $linea['cantidad'],
                 ),
             ];
@@ -64,18 +64,18 @@ final class CarritoService
         $this->exigirCantidadPositiva($cantidad);   // RN-10
 
         $lineas = $this->lineas();
-        $id     = (int) $p->getKey();
+        $id = (int) $p->getKey();
 
         if (isset($lineas[$id])) {
             // RN-09: una sola línea por producto; se suma la cantidad.
             $lineas[$id]['cantidad'] += $cantidad;
         } else {
             $lineas[$id] = [
-                'producto_id'     => $id,
-                'nombre'          => (string) $p->nombre,
+                'producto_id' => $id,
+                'nombre' => (string) $p->nombre,
                 // RN-11: precio congelado en el momento de agregar.
                 'precio_unitario' => self::aDecimal(self::aCentimos($p->precio)),
-                'cantidad'        => $cantidad,
+                'cantidad' => $cantidad,
             ];
         }
 
@@ -167,7 +167,7 @@ final class CarritoService
     private function exigirCantidadPositiva(int $cantidad): void
     {
         if ($cantidad <= 0) {
-            throw new CantidadInvalidaException();
+            throw new CantidadInvalidaException;
         }
     }
 
@@ -185,7 +185,7 @@ final class CarritoService
     }
 
     /**
-     * @param array<int, array{producto_id: int, nombre: string, precio_unitario: string, cantidad: int}> $lineas
+     * @param  array<int, array{producto_id: int, nombre: string, precio_unitario: string, cantidad: int}>  $lineas
      */
     private function guardar(array $lineas): void
     {
@@ -215,7 +215,7 @@ final class CarritoService
 
         [$enteros, $decimales] = array_pad(explode('.', $texto, 2), 2, '');
 
-        $enteros   = preg_replace('/\D/', '', $enteros) ?? '';
+        $enteros = preg_replace('/\D/', '', $enteros) ?? '';
         $decimales = preg_replace('/\D/', '', $decimales) ?? '';
 
         // Tres decimales: los dos que se guardan más uno para redondear.
@@ -236,10 +236,10 @@ final class CarritoService
      */
     public static function aDecimal(int $centimos): string
     {
-        $signo    = $centimos < 0 ? '-' : '';
+        $signo = $centimos < 0 ? '-' : '';
         $absoluto = abs($centimos);
 
-        return $signo . intdiv($absoluto, 100)
-            . '.' . str_pad((string) ($absoluto % 100), 2, '0', STR_PAD_LEFT);
+        return $signo.intdiv($absoluto, 100)
+            .'.'.str_pad((string) ($absoluto % 100), 2, '0', STR_PAD_LEFT);
     }
 }

@@ -8,8 +8,8 @@ use App\Models\Pedido;
 use App\Models\Producto;
 use App\Models\Suscripcion;
 use App\Models\Usuario;
-use App\Services\InventarioService;
 use App\Services\HistoriaClinicaService;
+use App\Services\InventarioService;
 use App\Services\PedidoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -30,8 +30,7 @@ class AdminController extends Controller
         private readonly InventarioService $inventario,
         private readonly PedidoService $pedidos,
         private readonly HistoriaClinicaService $historias,
-    ) {
-    }
+    ) {}
 
     public function index(): View
     {

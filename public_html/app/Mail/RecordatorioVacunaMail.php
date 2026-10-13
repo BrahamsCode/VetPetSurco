@@ -21,8 +21,7 @@ final class RecordatorioVacunaMail extends Mailable
     /** @param array{mascota: string, cliente: string, vacuna_aplicada: string|null, proxima_fecha: string, dias_restantes: int} $recordatorio */
     public function __construct(
         private readonly array $recordatorio,
-    ) {
-    }
+    ) {}
 
     public function envelope(): Envelope
     {

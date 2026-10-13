@@ -16,8 +16,8 @@ interface Pasarela
     /**
      * Cobra un token de tarjeta generado en el navegador.
      *
-     * @param int    $centimos Monto en centimos enteros.
-     * @param string $token    Token de tarjeta; el numero nunca llega aqui.
+     * @param  int  $centimos  Monto en centimos enteros.
+     * @param  string  $token  Token de tarjeta; el numero nunca llega aqui.
      */
     public function cobrar(int $centimos, string $token, string $correo, string $descripcion): ResultadoCargo;
 

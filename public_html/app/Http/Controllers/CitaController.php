@@ -26,9 +26,7 @@ class CitaController extends Controller
     /** Bloques de atencion del local. */
     private const HORARIOS = ['09:00', '10:00', '11:00', '12:00', '15:00', '16:00', '17:00', '18:00'];
 
-    public function __construct(private readonly AgendaService $agenda)
-    {
-    }
+    public function __construct(private readonly AgendaService $agenda) {}
 
     public function index(Request $request): View
     {

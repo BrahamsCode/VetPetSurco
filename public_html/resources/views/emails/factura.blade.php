@@ -56,6 +56,6 @@
 
   <p style="margin:16px 0 0 0;font-size:11px;color:#8a978f;">
     Documento sin validez tributaria: proyecto acad&eacute;mico del Curso de
-    E-business (Equipo 4, 2026).
+    E-business (2026).
   </p>
 @endsection

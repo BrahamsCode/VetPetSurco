@@ -18,8 +18,7 @@ class CatalogoController extends Controller
     public function __construct(
         private readonly InventarioService $inventario,
         private readonly CarritoService $carrito,
-    ) {
-    }
+    ) {}
 
     public function index(Request $request): View
     {

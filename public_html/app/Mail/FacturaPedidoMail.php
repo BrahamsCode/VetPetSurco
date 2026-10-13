@@ -21,8 +21,7 @@ final class FacturaPedidoMail extends Mailable
 
     public function __construct(
         private readonly Pedido $pedido,
-    ) {
-    }
+    ) {}
 
     public function envelope(): Envelope
     {

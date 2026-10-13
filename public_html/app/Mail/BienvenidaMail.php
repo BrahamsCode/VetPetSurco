@@ -16,8 +16,7 @@ final class BienvenidaMail extends Mailable
 
     public function __construct(
         private readonly Usuario $usuario,
-    ) {
-    }
+    ) {}
 
     public function envelope(): Envelope
     {

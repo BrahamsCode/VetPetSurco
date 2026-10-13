@@ -21,8 +21,7 @@ final readonly class ResultadoCargo
         public ?string $marca,
         public ?string $ultimosCuatro,
         public ?string $mensaje,
-    ) {
-    }
+    ) {}
 
     public static function aprobado(
         string $cargoId,

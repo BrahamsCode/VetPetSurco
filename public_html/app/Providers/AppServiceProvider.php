@@ -21,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(Pasarela::class, static function (): Pasarela {
             $llave = (string) config('services.culqi.llave_secreta');
 
-            return $llave === '' ? new PasarelaSimulada() : new PasarelaCulqi();
+            return $llave === '' ? new PasarelaSimulada : new PasarelaCulqi;
         });
     }
 

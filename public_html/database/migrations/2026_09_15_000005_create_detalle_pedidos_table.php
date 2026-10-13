@@ -33,7 +33,7 @@ return new class extends Migration
         });
 
         // Laravel no tiene API de esquema para CHECK: se añade con SQL directo.
-        if (in_array(DB::getDriverName(), ['mysql', 'mariadb'], true)) {
+        if (in_array(DB::getDriverName(), ['mysql', 'mariadb', 'pgsql'], true)) {
             // RN-10: no se admiten lineas con cantidad cero o negativa.
             DB::statement('ALTER TABLE detalle_pedidos ADD CONSTRAINT chk_cantidad_positiva CHECK (cantidad > 0)');
         }

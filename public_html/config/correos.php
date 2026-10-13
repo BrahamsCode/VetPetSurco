@@ -61,5 +61,9 @@ return [
             'etiqueta' => 'Mensaje de cliente',
             'color' => '#5d6b66',
         ],
+        'boletin' => [
+            'etiqueta' => 'Boletín VetPet',
+            'color' => '#2c7a6b',
+        ],
     ],
 ];

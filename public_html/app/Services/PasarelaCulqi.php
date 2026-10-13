@@ -32,8 +32,8 @@ final class PasarelaCulqi implements Pasarela
     /**
      * Cobra un token de tarjeta generado en el navegador.
      *
-     * @param int    $centimos Monto en centimos enteros, como lo exige Culqi.
-     * @param string $token    Token `tkn_...` que devolvio el checkout.
+     * @param  int  $centimos  Monto en centimos enteros, como lo exige Culqi.
+     * @param  string  $token  Token `tkn_...` que devolvio el checkout.
      */
     public function cobrar(int $centimos, string $token, string $correo, string $descripcion): ResultadoCargo
     {

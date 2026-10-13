@@ -80,8 +80,8 @@ final class PedidoTest extends TestCase
     public function test_rn12_la_excepcion_reune_todas_las_lineas_que_no_alcanzan(): void
     {
         $cliente = Usuario::factory()->cliente()->create();
-        $uno  = Producto::factory()->create(['nombre' => 'Vitaminas', 'stock_actual' => 3]);
-        $dos  = Producto::factory()->create(['nombre' => 'Arena', 'stock_actual' => 0]);
+        $uno = Producto::factory()->create(['nombre' => 'Vitaminas', 'stock_actual' => 3]);
+        $dos = Producto::factory()->create(['nombre' => 'Arena', 'stock_actual' => 0]);
 
         try {
             app(PedidoService::class)->confirmar($cliente, [
@@ -137,7 +137,7 @@ final class PedidoTest extends TestCase
     /** Un producto que ya no existe en el catálogo también tumba el pedido. */
     public function test_rn12_un_producto_inexistente_tumba_el_pedido_completo(): void
     {
-        $cliente  = Usuario::factory()->cliente()->create();
+        $cliente = Usuario::factory()->cliente()->create();
         $producto = Producto::factory()->create(['stock_actual' => 10]);
 
         $this->expectException(StockInsuficienteException::class);
@@ -161,7 +161,7 @@ final class PedidoTest extends TestCase
     public function test_rn13_el_pedido_recorre_la_secuencia_completa_de_estados(): void
     {
         $servicio = app(PedidoService::class);
-        $pedido   = Pedido::factory()->enEstado(EstadoPedido::PENDIENTE)->create();
+        $pedido = Pedido::factory()->enEstado(EstadoPedido::PENDIENTE)->create();
 
         $this->assertSame(EstadoPedido::PAGADO, $servicio->avanzarEstado($pedido)->estado);
         $this->assertSame(EstadoPedido::ENVIADO, $servicio->avanzarEstado($pedido)->estado);
@@ -169,7 +169,7 @@ final class PedidoTest extends TestCase
 
         $this->assertDatabaseHas('pedidos', [
             'pedido_id' => $pedido->pedido_id,
-            'estado'    => EstadoPedido::ENTREGADO->value,
+            'estado' => EstadoPedido::ENTREGADO->value,
         ]);
     }
 
@@ -207,14 +207,14 @@ final class PedidoTest extends TestCase
 
         $this->assertDatabaseHas('pedidos', [
             'pedido_id' => $pedido->pedido_id,
-            'estado'    => EstadoPedido::ANULADO->value,
+            'estado' => EstadoPedido::ANULADO->value,
         ]);
     }
 
     /** La ruta del panel administrativo avanza el pedido un paso. */
     public function test_rn13_la_ruta_del_admin_avanza_el_pedido_un_solo_paso(): void
     {
-        $admin  = Usuario::factory()->admin()->create();
+        $admin = Usuario::factory()->admin()->create();
         $pedido = Pedido::factory()->enEstado(EstadoPedido::PAGADO)->create();
 
         $respuesta = $this->actingAs($admin)
@@ -225,7 +225,7 @@ final class PedidoTest extends TestCase
         $respuesta->assertSessionHas('resultado', fn (array $r): bool => $r['ok'] === true);
         $this->assertDatabaseHas('pedidos', [
             'pedido_id' => $pedido->pedido_id,
-            'estado'    => EstadoPedido::ENVIADO->value,
+            'estado' => EstadoPedido::ENVIADO->value,
         ]);
     }
 
@@ -235,7 +235,7 @@ final class PedidoTest extends TestCase
      */
     public function test_rn13_la_ruta_del_admin_avisa_cuando_el_pedido_ya_no_puede_avanzar(): void
     {
-        $admin  = Usuario::factory()->admin()->create();
+        $admin = Usuario::factory()->admin()->create();
         $pedido = Pedido::factory()->enEstado(EstadoPedido::ENTREGADO)->create();
 
         $respuesta = $this->actingAs($admin)
@@ -246,7 +246,7 @@ final class PedidoTest extends TestCase
         $respuesta->assertSessionHas('resultado', fn (array $r): bool => $r['ok'] === false && $r['regla'] === 'RN-13');
         $this->assertDatabaseHas('pedidos', [
             'pedido_id' => $pedido->pedido_id,
-            'estado'    => EstadoPedido::ENTREGADO->value,
+            'estado' => EstadoPedido::ENTREGADO->value,
         ]);
     }
 
@@ -258,10 +258,10 @@ final class PedidoTest extends TestCase
         $this->expectException(QueryException::class);
 
         DB::table('pedidos')->insert([
-            'cliente_id'  => $cliente->usuario_id,
+            'cliente_id' => $cliente->usuario_id,
             'monto_total' => 100.00,
             'tipo_origen' => TipoOrigen::COMPRA_DIRECTA->value,
-            'estado'      => 'DEVUELTO',
+            'estado' => 'DEVUELTO',
         ]);
     }
 
@@ -291,7 +291,7 @@ final class PedidoTest extends TestCase
         $this->assertSame(TipoOrigen::SUSCRIPCION, $recurrente->fresh()->tipo_origen);
 
         $this->assertDatabaseHas('pedidos', [
-            'pedido_id'   => $recurrente->pedido_id,
+            'pedido_id' => $recurrente->pedido_id,
             'tipo_origen' => TipoOrigen::SUSCRIPCION->value,
         ]);
         $this->assertSame(
@@ -306,7 +306,7 @@ final class PedidoTest extends TestCase
      */
     public function test_rn14_el_pedido_confirmado_nace_pendiente_y_con_su_origen(): void
     {
-        $cliente  = Usuario::factory()->cliente()->create();
+        $cliente = Usuario::factory()->cliente()->create();
         $producto = Producto::factory()->create(['precio' => '50.00', 'stock_actual' => 20]);
 
         $pedido = app(PedidoService::class)->confirmar(
@@ -327,10 +327,10 @@ final class PedidoTest extends TestCase
         $this->expectException(QueryException::class);
 
         DB::table('pedidos')->insert([
-            'cliente_id'  => $cliente->usuario_id,
+            'cliente_id' => $cliente->usuario_id,
             'monto_total' => 100.00,
             'tipo_origen' => 'REGALO',
-            'estado'      => EstadoPedido::PENDIENTE->value,
+            'estado' => EstadoPedido::PENDIENTE->value,
         ]);
     }
 }

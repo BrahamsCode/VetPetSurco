@@ -24,9 +24,7 @@ use Illuminate\Support\Carbon;
  */
 final class DespachoService
 {
-    public function __construct(private readonly PedidoService $pedidos)
-    {
-    }
+    public function __construct(private readonly PedidoService $pedidos) {}
 
     /**
      * Emite los despachos de todas las suscripciones activas que ya vencieron.

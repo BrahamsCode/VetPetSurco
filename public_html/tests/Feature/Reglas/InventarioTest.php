@@ -33,11 +33,11 @@ final class InventarioTest extends TestCase
     private function formulario(array $cambios = []): array
     {
         return array_merge([
-            'codigo_sku'    => 'ALI-NUE-01',
-            'nombre'        => 'Alimento nuevo',
-            'categoria'     => CategoriaProducto::ALIMENTO->value,
-            'precio'        => '89.90',
-            'stock_actual'  => 20,
+            'codigo_sku' => 'ALI-NUE-01',
+            'nombre' => 'Alimento nuevo',
+            'categoria' => CategoriaProducto::ALIMENTO->value,
+            'precio' => '89.90',
+            'stock_actual' => 20,
             'punto_reorden' => 5,
         ], $cambios);
     }
@@ -72,13 +72,13 @@ final class InventarioTest extends TestCase
 
         // INSERT directo: se salta el Form Request y el modelo.
         DB::table('productos')->insert([
-            'codigo_sku'    => 'ALI-PER-15K',
-            'nombre'        => 'Duplicado',
-            'categoria'     => CategoriaProducto::ALIMENTO->value,
-            'precio'        => 50.00,
-            'stock_actual'  => 10,
+            'codigo_sku' => 'ALI-PER-15K',
+            'nombre' => 'Duplicado',
+            'categoria' => CategoriaProducto::ALIMENTO->value,
+            'precio' => 50.00,
+            'stock_actual' => 10,
             'punto_reorden' => 5,
-            'activo'        => 1,
+            'activo' => 1,
         ]);
     }
 
@@ -123,13 +123,13 @@ final class InventarioTest extends TestCase
         $this->expectException(QueryException::class);
 
         DB::table('productos')->insert([
-            'codigo_sku'    => 'ALI-GRA-00',
-            'nombre'        => 'Producto gratis',
-            'categoria'     => CategoriaProducto::ALIMENTO->value,
-            'precio'        => 0,
-            'stock_actual'  => 10,
+            'codigo_sku' => 'ALI-GRA-00',
+            'nombre' => 'Producto gratis',
+            'categoria' => CategoriaProducto::ALIMENTO->value,
+            'precio' => 0,
+            'stock_actual' => 10,
             'punto_reorden' => 5,
-            'activo'        => 1,
+            'activo' => 1,
         ]);
     }
 
@@ -139,13 +139,13 @@ final class InventarioTest extends TestCase
         $this->expectException(QueryException::class);
 
         DB::table('productos')->insert([
-            'codigo_sku'    => 'ALI-NEG-01',
-            'nombre'        => 'Producto con precio negativo',
-            'categoria'     => CategoriaProducto::ALIMENTO->value,
-            'precio'        => -1.00,
-            'stock_actual'  => 10,
+            'codigo_sku' => 'ALI-NEG-01',
+            'nombre' => 'Producto con precio negativo',
+            'categoria' => CategoriaProducto::ALIMENTO->value,
+            'precio' => -1.00,
+            'stock_actual' => 10,
             'punto_reorden' => 5,
-            'activo'        => 1,
+            'activo' => 1,
         ]);
     }
 
@@ -159,13 +159,13 @@ final class InventarioTest extends TestCase
         $this->expectException(QueryException::class);
 
         DB::table('productos')->insert([
-            'codigo_sku'    => 'ALI-NEG-02',
-            'nombre'        => 'Producto con stock negativo',
-            'categoria'     => CategoriaProducto::ALIMENTO->value,
-            'precio'        => 50.00,
-            'stock_actual'  => -1,
+            'codigo_sku' => 'ALI-NEG-02',
+            'nombre' => 'Producto con stock negativo',
+            'categoria' => CategoriaProducto::ALIMENTO->value,
+            'precio' => 50.00,
+            'stock_actual' => -1,
             'punto_reorden' => 5,
-            'activo'        => 1,
+            'activo' => 1,
         ]);
     }
 
@@ -186,7 +186,7 @@ final class InventarioTest extends TestCase
     /** Capa de aplicación: la compra descuenta el stock y nunca lo deja negativo. */
     public function test_rn07_la_compra_descuenta_el_stock_sin_dejarlo_negativo(): void
     {
-        $cliente  = Usuario::factory()->cliente()->create();
+        $cliente = Usuario::factory()->cliente()->create();
         $producto = Producto::factory()->create(['stock_actual' => 24, 'precio' => '129.90']);
 
         app(PedidoService::class)->confirmar(
@@ -202,7 +202,7 @@ final class InventarioTest extends TestCase
     /** Capa de aplicación: pedir más de lo que hay no toca el inventario. */
     public function test_rn07_un_pedido_mayor_que_el_stock_deja_el_inventario_intacto(): void
     {
-        $cliente  = Usuario::factory()->cliente()->create();
+        $cliente = Usuario::factory()->cliente()->create();
         $producto = Producto::factory()->create(['stock_actual' => 3]);
 
         try {
@@ -229,7 +229,7 @@ final class InventarioTest extends TestCase
         $inventario = app(InventarioService::class);
 
         $agotado = Producto::factory()->create(['stock_actual' => 0, 'punto_reorden' => 5]);
-        $justo   = Producto::factory()->create(['stock_actual' => 5, 'punto_reorden' => 5]);
+        $justo = Producto::factory()->create(['stock_actual' => 5, 'punto_reorden' => 5]);
         $ajustado = Producto::factory()->create(['stock_actual' => 8, 'punto_reorden' => 5]);
         $holgado = Producto::factory()->create(['stock_actual' => 40, 'punto_reorden' => 5]);
 
@@ -246,7 +246,7 @@ final class InventarioTest extends TestCase
         $inventario = app(InventarioService::class);
 
         $agotado = Producto::factory()->create(['stock_actual' => 0, 'punto_reorden' => 5]);
-        $justo   = Producto::factory()->create(['stock_actual' => 5, 'punto_reorden' => 5]);
+        $justo = Producto::factory()->create(['stock_actual' => 5, 'punto_reorden' => 5]);
         Producto::factory()->create(['stock_actual' => 40, 'punto_reorden' => 5]);
         // Un producto retirado del catálogo no entra en la alerta de reposición.
         Producto::factory()->inactivo()->create(['stock_actual' => 0, 'punto_reorden' => 5]);
@@ -264,8 +264,8 @@ final class InventarioTest extends TestCase
     public function test_rn08_una_compra_puede_dejar_el_producto_en_rojo(): void
     {
         $inventario = app(InventarioService::class);
-        $cliente    = Usuario::factory()->cliente()->create();
-        $producto   = Producto::factory()->create(['stock_actual' => 6, 'punto_reorden' => 5]);
+        $cliente = Usuario::factory()->cliente()->create();
+        $producto = Producto::factory()->create(['stock_actual' => 6, 'punto_reorden' => 5]);
 
         $this->assertSame(Semaforo::AMBAR, $inventario->semaforo($producto));
 

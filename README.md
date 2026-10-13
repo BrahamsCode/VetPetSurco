@@ -66,6 +66,14 @@ La aplicación vive en `public_html/` y toda la configuración de Docker queda f
 | [Pilares CRM, ERP y SRM](docs/presentacion/Pilares_CRM_ERP_SRM.pptx) | Análisis de los tres pilares de gestión: qué tablas y flujos forman cada uno, la propuesta para cerrar el SRM y en qué orden conviene hacerlo |
 | [EA2](docs/presentacion/EA2_VetPetConnect.pptx) | Evaluación de Avance 2: visión de negocio, metodología, requerimientos, la pila tecnológica y el entorno en contenedores, y el estado verificable del sistema |
 
+### Trabajo final del curso
+
+| Documento | Contenido |
+| --- | --- |
+| [Trabajo Final](docs/trabajo-final/TrabajoFinal_VetPetConnect.docx) | El informe completo siguiendo el temario del curso: carátula, introducción, los cinco capítulos, conclusiones, recomendaciones y bibliografía en APA. |
+| [Capturas del entregable](docs/trabajo-final/capturas/) | Blog corporativo, documentos legales, carrito y pasarela de pago. |
+| [Guía de despliegue](docs/DESPLIEGUE.md) | Cómo publicar la plataforma en Render con el blueprint `render.yaml`. |
+
 ### Documentos del cliente
 
 | Documento | Contenido |

@@ -40,7 +40,7 @@ final class CarritoTest extends TestCase
     /** Capa de aplicación: el segundo «agregar» acumula, no duplica. */
     public function test_rn09_agregar_dos_veces_el_mismo_producto_deja_una_linea_con_la_cantidad_acumulada(): void
     {
-        $carrito  = app(CarritoService::class);
+        $carrito = app(CarritoService::class);
         $producto = Producto::factory()->create(['precio' => '129.90', 'stock_actual' => 40]);
 
         $carrito->agregar($producto, 1);
@@ -57,9 +57,9 @@ final class CarritoTest extends TestCase
     /** Capa de aplicación: la acumulación funciona con cantidades mayores que uno. */
     public function test_rn09_la_acumulacion_suma_las_cantidades_de_cada_agregado(): void
     {
-        $carrito  = app(CarritoService::class);
+        $carrito = app(CarritoService::class);
         $producto = Producto::factory()->create(['precio' => '10.00']);
-        $otro     = Producto::factory()->create(['precio' => '5.00']);
+        $otro = Producto::factory()->create(['precio' => '5.00']);
 
         $carrito->agregar($producto, 3);
         $carrito->agregar($otro, 1);
@@ -76,7 +76,7 @@ final class CarritoTest extends TestCase
     /** Capa de aplicación: el pedido consolida dos líneas del mismo producto. */
     public function test_rn09_el_pedido_consolida_dos_lineas_del_mismo_producto_en_una(): void
     {
-        $cliente  = Usuario::factory()->cliente()->create();
+        $cliente = Usuario::factory()->cliente()->create();
         $producto = Producto::factory()->create(['precio' => '20.00', 'stock_actual' => 30]);
 
         $pedido = app(PedidoService::class)->confirmar($cliente, [
@@ -93,26 +93,26 @@ final class CarritoTest extends TestCase
     /** Capa del motor: `uk_linea_pedido (pedido_id, producto_id)`. */
     public function test_rn09_el_motor_rechaza_dos_lineas_del_mismo_producto_en_el_mismo_pedido(): void
     {
-        $pedido   = Pedido::factory()->create();
+        $pedido = Pedido::factory()->create();
         $producto = Producto::factory()->create();
 
         DB::table('detalle_pedidos')->insert([
-            'pedido_id'       => $pedido->pedido_id,
-            'producto_id'     => $producto->producto_id,
-            'cantidad'        => 1,
+            'pedido_id' => $pedido->pedido_id,
+            'producto_id' => $producto->producto_id,
+            'cantidad' => 1,
             'precio_unitario' => 20.00,
-            'subtotal'        => 20.00,
+            'subtotal' => 20.00,
         ]);
 
         $this->expectException(QueryException::class);
 
         // Segunda línea del mismo producto: la rechaza el índice único.
         DB::table('detalle_pedidos')->insert([
-            'pedido_id'       => $pedido->pedido_id,
-            'producto_id'     => $producto->producto_id,
-            'cantidad'        => 1,
+            'pedido_id' => $pedido->pedido_id,
+            'producto_id' => $producto->producto_id,
+            'cantidad' => 1,
             'precio_unitario' => 20.00,
-            'subtotal'        => 20.00,
+            'subtotal' => 20.00,
         ]);
     }
 
@@ -123,13 +123,13 @@ final class CarritoTest extends TestCase
     /** Capa de aplicación: `CarritoService::agregar()` exige cantidad positiva. */
     public function test_rn10_el_carrito_rechaza_agregar_una_cantidad_cero_o_negativa(): void
     {
-        $carrito  = app(CarritoService::class);
+        $carrito = app(CarritoService::class);
         $producto = Producto::factory()->create();
 
         foreach ([0, -1, -25] as $cantidad) {
             try {
                 $carrito->agregar($producto, $cantidad);
-                $this->fail('RN-10: la cantidad ' . $cantidad . ' tenía que ser rechazada.');
+                $this->fail('RN-10: la cantidad '.$cantidad.' tenía que ser rechazada.');
             } catch (CantidadInvalidaException $e) {
                 $this->assertSame('RN-10', $e->regla());
             }
@@ -141,7 +141,7 @@ final class CarritoTest extends TestCase
     /** Capa de aplicación: tampoco se deja fijar una línea en cero. */
     public function test_rn10_el_carrito_rechaza_actualizar_una_linea_a_cero(): void
     {
-        $carrito  = app(CarritoService::class);
+        $carrito = app(CarritoService::class);
         $producto = Producto::factory()->create(['precio' => '30.00']);
         $carrito->agregar($producto, 2);
 
@@ -153,14 +153,14 @@ final class CarritoTest extends TestCase
     /** Capa de aplicación: el Form Request del carrito también corta el cero. */
     public function test_rn10_la_ruta_del_carrito_rechaza_una_cantidad_cero(): void
     {
-        $cliente  = Usuario::factory()->cliente()->create();
+        $cliente = Usuario::factory()->cliente()->create();
         $producto = Producto::factory()->create();
 
         $respuesta = $this->actingAs($cliente)
             ->from(route('carrito'))
             ->post(route('carrito.agregar'), [
                 'producto_id' => $producto->producto_id,
-                'cantidad'    => 0,
+                'cantidad' => 0,
             ]);
 
         $respuesta->assertSessionHasErrors('cantidad');
@@ -170,34 +170,34 @@ final class CarritoTest extends TestCase
     /** Capa del motor: `CHECK (cantidad > 0)` sobre `detalle_pedidos`. */
     public function test_rn10_el_motor_rechaza_una_linea_con_cantidad_cero(): void
     {
-        $pedido   = Pedido::factory()->create();
+        $pedido = Pedido::factory()->create();
         $producto = Producto::factory()->create();
 
         $this->expectException(QueryException::class);
 
         DB::table('detalle_pedidos')->insert([
-            'pedido_id'       => $pedido->pedido_id,
-            'producto_id'     => $producto->producto_id,
-            'cantidad'        => 0,
+            'pedido_id' => $pedido->pedido_id,
+            'producto_id' => $producto->producto_id,
+            'cantidad' => 0,
             'precio_unitario' => 20.00,
-            'subtotal'        => 0.00,
+            'subtotal' => 0.00,
         ]);
     }
 
     /** Capa del motor: `CHECK (cantidad > 0)` tampoco admite negativos. */
     public function test_rn10_el_motor_rechaza_una_linea_con_cantidad_negativa(): void
     {
-        $pedido   = Pedido::factory()->create();
+        $pedido = Pedido::factory()->create();
         $producto = Producto::factory()->create();
 
         $this->expectException(QueryException::class);
 
         DB::table('detalle_pedidos')->insert([
-            'pedido_id'       => $pedido->pedido_id,
-            'producto_id'     => $producto->producto_id,
-            'cantidad'        => -3,
+            'pedido_id' => $pedido->pedido_id,
+            'producto_id' => $producto->producto_id,
+            'cantidad' => -3,
             'precio_unitario' => 20.00,
-            'subtotal'        => -60.00,
+            'subtotal' => -60.00,
         ]);
     }
 
@@ -211,7 +211,7 @@ final class CarritoTest extends TestCase
      */
     public function test_rn11_si_cambia_el_precio_del_catalogo_el_precio_del_detalle_no_cambia(): void
     {
-        $cliente  = Usuario::factory()->cliente()->create();
+        $cliente = Usuario::factory()->cliente()->create();
         $producto = Producto::factory()->create(['precio' => '129.90', 'stock_actual' => 10]);
 
         $pedido = app(PedidoService::class)->confirmar(
@@ -221,10 +221,10 @@ final class CarritoTest extends TestCase
         );
 
         $this->assertDatabaseHas('detalle_pedidos', [
-            'pedido_id'       => $pedido->pedido_id,
-            'producto_id'     => $producto->producto_id,
+            'pedido_id' => $pedido->pedido_id,
+            'producto_id' => $producto->producto_id,
             'precio_unitario' => '129.90',
-            'subtotal'        => '259.80',
+            'subtotal' => '259.80',
         ]);
         $this->assertSame('259.80', (string) $pedido->fresh()->monto_total);
 
@@ -243,7 +243,7 @@ final class CarritoTest extends TestCase
     /** El precio del carrito se congela al agregar la línea. */
     public function test_rn11_el_carrito_congela_el_precio_al_agregar_la_linea(): void
     {
-        $carrito  = app(CarritoService::class);
+        $carrito = app(CarritoService::class);
         $producto = Producto::factory()->create(['precio' => '49.50']);
 
         $carrito->agregar($producto, 2);
@@ -261,7 +261,7 @@ final class CarritoTest extends TestCase
     /** El subtotal se recalcula siempre: nunca queda desfasado de la cantidad. */
     public function test_rn11_el_subtotal_se_recalcula_al_cambiar_la_cantidad(): void
     {
-        $carrito  = app(CarritoService::class);
+        $carrito = app(CarritoService::class);
         $producto = Producto::factory()->create(['precio' => '19.90']);
 
         $carrito->agregar($producto, 1);

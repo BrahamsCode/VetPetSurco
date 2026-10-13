@@ -22,6 +22,23 @@ Route::get('/', [PaginaPublicaController::class, 'inicio'])->name('inicio');
 Route::get('/nosotros', [PaginaPublicaController::class, 'nosotros'])->name('nosotros');
 Route::get('/productos', [PaginaPublicaController::class, 'productos'])->name('productos');
 Route::get('/contacto', [PaginaPublicaController::class, 'contacto'])->name('contacto');
+
+// Legales: contenido estatico que el consumidor debe poder leer sin cuenta.
+Route::get('/terminos', [PaginaPublicaController::class, 'terminos'])->name('terminos');
+Route::get('/privacidad', [PaginaPublicaController::class, 'privacidad'])->name('privacidad');
+
+// Blog corporativo: el caso del negocio, publicado y estructurado.
+Route::get('/blog', [PaginaPublicaController::class, 'blog'])->name('blog');
+Route::get('/blog/{ruta}', [PaginaPublicaController::class, 'articulo'])->name('blog.articulo');
+
+// Boletin: alta con consentimiento y baja con un clic.
+Route::post('/boletin', [PaginaPublicaController::class, 'suscribirBoletin'])
+    ->middleware('throttle:10,1')
+    ->name('boletin.suscribir');
+Route::get('/boletin/baja/{token}', [PaginaPublicaController::class, 'bajaBoletin'])->name('boletin.baja');
+
+// SEO: mapa del sitio para los buscadores.
+Route::get('/sitemap.xml', [PaginaPublicaController::class, 'sitemap'])->name('sitemap');
 Route::post('/contacto', [PaginaPublicaController::class, 'recibirContacto'])
     ->middleware('throttle:10,1')
     ->name('contacto.enviar');

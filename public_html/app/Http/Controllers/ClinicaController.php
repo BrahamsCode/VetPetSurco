@@ -25,8 +25,7 @@ class ClinicaController extends Controller
     public function __construct(
         private readonly AgendaService $agenda,
         private readonly HistoriaClinicaService $historias,
-    ) {
-    }
+    ) {}
 
     public function index(Request $request): View
     {

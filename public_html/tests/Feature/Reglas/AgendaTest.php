@@ -7,6 +7,7 @@ namespace Tests\Feature\Reglas;
 use App\Enums\EstadoCita;
 use App\Enums\Rol;
 use App\Enums\Servicio;
+use App\Exceptions\DesenlaceInvalidoException;
 use App\Exceptions\HorarioOcupadoException;
 use App\Models\Cita;
 use App\Models\Mascota;
@@ -180,7 +181,7 @@ final class AgendaTest extends TestCase
     {
         $cita = Cita::factory()->atendida()->create();
 
-        $this->expectException(\App\Exceptions\DesenlaceInvalidoException::class);
+        $this->expectException(DesenlaceInvalidoException::class);
         $this->agenda()->cerrar($cita, EstadoCita::CANCELADA);
     }
 

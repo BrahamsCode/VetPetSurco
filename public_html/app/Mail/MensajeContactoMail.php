@@ -26,8 +26,7 @@ final class MensajeContactoMail extends Mailable
      */
     public function __construct(
         private readonly array $datos,
-    ) {
-    }
+    ) {}
 
     public function envelope(): Envelope
     {

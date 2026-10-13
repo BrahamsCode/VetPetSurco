@@ -44,7 +44,7 @@ final class AgendaService
     {
         // La agenda trabaja al minuto: se descartan los segundos para que la
         // comprobación previa y el UNIQUE comparen exactamente el mismo valor.
-        $momento = $fechaHora->format('Y-m-d H:i') . ':00';
+        $momento = $fechaHora->format('Y-m-d H:i').':00';
 
         // RN-17, primera capa: choque de horario con el mismo veterinario.
         // Una cita CANCELADA no ocupa la agenda, igual que en el prototipo.
@@ -55,15 +55,15 @@ final class AgendaService
             ->exists();
 
         if ($ocupado) {
-            throw new HorarioOcupadoException();
+            throw new HorarioOcupadoException;
         }
 
-        $cita = new Cita();
-        $cita->mascota_id     = $m->getKey();
+        $cita = new Cita;
+        $cita->mascota_id = $m->getKey();
         $cita->veterinario_id = $vet->getKey();
-        $cita->servicio       = $s;
-        $cita->fecha_hora     = $momento;
-        $cita->estado         = EstadoCita::RESERVADA;   // RN-18: nace sin desenlace
+        $cita->servicio = $s;
+        $cita->fecha_hora = $momento;
+        $cita->estado = EstadoCita::RESERVADA;   // RN-18: nace sin desenlace
 
         try {
             $cita->save();
@@ -86,7 +86,7 @@ final class AgendaService
      * Alimenta el selector de horarios para que el cliente no llegue siquiera
      * a intentar una hora ocupada (RN-17).
      *
-     * @param  string $fecha fecha en formato «AAAA-MM-DD»
+     * @param  string  $fecha  fecha en formato «AAAA-MM-DD»
      * @return array<int, string>
      */
     public function horariosOcupados(Usuario $vet, string $fecha): array
@@ -128,7 +128,7 @@ final class AgendaService
         $actual = $this->estadoDe($cita);
 
         if ($actual !== EstadoCita::RESERVADA) {
-            throw new DesenlaceInvalidoException('La cita ya tiene un desenlace registrado: ' . $actual->value . '.');
+            throw new DesenlaceInvalidoException('La cita ya tiene un desenlace registrado: '.$actual->value.'.');
         }
 
         $cita->estado = $desenlace;
@@ -160,7 +160,7 @@ final class AgendaService
     public static function esEntradaDuplicada(QueryException $e): bool
     {
         $codigoMotor = isset($e->errorInfo[1]) ? (int) $e->errorInfo[1] : 0;
-        $mensaje     = $e->getMessage();
+        $mensaje = $e->getMessage();
 
         return $codigoMotor === 1062
             || str_contains($mensaje, 'Duplicate entry')

@@ -16,8 +16,7 @@ final class ConfirmacionPedidoMail extends Mailable
 
     public function __construct(
         private readonly Pedido $pedido,
-    ) {
-    }
+    ) {}
 
     public function envelope(): Envelope
     {

@@ -81,10 +81,10 @@ final class SuscripcionService
             ->exists();
 
         if ($vigente) {
-            throw new SuscripcionDuplicadaException();
+            throw new SuscripcionDuplicadaException;
         }
 
-        $suscripcion = new Suscripcion();
+        $suscripcion = new Suscripcion;
         $suscripcion->cliente_id = $cliente->getKey();
         $suscripcion->mascota_id = $mascota->getKey();
         $suscripcion->producto_id = $producto->getKey();

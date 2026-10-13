@@ -30,7 +30,8 @@ return new class extends Migration
 
         // Laravel no tiene API de esquema para CHECK: se añaden con SQL directo.
         // SQLite (suite de pruebas) no admite ALTER TABLE ... ADD CONSTRAINT.
-        if (in_array(DB::getDriverName(), ['mysql', 'mariadb'], true)) {
+        // MySQL, MariaDB y PostgreSQL si: la sintaxis es la misma en los tres.
+        if (in_array(DB::getDriverName(), ['mysql', 'mariadb', 'pgsql'], true)) {
             // RN-06: no se puede publicar un producto con precio cero o negativo.
             DB::statement('ALTER TABLE productos ADD CONSTRAINT chk_precio_positivo CHECK (precio > 0)');
             // RN-07: el stock nunca queda negativo, evita la sobreventa (RNF-03).

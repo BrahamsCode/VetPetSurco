@@ -21,8 +21,7 @@ final class ConfirmacionCitaMail extends Mailable
         private readonly Mascota $mascota,
         private readonly Usuario $veterinario,
         private readonly Usuario $cliente,
-    ) {
-    }
+    ) {}
 
     public function envelope(): Envelope
     {

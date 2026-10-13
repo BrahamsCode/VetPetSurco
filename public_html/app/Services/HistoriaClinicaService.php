@@ -29,14 +29,13 @@ final class HistoriaClinicaService
      * `new HistoriaClinicaService()` sin pasar por el contenedor.
      */
     public function __construct(
-        private readonly AgendaService $agenda = new AgendaService(),
-    ) {
-    }
+        private readonly AgendaService $agenda = new AgendaService,
+    ) {}
 
     /**
      * Registra la atención de una cita y la cierra en la misma transacción.
      *
-     * @param array{diagnostico?: string|null, tratamiento?: string|null, vacuna_aplicada?: string|null, proxima_fecha?: string|null} $datos
+     * @param  array{diagnostico?: string|null, tratamiento?: string|null, vacuna_aplicada?: string|null, proxima_fecha?: string|null}  $datos
      *
      * @throws AtencionYaRegistradaException si la cita ya tiene registro clínico (RN-19)
      */
@@ -52,18 +51,18 @@ final class HistoriaClinicaService
                 ->exists();
 
             if ($yaExiste) {
-                throw new AtencionYaRegistradaException();
+                throw new AtencionYaRegistradaException;
             }
 
-            $historia = new HistoriaClinica();
-            $historia->mascota_id      = $cita->mascota_id;
-            $historia->cita_id         = $cita->getKey();
-            $historia->fecha_atencion  = now();
-            $historia->diagnostico     = $datos['diagnostico']     ?? null;
-            $historia->tratamiento     = $datos['tratamiento']     ?? null;
+            $historia = new HistoriaClinica;
+            $historia->mascota_id = $cita->mascota_id;
+            $historia->cita_id = $cita->getKey();
+            $historia->fecha_atencion = now();
+            $historia->diagnostico = $datos['diagnostico'] ?? null;
+            $historia->tratamiento = $datos['tratamiento'] ?? null;
             $historia->vacuna_aplicada = $datos['vacuna_aplicada'] ?? null;
             // RN-20: la próxima fecha es la que alimenta el recordatorio.
-            $historia->proxima_fecha   = ($datos['proxima_fecha'] ?? null) ?: null;
+            $historia->proxima_fecha = ($datos['proxima_fecha'] ?? null) ?: null;
 
             try {
                 $historia->save();
@@ -91,12 +90,12 @@ final class HistoriaClinicaService
      * el constructor de consultas sobre los nombres de tabla del esquema para
      * no depender de cómo se llamen las relaciones en los modelos.
      *
-     * @param  int $dias ventana de aviso, 15 días por omisión
+     * @param  int  $dias  ventana de aviso, 15 días por omisión
      * @return Collection<int, array{mascota_id: int, mascota: string, cliente: string, correo: string, vacuna_aplicada: string|null, proxima_fecha: string, dias_restantes: int}>
      */
     public function recordatorios(int $dias = 15): Collection
     {
-        $hoy    = Carbon::today();
+        $hoy = Carbon::today();
         $limite = $hoy->copy()->addDays(max($dias, 0));
 
         $filas = DB::table('historias_clinicas as h')
@@ -120,14 +119,14 @@ final class HistoriaClinicaService
                 $proxima = Carbon::parse((string) $fila->proxima_fecha)->startOfDay();
 
                 return [
-                    'mascota_id'      => (int) $fila->mascota_id,
-                    'mascota'         => (string) $fila->mascota,
-                    'cliente'         => (string) $fila->cliente,
-                    'correo'          => (string) $fila->correo,
+                    'mascota_id' => (int) $fila->mascota_id,
+                    'mascota' => (string) $fila->mascota,
+                    'cliente' => (string) $fila->cliente,
+                    'correo' => (string) $fila->correo,
                     'vacuna_aplicada' => $fila->vacuna_aplicada === null ? null : (string) $fila->vacuna_aplicada,
-                    'proxima_fecha'   => $proxima->toDateString(),
+                    'proxima_fecha' => $proxima->toDateString(),
                     // Días que faltan para el control; 0 significa que es hoy.
-                    'dias_restantes'  => (int) $hoy->diffInDays($proxima, false),
+                    'dias_restantes' => (int) $hoy->diffInDays($proxima, false),
                 ];
             })
             ->sortBy('dias_restantes')

@@ -45,7 +45,7 @@
             (01) 445-8820 / 987 654 321 &middot; contacto@vetpetsurco.pe
           </p>
           <p style="margin:10px 0 0 0;font-size:11px;color:#8a978f;">
-            Proyecto acad&eacute;mico del Curso de E-business (Equipo 4, 2026).
+            Proyecto acad&eacute;mico del Curso de E-business (2026).
             Empresa ficticia con fines educativos.
           </p>
         </td></tr>

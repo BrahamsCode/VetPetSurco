@@ -28,8 +28,7 @@ class CarritoController extends Controller
     public function __construct(
         private readonly CarritoService $carrito,
         private readonly PedidoService $pedidos,
-    ) {
-    }
+    ) {}
 
     public function index(): View
     {

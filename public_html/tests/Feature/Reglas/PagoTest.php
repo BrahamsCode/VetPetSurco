@@ -131,7 +131,7 @@ final class PagoTest extends TestCase
 
     public function test_rn01_un_cliente_no_puede_pagar_el_pedido_de_otro(): void
     {
-        $dueno   = Usuario::factory()->cliente()->create();
+        $dueno = Usuario::factory()->cliente()->create();
         $intruso = Usuario::factory()->cliente()->create();
 
         $pedido = Pedido::factory()
@@ -155,7 +155,7 @@ final class PagoTest extends TestCase
 
     public function test_la_pasarela_simulada_aprueba_una_tarjeta_normal(): void
     {
-        $resultado = (new PasarelaSimulada())
+        $resultado = (new PasarelaSimulada)
             ->cobrar(1990, 'tkn_sim_visa_1111', 'ana@correo.com', 'pedido de prueba');
 
         $this->assertTrue($resultado->fueAprobado());
@@ -167,7 +167,7 @@ final class PagoTest extends TestCase
     /** Las terminadas en 0000 simulan el rechazo del emisor. */
     public function test_la_pasarela_simulada_rechaza_la_tarjeta_terminada_en_ceros(): void
     {
-        $resultado = (new PasarelaSimulada())
+        $resultado = (new PasarelaSimulada)
             ->cobrar(1990, 'tkn_sim_visa_0000', 'ana@correo.com', 'pedido de prueba');
 
         $this->assertFalse($resultado->fueAprobado());
@@ -177,7 +177,7 @@ final class PagoTest extends TestCase
 
     public function test_la_pasarela_simulada_rechaza_un_token_con_formato_invalido(): void
     {
-        $resultado = (new PasarelaSimulada())
+        $resultado = (new PasarelaSimulada)
             ->cobrar(1990, 'tkn_cualquier_cosa', 'ana@correo.com', 'pedido de prueba');
 
         $this->assertSame(EstadoPago::ERROR, $resultado->estado);

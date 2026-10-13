@@ -42,9 +42,9 @@ final class CuentasTest extends TestCase
     /** Capa de aplicación: el rol es excluyente en las tres direcciones. */
     public function test_rn01_cada_rol_solo_entra_a_los_modulos_de_su_rol(): void
     {
-        $cliente     = Usuario::factory()->cliente()->create();
+        $cliente = Usuario::factory()->cliente()->create();
         $veterinario = Usuario::factory()->veterinario()->create();
-        $admin       = Usuario::factory()->admin()->create();
+        $admin = Usuario::factory()->admin()->create();
 
         // El CLIENTE no entra ni a la clínica ni al panel administrativo.
         $this->actingAs($cliente)->get('/app/clinica')->assertForbidden();
@@ -74,10 +74,10 @@ final class CuentasTest extends TestCase
 
         // Se salta el modelo a propósito: el INSERT va directo contra la tabla.
         DB::table('usuarios')->insert([
-            'nombre'        => 'Rol inventado',
-            'correo'        => 'inventado@vetpetsurco.pe',
+            'nombre' => 'Rol inventado',
+            'correo' => 'inventado@vetpetsurco.pe',
             'password_hash' => Hash::make('demo123'),
-            'rol'           => 'SUPERUSUARIO',
+            'rol' => 'SUPERUSUARIO',
         ]);
     }
 
@@ -100,9 +100,9 @@ final class CuentasTest extends TestCase
         Usuario::factory()->cliente()->create(['correo' => 'ana@correo.com']);
 
         $respuesta = $this->from(route('registro'))->post(route('registro.enviar'), [
-            'nombre'            => 'Otra Ana',
-            'correo'            => 'ana@correo.com',
-            'clave'             => 'clave123',
+            'nombre' => 'Otra Ana',
+            'correo' => 'ana@correo.com',
+            'clave' => 'clave123',
             'clave_confirmation' => 'clave123',
         ]);
 
@@ -123,10 +123,10 @@ final class CuentasTest extends TestCase
 
         // INSERT directo, sin pasar por el Form Request ni por el modelo.
         DB::table('usuarios')->insert([
-            'nombre'        => 'Ana repetida',
-            'correo'        => 'ana@correo.com',
+            'nombre' => 'Ana repetida',
+            'correo' => 'ana@correo.com',
             'password_hash' => Hash::make('demo123'),
-            'rol'           => Rol::CLIENTE->value,
+            'rol' => Rol::CLIENTE->value,
         ]);
     }
 
@@ -134,9 +134,9 @@ final class CuentasTest extends TestCase
     public function test_rn02_un_correo_libre_si_crea_la_cuenta(): void
     {
         $respuesta = $this->post(route('registro.enviar'), [
-            'nombre'            => 'Nueva Clienta',
-            'correo'            => 'nueva@correo.com',
-            'clave'             => 'clave123',
+            'nombre' => 'Nueva Clienta',
+            'correo' => 'nueva@correo.com',
+            'clave' => 'clave123',
             'clave_confirmation' => 'clave123',
         ]);
 
@@ -152,9 +152,9 @@ final class CuentasTest extends TestCase
     public function test_rn03_la_contrasena_almacenada_no_es_el_texto_plano(): void
     {
         $this->post(route('registro.enviar'), [
-            'nombre'            => 'Nueva Clienta',
-            'correo'            => 'nueva@correo.com',
-            'clave'             => 'clave123',
+            'nombre' => 'Nueva Clienta',
+            'correo' => 'nueva@correo.com',
+            'clave' => 'clave123',
             'clave_confirmation' => 'clave123',
         ])->assertRedirect(route('catalogo'));
 
@@ -173,7 +173,7 @@ final class CuentasTest extends TestCase
     public function test_rn03_el_ingreso_valida_la_contrasena_contra_el_hash(): void
     {
         $cliente = Usuario::factory()->cliente()->create([
-            'correo'        => 'ana@correo.com',
+            'correo' => 'ana@correo.com',
             'password_hash' => Hash::make('demo123'),
         ]);
 

@@ -22,9 +22,7 @@ use Illuminate\Validation\Rule;
  */
 class SuscripcionController extends Controller
 {
-    public function __construct(private readonly SuscripcionService $suscripciones)
-    {
-    }
+    public function __construct(private readonly SuscripcionService $suscripciones) {}
 
     /** Contratacion de un plan nuevo. — RF-03 / RN-16 / RN-22 */
     public function contratar(Request $request): RedirectResponse

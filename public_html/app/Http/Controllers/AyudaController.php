@@ -15,8 +15,7 @@ class AyudaController extends Controller
 {
     public function __construct(
         private readonly AsistenteService $asistente,
-    ) {
-    }
+    ) {}
 
     /** Guia del menu del chat (fuente unica: config/asistente.php). */
     public function guias(): JsonResponse

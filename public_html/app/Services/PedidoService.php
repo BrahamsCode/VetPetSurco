@@ -40,11 +40,11 @@ final class PedidoService
      *  5. Si alcanza, crea el pedido y su detalle copiando el precio unitario
      *     vigente (RN-11) y descuenta el stock (RN-07).
      *
-     * @param array<int, array{producto_id: int|string, cantidad: int|string, nombre?: string}> $lineas
-     *        Líneas del carrito, tal como las devuelve `CarritoService::items()`.
+     * @param  array<int, array{producto_id: int|string, cantidad: int|string, nombre?: string}>  $lineas
+     *                                                                                                     Líneas del carrito, tal como las devuelve `CarritoService::items()`.
      *
      * @throws StockInsuficienteException si alguna línea no tiene stock (RN-12)
-     * @throws CantidadInvalidaException  si alguna cantidad no es entera y positiva (RN-10)
+     * @throws CantidadInvalidaException si alguna cantidad no es entera y positiva (RN-10)
      */
     public function confirmar(Usuario $cliente, array $lineas, TipoOrigen $origen): Pedido
     {
@@ -65,8 +65,8 @@ final class PedidoService
         // nuestra o un rechazo del motor— Laravel revierte la transacción
         // completa, igual que el EXIT HANDLER del procedimiento almacenado.
         return DB::transaction(function () use ($cliente, $pedidas, $origen): Pedido {
-            $productos    = [];
-            $faltantes    = [];
+            $productos = [];
+            $faltantes = [];
             $totalCentimos = 0;
 
             // Paso 3: se recorre en orden de identificador para que dos compras
@@ -86,11 +86,11 @@ final class PedidoService
                     // informar de una vez todo lo que falta.
                     $faltantes[] = [
                         'producto_id' => $producto === null ? null : (int) $producto->getKey(),
-                        'nombre'      => $producto === null
-                            ? 'Producto #' . $productoId . ' no disponible'
+                        'nombre' => $producto === null
+                            ? 'Producto #'.$productoId.' no disponible'
                             : (string) $producto->nombre,
-                        'pedida'      => $cantidad,
-                        'disponible'  => $disponible,
+                        'pedida' => $cantidad,
+                        'disponible' => $disponible,
                     ];
 
                     continue;
@@ -112,30 +112,30 @@ final class PedidoService
                 $totalCentimos += CarritoService::aCentimos($productos[$productoId]->precio) * $cantidad;
             }
 
-            $pedido = new Pedido();
-            $pedido->cliente_id   = $cliente->getKey();
+            $pedido = new Pedido;
+            $pedido->cliente_id = $cliente->getKey();
             $pedido->fecha_pedido = now();
-            $pedido->monto_total  = CarritoService::aDecimal($totalCentimos);
-            $pedido->tipo_origen  = $origen;                    // RN-14
+            $pedido->monto_total = CarritoService::aDecimal($totalCentimos);
+            $pedido->tipo_origen = $origen;                    // RN-14
             // RN-13: el pedido nace PENDIENTE y solo pasa a PAGADO cuando la
             // pasarela aprueba el cobro (ver PagoService). El stock ya se
             // descuento aqui mismo, asi que un pedido sin pagar mantiene la
             // reserva hasta que se anule.
-            $pedido->estado       = EstadoPedido::PENDIENTE;
+            $pedido->estado = EstadoPedido::PENDIENTE;
             $pedido->save();
 
             foreach ($pedidas as $productoId => $cantidad) {
-                $producto        = $productos[$productoId];
-                $precioCentimos  = CarritoService::aCentimos($producto->precio);
+                $producto = $productos[$productoId];
+                $precioCentimos = CarritoService::aCentimos($producto->precio);
 
-                $detalle = new DetallePedido();
-                $detalle->pedido_id   = $pedido->getKey();
+                $detalle = new DetallePedido;
+                $detalle->pedido_id = $pedido->getKey();
                 $detalle->producto_id = $producto->getKey();
-                $detalle->cantidad    = $cantidad;
+                $detalle->cantidad = $cantidad;
                 // RN-11: se copia el precio vigente; el detalle es el precio
                 // histórico y ya no cambia aunque el catálogo suba mañana.
                 $detalle->precio_unitario = CarritoService::aDecimal($precioCentimos);
-                $detalle->subtotal        = CarritoService::aDecimal($precioCentimos * $cantidad);
+                $detalle->subtotal = CarritoService::aDecimal($precioCentimos * $cantidad);
                 $detalle->save();
 
                 // Descuento del inventario en tiempo real, sobre la fila que
@@ -149,9 +149,9 @@ final class PedidoService
                     // (el esquema lo repite con CHECK (stock_actual >= 0)).
                     throw new StockInsuficienteException([[
                         'producto_id' => (int) $producto->getKey(),
-                        'nombre'      => (string) $producto->nombre,
-                        'pedida'      => $cantidad,
-                        'disponible'  => (int) $producto->stock_actual,
+                        'nombre' => (string) $producto->nombre,
+                        'pedida' => $cantidad,
+                        'disponible' => (int) $producto->stock_actual,
                     ]]);
                 }
 
@@ -193,7 +193,7 @@ final class PedidoService
      * Agrupa las líneas por producto sumando las cantidades (RN-09) y valida
      * que cada cantidad sea un entero mayor que cero (RN-10).
      *
-     * @param  array<int, array{producto_id: int|string, cantidad: int|string, nombre?: string}> $lineas
+     * @param  array<int, array{producto_id: int|string, cantidad: int|string, nombre?: string}>  $lineas
      * @return array<int, int> cantidad pedida, indexada por `producto_id`
      *
      * @throws CantidadInvalidaException
@@ -208,17 +208,17 @@ final class PedidoService
             }
 
             $productoId = (int) $linea['producto_id'];
-            $cantidad   = $linea['cantidad'];
+            $cantidad = $linea['cantidad'];
 
             // RN-10: entero y mayor que cero, igual que CHECK (cantidad > 0).
             if (! is_int($cantidad) && ! (is_string($cantidad) && ctype_digit($cantidad))) {
-                throw new CantidadInvalidaException();
+                throw new CantidadInvalidaException;
             }
 
             $cantidad = (int) $cantidad;
 
             if ($cantidad <= 0) {
-                throw new CantidadInvalidaException();
+                throw new CantidadInvalidaException;
             }
 
             // RN-09: si el producto se repite, se acumula en la misma línea.
