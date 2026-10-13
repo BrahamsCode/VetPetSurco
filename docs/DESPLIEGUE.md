@@ -13,8 +13,9 @@ y no requiere tocar código.
 ## Pasos
 
 1. **Entra a tu proyecto en Render** y elige **New → Blueprint**.
-2. **Selecciona este repositorio** y la rama `claude/entregable-2-estructura-push-ql8eih`
-   (o `main`, si ya la fusionaste). Render detecta el archivo `render.yaml` de la raíz.
+2. **Selecciona este repositorio** y la rama **`main`**, que es la que reúne todo
+   el trabajo. Render detecta el archivo `render.yaml` de la raíz, así que el
+   campo *Blueprint Path* se deja vacío.
 3. **Revisa el plan** de los dos recursos: ambos deben quedar en *Free*.
 4. **Apply**. Render construye la imagen a partir de `docker/render/Dockerfile`,
    crea la base de datos e inyecta sus credenciales en el servicio web.
