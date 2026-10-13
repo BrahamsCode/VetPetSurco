@@ -15,6 +15,13 @@ if [ -z "${APP_KEY:-}" ]; then
   echo "AVISO: APP_KEY no estaba definida; se generó una temporal."
 fi
 
+# Render (generateValue) entrega 32 bytes en base64 pero sin el prefijo que
+# Laravel necesita para decodificarla; sin el, la toma como texto plano de 44
+# caracteres y falla con "Unsupported cipher or incorrect key length".
+if [[ "${APP_KEY}" != base64:* ]]; then
+  export APP_KEY="base64:${APP_KEY}"
+fi
+
 # Esquema y datos de demostracion. --force porque en produccion Laravel pide
 # confirmacion interactiva y aqui no hay nadie para darla.
 php artisan migrate --force --seed || echo "AVISO: las migraciones fallaron; revisa la conexión a la base."

@@ -22,3 +22,7 @@ docker/dockerfile/.env
 docker/dockerfile/docker-compose.override.yml
 docker/my.crt
 docker/my.key
+
+# Herramientas locales: configuracion de Claude Code y capturas de Playwright
+.claude/
+.playwright-mcp/

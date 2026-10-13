@@ -19,6 +19,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Al entrar sin sesion, la plataforma devuelve al formulario de ingreso.
         $middleware->redirectGuestsTo(fn () => route('ingresar'));
+
+        // Render termina el HTTPS en su proxy y reenvia la peticion por HTTP.
+        // Confiar en sus cabeceras X-Forwarded-* hace que Laravel genere las
+        // URLs con https y el navegador no bloquee el CSS por contenido mixto.
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
