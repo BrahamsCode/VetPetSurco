@@ -9,6 +9,7 @@
         'CLIENTE' => [
             ['catalogo', 'Cat&aacute;logo'],
             ['carrito', 'Carrito'],
+            ['pedidos', 'Mis pedidos'],
             ['citas', 'Reservar cita'],
             ['mascotas', 'Mis mascotas'],
         ],
@@ -66,7 +67,7 @@
 @if ($usuario)
         <nav aria-label="M&oacute;dulos de la plataforma"><ul class="menu">
 @foreach ($modulos as [$ruta, $etiqueta])
-          <li><a href="{{ route($ruta) }}" @if (request()->routeIs($ruta)) aria-current="page" @endif>{!! $etiqueta !!}</a></li>
+          <li><a href="{{ route($ruta) }}" @if (request()->routeIs($ruta, $ruta.'.*')) aria-current="page" @endif>{!! $etiqueta !!}</a></li>
 @endforeach
         </ul></nav>
         <div class="sesion" data-rn="RN-01" data-rn-nota="Rol excluyente">
@@ -95,6 +96,9 @@
       <p>Plataforma acad&eacute;mica de VetPet Connect &mdash; Curso de E-business, 2026.</p>
     </div>
   </footer>
+
+  {{-- Dialogo de confirmacion para acciones que no se deshacen. --}}
+  @include('components.confirmar')
 
   {{-- Animacion de resultado del pago (aprobado / rechazado). --}}
   @include('components.pago-animacion')

@@ -10,6 +10,7 @@ use App\Http\Controllers\ClinicaController;
 use App\Http\Controllers\MascotaController;
 use App\Http\Controllers\PaginaPublicaController;
 use App\Http\Controllers\PagoController;
+use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\SuscripcionController;
 use Illuminate\Support\Facades\Route;
 
@@ -76,6 +77,10 @@ Route::middleware('auth')->prefix('app')->group(function (): void {
         Route::patch('/carrito/{producto}', [CarritoController::class, 'actualizar'])->name('carrito.actualizar');
         Route::delete('/carrito/{producto}', [CarritoController::class, 'quitar'])->name('carrito.quitar');
 
+        // Mis pedidos: seguimiento de la entrega y anulacion de lo no pagado.
+        Route::get('/pedidos', [PedidoController::class, 'index'])->name('pedidos');
+        Route::patch('/pedidos/{pedido}/anular', [PedidoController::class, 'anular'])->name('pedidos.anular');
+
         // RN-21: el pedido nace PENDIENTE y se paga aqui con tarjeta.
         Route::get('/pedidos/{pedido}/pagar', [PagoController::class, 'mostrar'])->name('pago');
         Route::post('/pedidos/{pedido}/pagar', [PagoController::class, 'procesar'])->name('pago.procesar');
@@ -102,6 +107,7 @@ Route::middleware('auth')->prefix('app')->group(function (): void {
     // ---- Modulo del VETERINARIO ----
     Route::middleware('rol:VETERINARIO')->group(function (): void {
         Route::get('/clinica', [ClinicaController::class, 'index'])->name('clinica');
+        Route::get('/clinica/historia', [ClinicaController::class, 'historia'])->name('clinica.historia');
         Route::post('/clinica/{cita}/atender', [ClinicaController::class, 'atender'])->name('clinica.atender');
         Route::patch('/clinica/{cita}/desenlace', [ClinicaController::class, 'desenlace'])->name('clinica.desenlace');
     });
@@ -111,5 +117,6 @@ Route::middleware('auth')->prefix('app')->group(function (): void {
         Route::get('/admin', [AdminController::class, 'index'])->name('admin');
         Route::post('/admin/productos', [AdminController::class, 'crearProducto'])->name('admin.productos.crear');
         Route::patch('/admin/pedidos/{pedido}', [AdminController::class, 'avanzarPedido'])->name('admin.pedidos.avanzar');
+        Route::patch('/admin/pedidos/{pedido}/anular', [AdminController::class, 'anularPedido'])->name('admin.pedidos.anular');
     });
 });

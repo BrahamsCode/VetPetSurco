@@ -33,6 +33,19 @@ enum EstadoPedido: string
         };
     }
 
+    /**
+     * Etiqueta que ve el cliente segun como recibe el pedido: ENVIADO es
+     * "En camino" si va a domicilio y "Listo para recoger" si pasa a tienda.
+     */
+    public function etiquetaPara(ModalidadEntrega $modalidad): string
+    {
+        return match ($this) {
+            self::PENDIENTE => 'Pendiente de pago',
+            self::ENVIADO => $modalidad === ModalidadEntrega::DELIVERY ? 'En camino' : 'Listo para recoger',
+            default => $this->etiqueta(),
+        };
+    }
+
     /** Etiqueta legible para las vistas. */
     public function etiqueta(): string
     {

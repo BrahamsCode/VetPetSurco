@@ -5,14 +5,20 @@
 
 @php
     /* Culqi cobra en centimos enteros, la misma unidad del carrito. */
-    $centimos = \App\Services\CarritoService::aCentimos($pedido->monto_total);
-    $pagado = $pedido->estado === \App\Enums\EstadoPedido::PAGADO;
+    $centimos = \App\Services\CarritoService::aCentimos($pedido->totalACobrar());
+    $totalSoles = (float) $pedido->totalACobrar();
+    $estadoPedido = $pedido->estadoActual();
+    /* Pagado es PAGADO o cualquier paso posterior de la entrega. */
+    $pagado = in_array($estadoPedido, [\App\Enums\EstadoPedido::PAGADO, \App\Enums\EstadoPedido::ENVIADO, \App\Enums\EstadoPedido::ENTREGADO], true);
+    /* Anulado, o pendiente pero fuera de plazo: ya no se puede pagar. */
+    $noPagable = $estadoPedido === \App\Enums\EstadoPedido::ANULADO
+        || ($estadoPedido === \App\Enums\EstadoPedido::PENDIENTE && now()->greaterThan($pedido->vencePagoEl()));
     /* Sin llaves de Culqi entra la pasarela simulada (ver AppServiceProvider). */
     $faltaLlavePublica = ! $simulada && $llavePublica === '';
     $intentos = $pedido->pagos->sortByDesc('pago_id');
     /* Desglose fiscal peruano: los precios al publico incluyen IGV 18%. */
-    $igv = round((float) $pedido->monto_total - ((float) $pedido->monto_total / 1.18), 2);
-    $base = round((float) $pedido->monto_total - $igv, 2);
+    $igv = round($totalSoles - ($totalSoles / 1.18), 2);
+    $base = round($totalSoles - $igv, 2);
 @endphp
 
 @section('contenido')
@@ -21,9 +27,11 @@
         <h1>{{ $pagado ? 'Pedido' : 'Pagar el pedido' }} {{ $pedido->pedido_id }}</h1>
         <p>
           @if ($pagado)
-            Pedido pagado. Ahora avanza a ENVIADO cuando la tienda lo despache.
+            Pedido pagado &middot; {{ $pedido->etiquetaEstado() }}. Sigue su avance en <a href="{{ route('pedidos') }}">Mis pedidos</a>.
+          @elseif ($noPagable)
+            Este pedido ya no se puede pagar.
           @else
-            El pedido ya reserv&oacute; el stock. Queda confirmarlo con el pago.
+            Tus productos est&aacute;n separados hasta el {{ $pedido->vencePagoEl()->format('d/m/Y \a \l\a\s H:i') }}. Queda confirmarlo con el pago.
           @endif
         </p>
       </div>
@@ -56,10 +64,14 @@
             @endforeach
 
             <div class="total-desglose">
+              <p class="total-fila"><span>{{ $pedido->modalidad()->etiqueta() }}</span><span>{{ (float) $pedido->costo_envio > 0 ? 'S/ '.number_format((float) $pedido->costo_envio, 2) : 'Gratis' }}</span></p>
               <p class="total-fila"><span>Subtotal (sin IGV)</span><span>S/ {{ number_format($base, 2) }}</span></p>
               <p class="total-fila"><span>IGV 18%</span><span>S/ {{ number_format($igv, 2) }}</span></p>
-              <p class="total-fila total-fila--final"><span>Total a pagar</span><span>S/ {{ number_format((float) $pedido->monto_total, 2) }}</span></p>
+              <p class="total-fila total-fila--final"><span>Total a pagar</span><span>S/ {{ number_format($totalSoles, 2) }}</span></p>
             </div>
+            @if ($pedido->direccion_entrega)
+              <p class="fiscal-nota" style="margin-top:8px;">Entrega en: {{ $pedido->direccion_entrega }}</p>
+            @endif
           </div>
 
           <p class="fiscal-nota">Precios de venta al p&uacute;blico con IGV incluido (D.S. 055-99-EF).
@@ -129,8 +141,19 @@
                 </svg>
               </div>
               <h2>&iexcl;Pedido pagado!</h2>
-              <p>Gracias por cuidar a tu mascota con nosotros. Tu pedido avanza a ENVIADO cuando la tienda lo despache.</p>
-              <p style="margin-top:16px;"><a class="boton" href="{{ route('catalogo') }}">Volver al cat&aacute;logo</a></p>
+              <p>Gracias por cuidar a tu mascota con nosotros. Te escribiremos cuando tu pedido
+                 {{ $pedido->modalidad() === \App\Enums\ModalidadEntrega::DELIVERY ? 'salga a tu dirección' : 'esté listo para recoger' }}.</p>
+              <p style="margin-top:16px;"><a class="boton" href="{{ route('pedidos') }}">Ver mis pedidos</a></p>
+            </div>
+
+          @elseif ($noPagable)
+            <div class="clinica-vacio">
+              <p class="clinica-vacio-titulo">
+                {{ $estadoPedido === \App\Enums\EstadoPedido::ANULADO ? 'Pedido anulado' : 'Venció el plazo de pago' }}
+              </p>
+              <p>{{ $pedido->motivo_anulacion ?? 'Pasaron '.\App\Models\Pedido::HORAS_PARA_PAGAR.' horas sin pagarse.' }}
+                 Los productos volvieron a la tienda: arma tu carrito otra vez si a&uacute;n los quieres.</p>
+              <p style="margin-top:12px !important;"><a class="boton" href="{{ route('catalogo') }}">Ir al cat&aacute;logo</a></p>
             </div>
 
           @elseif ($faltaLlavePublica)
@@ -245,7 +268,7 @@
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
                       <rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>
                     </svg>
-                    Pagar S/ {{ number_format((float) $pedido->monto_total, 2) }}
+                    Pagar S/ {{ number_format($totalSoles, 2) }}
                   </button>
                 </p>
               </form>
@@ -277,7 +300,7 @@
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
                       <rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>
                     </svg>
-                    Pagar S/ {{ number_format((float) $pedido->monto_total, 2) }}
+                    Pagar S/ {{ number_format($totalSoles, 2) }}
                   </button>
                 </p>
               </form>
@@ -290,7 +313,7 @@
 @endsection
 
 @section('scripts')
-  @if (! $pagado && ! $faltaLlavePublica)
+  @if (! $pagado && ! $noPagable && ! $faltaLlavePublica)
     @if ($simulada)
       <script>
         /*

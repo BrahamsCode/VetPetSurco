@@ -138,10 +138,29 @@ final class AgendaService
     }
 
     /**
+     * RN-18 en el tiempo: una cita se atiende el dia que le toca o despues
+     * (si quedo pendiente de cerrar). Una cita de la proxima semana todavia no
+     * tiene nada que registrar. El paciente puede llegar antes de su hora, asi
+     * que basta con que sea de hoy.
+     */
+    public function sePuedeAtender(Cita $cita): bool
+    {
+        return $this->estadoDe($cita) === EstadoCita::RESERVADA
+            && $cita->fecha_hora->lte(now()->endOfDay());
+    }
+
+    /** Solo se registra la inasistencia cuando la hora de la cita ya paso. */
+    public function sePuedeMarcarInasistencia(Cita $cita): bool
+    {
+        return $this->estadoDe($cita) === EstadoCita::RESERVADA
+            && $cita->fecha_hora->lte(now());
+    }
+
+    /**
      * Lee el estado de la cita admitiendo tanto el enum casteado por el modelo
      * como el texto crudo de la columna ENUM.
      */
-    private function estadoDe(Cita $cita): EstadoCita
+    public function estadoDe(Cita $cita): EstadoCita
     {
         $estado = $cita->estado;
 

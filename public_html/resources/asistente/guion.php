@@ -55,7 +55,7 @@ return [
         ],
     ],
     'envios' => [
-        'texto' => 'Hacemos despacho el mismo día en Santiago de Surco. Los pedidos confirmados antes de las 6 p.m. salen ese día; los posteriores, a la mañana siguiente.',
+        'texto' => 'Tienes dos opciones al confirmar: delivery en Santiago de Surco (S/ 8.00, gratis desde S/ 80.00) o recojo en tienda sin costo. Los pedidos pagados antes de las 6 p.m. salen ese día; los posteriores, a la mañana siguiente. Te escribimos cuando tu pedido sale o está listo para recoger, y lo sigues en Mis pedidos.',
         'opciones' => [
             0 => [
                 'texto' => '📦 Ver mis pedidos',

@@ -38,7 +38,15 @@ body {
   line-height: 1.65;
   -webkit-text-size-adjust: 100%;
   text-rendering: optimizeLegibility;
+  /* Footer siempre abajo: si el contenido es corto, <main> crece y empuja el
+     pie al fondo de la ventana en vez de dejarlo flotando a media pantalla. */
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
 }
+body > main { flex: 1 0 auto; }
+body > .pie { flex-shrink: 0; }
 
 h1, h2, h3 {
   font-family: "Fraunces", Georgia, "Times New Roman", serif;
