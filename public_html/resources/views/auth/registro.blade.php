@@ -17,15 +17,15 @@
             @csrf
             <div class="campo">
               <label for="reg-nombre">Nombre y apellido</label>
-              <input type="text" id="reg-nombre" name="nombre" value="{{ old('nombre') }}" autocomplete="name" required>
+              <input type="text" id="reg-nombre" name="nombre" value="{{ old('nombre') }}" maxlength="100" autocomplete="name" required>
             </div>
             <div class="campo" data-rn="RN-02" data-rn-nota="Correo único">
               <label for="reg-correo">Correo electr&oacute;nico</label>
-              <input type="email" id="reg-correo" name="correo" value="{{ old('correo') }}" autocomplete="email" required>
+              <input type="email" id="reg-correo" name="correo" value="{{ old('correo') }}" maxlength="100" autocomplete="email" required>
             </div>
             <div class="campo">
               <label for="reg-telefono">Tel&eacute;fono</label>
-              <input type="tel" id="reg-telefono" name="telefono" value="{{ old('telefono') }}" autocomplete="tel">
+              <input type="tel" id="reg-telefono" name="telefono" value="{{ old('telefono') }}" maxlength="15" placeholder="987 654 321" autocomplete="tel">
             </div>
             <div class="campo" data-rn="RN-03" data-rn-nota="Contraseña no legible">
               <label for="reg-clave">Contrase&ntilde;a</label>

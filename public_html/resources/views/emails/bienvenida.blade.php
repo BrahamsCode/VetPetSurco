@@ -1,6 +1,8 @@
 @extends('emails.plantilla', ['tipo' => 'bienvenida'])
 
-@section('titulo')&iexcl;Bienvenido a VetPet Connect, {{ $usuario->nombre }}!@endsection
+@section('titulo')
+&iexcl;Bienvenido a VetPet Connect, {{ $usuario->nombre }}!
+@endsection
 
 @section('contenido')
   <p style="margin:0 0 14px 0;">

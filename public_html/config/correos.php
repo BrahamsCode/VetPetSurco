@@ -41,6 +41,10 @@ return [
             'etiqueta' => 'Comprobante de pago',
             'color' => '#14524a',
         ],
+        'entrega' => [
+            'etiqueta' => 'Entrega de tu pedido',
+            'color' => '#2c7a6b',
+        ],
         'cita' => [
             'etiqueta' => 'Tu cita',
             'color' => '#2c7a6b',

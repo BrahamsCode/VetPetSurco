@@ -5,7 +5,9 @@
     $servicio = $cita->servicio instanceof \BackedEnum ? $cita->servicio->value : (string) $cita->servicio;
 @endphp
 
-@section('titulo')Tu cita est&aacute; confirmada@endsection
+@section('titulo')
+Tu cita est&aacute; confirmada
+@endsection
 
 @section('contenido')
   <p style="margin:0 0 14px 0;">

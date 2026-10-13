@@ -1,6 +1,8 @@
 @extends('emails.plantilla', ['tipo' => 'contacto'])
 
-@section('titulo')Mensaje de {{ $datos['nombre'] }}@endsection
+@section('titulo')
+Mensaje de {{ $datos['nombre'] }}
+@endsection
 
 @section('contenido')
   <p style="margin:0 0 14px 0;">

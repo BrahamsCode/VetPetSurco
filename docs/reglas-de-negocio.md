@@ -35,7 +35,7 @@ pantalla del prototipo se puede ver funcionando.
 | **RN-19** | Cada atención genera un único registro clínico | `cita_id UNIQUE` | `rn19RegistrarAtencion()` | 07 |
 | **RN-20** | Se avisa 15 días antes del próximo control | `v_recordatorios_salud` | `rn20Recordatorios()` | 07, 08 |
 | **RN-21** | Un pedido solo pasa a PAGADO si la pasarela aprueba | `pagos.estado ENUM` | `PagoService::cobrar()` | — |
-| **RN-22** | Una mascota no repite un plan vigente del mismo producto | — | `SuscripcionService::contratar()` | — |
+| **RN-22** | Cada mascota tiene un solo plan vigente (ACTIVO o PAUSADO) | — | `SuscripcionService::contratar()` | — |
 
 ## Reparto por capa
 

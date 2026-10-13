@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ModalidadEntrega;
 use App\Enums\TipoOrigen;
 use App\Exceptions\ReglaDeNegocioException;
 use App\Exceptions\StockInsuficienteException;
@@ -13,6 +14,7 @@ use App\Services\CorreoService;
 use App\Services\PedidoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 /**
@@ -30,12 +32,25 @@ class CarritoController extends Controller
         private readonly PedidoService $pedidos,
     ) {}
 
-    public function index(): View
+    public function index(Request $request): View
     {
+        $lineas = $this->carrito->items();
+
+        // Miniatura de cada linea, indexada por producto.
+        $imagenes = Producto::query()
+            ->whereIn('producto_id', array_map(fn ($l) => (int) data_get($l, 'producto_id'), $lineas))
+            ->get()
+            ->mapWithKeys(fn (Producto $p) => [$p->producto_id => $p->urlImagen()]);
+
         return view('app.carrito', [
-            'lineas' => $this->carrito->items(),
+            'lineas' => $lineas,
+            'imagenes' => $imagenes,
             'total' => $this->carrito->total(),
             'unidades' => $this->carrito->unidades(),
+            // Para precargar la direccion del delivery y calcular el envio en pantalla.
+            'direccionPerfil' => (string) $request->user()->direccion,
+            'envioCentimos' => PedidoService::ENVIO_CENTIMOS,
+            'envioGratisDesdeCentimos' => PedidoService::ENVIO_GRATIS_DESDE_CENTIMOS,
         ]);
     }
 
@@ -114,6 +129,17 @@ class CarritoController extends Controller
             ]);
         }
 
+        $datos = $request->validate([
+            'modalidad_entrega' => ['required', Rule::enum(ModalidadEntrega::class)],
+            'direccion_entrega' => ['required_if:modalidad_entrega,DELIVERY', 'nullable', 'string', 'min:8', 'max:255'],
+        ], [
+            'modalidad_entrega.required' => 'Elige si quieres delivery o recojo en tienda.',
+            'direccion_entrega.required_if' => 'Para el delivery necesitamos la direccion de entrega.',
+            'direccion_entrega.min' => 'Escribe la direccion completa: calle, numero y referencia.',
+        ]);
+        $modalidad = ModalidadEntrega::from($datos['modalidad_entrega']);
+        $direccion = trim((string) ($datos['direccion_entrega'] ?? ''));
+
         try {
             // RN-12: transaccion con bloqueo de filas; o entra todo o no entra nada.
             // RN-14: lo que sale del carrito es siempre una compra directa; los
@@ -122,6 +148,8 @@ class CarritoController extends Controller
                 $request->user(),
                 $lineas,
                 TipoOrigen::COMPRA_DIRECTA,
+                $modalidad,
+                $direccion,
             );
         } catch (StockInsuficienteException $e) {
             return back()->with('resultado', [
@@ -138,6 +166,12 @@ class CarritoController extends Controller
         }
 
         $this->carrito->vaciar();
+
+        // La primera direccion de delivery queda en el perfil para la proxima
+        // compra y para los despachos de suscripcion.
+        if ($modalidad === ModalidadEntrega::DELIVERY && blank($request->user()->direccion)) {
+            $request->user()->forceFill(['direccion' => $direccion])->save();
+        }
 
         // Confirmacion por correo con el detalle del pedido.
         app(CorreoService::class)->enviar(

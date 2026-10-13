@@ -11,7 +11,8 @@ use Throwable;
  * (PENDIENTE → PAGADO → ENVIADO → ENTREGADO), sin saltos ni vuelta atrás.
  *
  * Se lanza cuando se pide avanzar un pedido que ya está ENTREGADO o que fue
- * ANULADO, los dos casos en los que `EstadoPedido::siguiente()` no devuelve nada.
+ * ANULADO, cuando se intenta marcar como pagado a mano (eso solo lo hace la
+ * pasarela) o cuando se quiere anular un pedido que ya no está pendiente.
  */
 final class EstadoPedidoInvalidoException extends ReglaDeNegocioException
 {

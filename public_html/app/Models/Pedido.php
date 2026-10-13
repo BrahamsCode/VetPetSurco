@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\EstadoPedido;
+use App\Enums\ModalidadEntrega;
 use App\Enums\TipoOrigen;
+use App\Services\CarritoService;
 use Database\Factories\PedidoFactory;
+use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -35,16 +38,67 @@ class Pedido extends Model
         'cliente_id',
         'fecha_pedido',
         'monto_total',
+        'costo_envio',
         'tipo_origen',
+        'modalidad_entrega',
+        'direccion_entrega',
         'estado',
+        'enviado_en',
+        'entregado_en',
+        'anulado_en',
+        'motivo_anulacion',
     ];
 
     protected $casts = [
         'fecha_pedido' => 'datetime',
         'monto_total' => 'decimal:2',
+        'costo_envio' => 'decimal:2',
         'tipo_origen' => TipoOrigen::class,
+        'modalidad_entrega' => ModalidadEntrega::class,
         'estado' => EstadoPedido::class,
+        'enviado_en' => 'datetime',
+        'entregado_en' => 'datetime',
+        'anulado_en' => 'datetime',
     ];
+
+    /** Horas que tiene el cliente para pagar antes de que el pedido se anule. */
+    public const HORAS_PARA_PAGAR = 48;
+
+    // ---------------------------------------------------------------
+    // Reglas de lectura
+    // ---------------------------------------------------------------
+
+    /** Lo que se cobra: productos mas envio, en centimos exactos. */
+    public function totalACobrar(): string
+    {
+        return CarritoService::aDecimal(
+            CarritoService::aCentimos($this->monto_total) + CarritoService::aCentimos($this->costo_envio ?? 0),
+        );
+    }
+
+    public function modalidad(): ModalidadEntrega
+    {
+        return $this->modalidad_entrega instanceof ModalidadEntrega
+            ? $this->modalidad_entrega
+            : ModalidadEntrega::from((string) ($this->modalidad_entrega ?? ModalidadEntrega::RECOJO->value));
+    }
+
+    public function estadoActual(): EstadoPedido
+    {
+        return $this->estado instanceof EstadoPedido ? $this->estado : EstadoPedido::from((string) $this->estado);
+    }
+
+    /** Estado con el nombre que corresponde a la modalidad ("En camino", "Listo para recoger"). */
+    public function etiquetaEstado(): string
+    {
+        return $this->estadoActual()->etiquetaPara($this->modalidad());
+    }
+
+    /** Hasta cuando puede pagarse un pedido pendiente. */
+    public function vencePagoEl(): Carbon
+    {
+        return $this->fecha_pedido->copy()->addHours(self::HORAS_PARA_PAGAR);
+    }
 
     // ---------------------------------------------------------------
     // Relaciones
